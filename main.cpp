@@ -1,0 +1,28 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <string>
+#include <algorithm>
+#include <iomanip>
+#include "Scanner.h"
+
+using namespace std;
+
+int main(int argc, char* argv[]) {
+    InitStates();
+    if (argc == 1) {
+        std::cout << "error: no input file";
+    }
+    if (argc == 3) {
+        if (strcmp(argv[1], "-s") == 0) {
+            Scanner scanner(argv[2]);
+            Lexem l;
+            while (l.tokenType != T_EOF) {
+                l = scanner.NextToken();
+                cout << left << setw(10) << l.pos.first << setw(10) <<l.pos.second << setw(25) << enum_to_str[l.tokenType] << l.val << setw(10) << endl;
+            }
+        }
+    }
+
+    return 0;
+}
