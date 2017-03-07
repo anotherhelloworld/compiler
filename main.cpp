@@ -17,9 +17,9 @@ int main(int argc, char* argv[]) {
         if (strcmp(argv[1], "-s") == 0) {
             Scanner scanner(argv[2]);
             Lexem l;
-            while (l.tokenType != T_EOF) {
+            while (l.token != T_EOF) {
                 l = scanner.NextToken();
-                cout << left << setw(10) << l.pos.first << setw(10) <<l.pos.second << setw(25) << enum_to_str[l.tokenType] << l.val << setw(10) << endl;
+                cout << left << setw(10) << l.pos.first << setw(10) <<l.pos.second << setw(25) << enumToStr[l.token] << l.val << setw(10) << endl;
             }
         }
     }

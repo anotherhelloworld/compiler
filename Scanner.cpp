@@ -1,106 +1,106 @@
 #include "Scanner.h"
 
-void fillWith(Token state, TokenType bl, TokenType sl, TokenType nums) {
+void fillWith(TokenType state, ScannerState bl, ScannerState sl, ScannerState nums) {
     for (char c = 'A'; c <= 'Z'; c++) {
-        states_global[state][c] = bl;
+        statesGlobal[state][c] = bl;
     }
     for (char c = 'a'; c <= 'z'; c++) {
-        states_global[state][c] = sl;
+        statesGlobal[state][c] = sl;
     }
     for (char c = '0'; c <= '9'; c++) {
-        states_global[state][c] = nums;
+        statesGlobal[state][c] = nums;
     }
 }
 
-void fillWith(Token state, bool add, bool save) {
+void fillWith(TokenType state, bool add, bool save) {
     for (auto c: tokensStr) {
-        states_global[state][c] = TokenType(tokenToTokenType[c], add, save);
+        statesGlobal[state][c] = ScannerState(tokenToTokenType[c], add, save);
     }
-    states_global[state]['\n'] = TokenType(START, add, save, false, false);
-    states_global[state]['\t'] = TokenType(START, add, save, false, false);
-    states_global[state]['\0'] = TokenType(START, add, save, false, false);
-    states_global[state][' '] = TokenType(START, add, save, false, false);
-    states_global[state]['{'] = TokenType(COMMENT, add, save, false, false);
-    states_global[state]['\''] = TokenType(TOKEN_STRING, add, save, false, false);
+    statesGlobal[state]['\n'] = ScannerState(START, add, save, false, false);
+    statesGlobal[state]['\t'] = ScannerState(START, add, save, false, false);
+    statesGlobal[state]['\0'] = ScannerState(START, add, save, false, false);
+    statesGlobal[state][' '] = ScannerState(START, add, save, false, false);
+    statesGlobal[state]['{'] = ScannerState(COMMENT, add, save, false, false);
+    statesGlobal[state]['\''] = ScannerState(TOKEN_STRING, add, save, false, false);
 };
 
 void InitStates() {
-    for (int i = START; i < states_global.size(); i++) {
+    for (int i = START; i < statesGlobal.size(); i++) {
         if (i == START) {
-            fillWith(START, TokenType(IDENTIFICATOR), TokenType(IDENTIFICATOR), TokenType(NUMBER));
+            fillWith(START, ScannerState(IDENTIFICATOR), ScannerState(IDENTIFICATOR), ScannerState(NUMBER));
             fillWith(START, false, false);
         }
         if (i == NUMBER || i == REAL_NUMBER) {
-            TokenType tmp = TokenType(ERROR, false, false, false, false, "Unknown symbol in ");
-            fillWith((Token)i, tmp, tmp, TokenType((Token)i));
-            fillWith((Token)i, false, true);
+            ScannerState tmp = ScannerState(ERROR, false, false, false, false, "Unknown symbol in ");
+            fillWith((TokenType)i, tmp, tmp, ScannerState((TokenType)i));
+            fillWith((TokenType)i, false, true);
         }
         if (i == NUMBER_E) {
-            TokenType tmp = TokenType(ERROR, false, false, false, false, "Unknown symbol in ");
-            fillWith((Token)i, tmp, tmp, TokenType(NUMBER_E));
-            fillWith((Token)i, false, true);
+            ScannerState tmp = ScannerState(ERROR, false, false, false, false, "Unknown symbol in ");
+            fillWith((TokenType)i, tmp, tmp, ScannerState(NUMBER_E));
+            fillWith((TokenType)i, false, true);
         }
         if (i == NUMBER_E_POW) {
-            TokenType tmp = TokenType(ERROR, false, false, false, false, "Unknown symbol in ");
-            fillWith((Token)i, tmp, tmp, TokenType(NUMBER_E_POW));
-            fillWith((Token)i, false, true);
+            ScannerState tmp = ScannerState(ERROR, false, false, false, false, "Unknown symbol in ");
+            fillWith((TokenType)i, tmp, tmp, ScannerState(NUMBER_E_POW));
+            fillWith((TokenType)i, false, true);
         }
         if (i >= BIT_NOT && i < COMMENT) {
-            fillWith((Token)i, TokenType(IDENTIFICATOR, false, true), TokenType(IDENTIFICATOR, false, true), TokenType(NUMBER, false, true));
-            fillWith((Token)i, false, true);
+            fillWith((TokenType)i, ScannerState(IDENTIFICATOR, false, true), ScannerState(IDENTIFICATOR, false, true), ScannerState(NUMBER, false, true));
+            fillWith((TokenType)i, false, true);
         }
         if (i == IDENTIFICATOR) {
-            fillWith(IDENTIFICATOR, TokenType(IDENTIFICATOR), TokenType(IDENTIFICATOR), TokenType(IDENTIFICATOR));
+            fillWith(IDENTIFICATOR, ScannerState(IDENTIFICATOR), ScannerState(IDENTIFICATOR), ScannerState(IDENTIFICATOR));
             fillWith(IDENTIFICATOR, false, true);
         }
         if (i == COMMENT || i == SINGLE_COMMENT) {
-            fillWith((Token)i, TokenType((Token)i, false, false, false, false), TokenType((Token)i, false, false, false, false),
-                     TokenType((Token)i, false, false, false, false));
+            fillWith((TokenType)i, ScannerState((TokenType)i, false, false, false, false), ScannerState((TokenType)i, false, false, false, false),
+                     ScannerState((TokenType)i, false, false, false, false));
             for (auto c: tokensStr) {
-                states_global[(Token)i][c] = TokenType((Token)i, false, false, false, false);
+                statesGlobal[(TokenType)i][c] = ScannerState((TokenType)i, false, false, false, false);
             }
-            states_global[COMMENT]['}'] = TokenType(START, false, false, false, false);
-            states_global[COMMENT][EOF] = TokenType(ERROR, false, false, false, false, "Unexpected EOF in ");
+            statesGlobal[COMMENT]['}'] = ScannerState(START, false, false, false, false);
+            statesGlobal[COMMENT][EOF] = ScannerState(ERROR, false, false, false, false, "Unexpected EOF in ");
         }
         if (i == TOKEN_STRING) {
-            fillWith(TOKEN_STRING, TokenType(TOKEN_STRING), TokenType(TOKEN_STRING), TokenType(TOKEN_STRING));
+            fillWith(TOKEN_STRING, ScannerState(TOKEN_STRING), ScannerState(TOKEN_STRING), ScannerState(TOKEN_STRING));
             for (auto c: tokensStr) {
-                states_global[TOKEN_STRING][c] = TokenType(TOKEN_STRING);
+                statesGlobal[TOKEN_STRING][c] = ScannerState(TOKEN_STRING);
             }
 
         }
 
     }
 
-    states_global[NUMBER]['.'] = TokenType(REAL_NUMBER, false, false);
-    states_global[NUMBER]['e'] = TokenType(NUMBER_E, false, false);
-    states_global[REAL_NUMBER]['.'] = TokenType(DOUBLE_POINT, true, true, true);
-    states_global[NUMBER_E]['+'] = TokenType(NUMBER_E_POW, false, false);
-    states_global[NUMBER_E]['-'] = TokenType(NUMBER_E_POW, false, false);
-    states_global[POINT]['.'] = TokenType(POINT, true, true, true);
-    states_global[ADD]['=']  = TokenType(EQUAL, true, true, true);
-    states_global[COLON]['=']  = TokenType(EQUAL, true, true, true);
-    states_global[MULT]['=']  = TokenType(EQUAL, true, true, true);
-    states_global[DIVISION]['=']  = TokenType(EQUAL, true, true, true);
-    states_global[SUB]['='] = TokenType(EQUAL, true, true, true);
-    states_global[LESS_THAN]['='] = TokenType(EQUAL, true, true, true);
-    states_global[GREATER_THAN]['='] = TokenType(EQUAL, true, true, true);
-    states_global[COLON]['='] = TokenType(EQUAL, true, true, true);
-    states_global[LESS_THAN]['>'] = TokenType(GREATER_THAN, true, true, true);
-    states_global[LESS_THAN]['<'] = TokenType(LESS_THAN, true, true, true);
-    states_global[GREATER_THAN]['>'] = TokenType(GREATER_THAN, true, true, true);
-    states_global[DIVISION]['/']  = TokenType(DIVISION, true, true, true);
-    states_global[MULT]['*']  = TokenType(MULT, true, true, true);
-    states_global[IDENTIFICATOR]['_'] = TokenType(IDENTIFICATOR);
-    states_global[DIVISION]['/'] = TokenType(SINGLE_COMMENT, false, false, false, false);
-    states_global[SINGLE_COMMENT]['\n'] = TokenType(START, false, false, false, false);
-    states_global[SINGLE_COMMENT]['\t'] = TokenType(START, false, false, false, false);
-    states_global[SINGLE_COMMENT]['\0'] = TokenType(START, false, false, false, false);
-    states_global[TOKEN_STRING]['\''] = TokenType(START, false, true, false, false);
-    states_global[TOKEN_STRING][EOF] = TokenType(ERROR, false, false, false, false, "Unexpected EOF in ");
+    statesGlobal[NUMBER]['.'] = ScannerState(REAL_NUMBER, false, false);
+    statesGlobal[NUMBER]['e'] = ScannerState(NUMBER_E, false, false);
+    statesGlobal[REAL_NUMBER]['.'] = ScannerState(DOUBLE_POINT, true, true, true);
+    statesGlobal[NUMBER_E]['+'] = ScannerState(NUMBER_E_POW, false, false);
+    statesGlobal[NUMBER_E]['-'] = ScannerState(NUMBER_E_POW, false, false);
+    statesGlobal[POINT]['.'] = ScannerState(POINT, true, true, true);
+    statesGlobal[ADD]['=']  = ScannerState(EQUAL, true, true, true);
+    statesGlobal[COLON]['=']  = ScannerState(EQUAL, true, true, true);
+    statesGlobal[MULT]['=']  = ScannerState(EQUAL, true, true, true);
+    statesGlobal[DIVISION]['=']  = ScannerState(EQUAL, true, true, true);
+    statesGlobal[SUB]['='] = ScannerState(EQUAL, true, true, true);
+    statesGlobal[LESS_THAN]['='] = ScannerState(EQUAL, true, true, true);
+    statesGlobal[GREATER_THAN]['='] = ScannerState(EQUAL, true, true, true);
+    statesGlobal[COLON]['='] = ScannerState(EQUAL, true, true, true);
+    statesGlobal[LESS_THAN]['>'] = ScannerState(GREATER_THAN, true, true, true);
+    statesGlobal[LESS_THAN]['<'] = ScannerState(LESS_THAN, true, true, true);
+    statesGlobal[GREATER_THAN]['>'] = ScannerState(GREATER_THAN, true, true, true);
+    statesGlobal[DIVISION]['/']  = ScannerState(DIVISION, true, true, true);
+    statesGlobal[MULT]['*']  = ScannerState(MULT, true, true, true);
+    statesGlobal[IDENTIFICATOR]['_'] = ScannerState(IDENTIFICATOR);
+    statesGlobal[DIVISION]['/'] = ScannerState(SINGLE_COMMENT, false, false, false, false);
+    statesGlobal[SINGLE_COMMENT]['\n'] = ScannerState(START, false, false, false, false);
+    statesGlobal[SINGLE_COMMENT]['\t'] = ScannerState(START, false, false, false, false);
+    statesGlobal[SINGLE_COMMENT]['\0'] = ScannerState(START, false, false, false, false);
+    statesGlobal[TOKEN_STRING]['\''] = ScannerState(START, false, true, false, false);
+    statesGlobal[TOKEN_STRING][EOF] = ScannerState(ERROR, false, false, false, false, "Unexpected EOF in ");
 
-//    for (auto i : states_global[TOKEN_STRING]) {
-//        std::cout << i.first << "   " << enum_to_str[i.second.tokenType] << "   " <<i.second.add << "  " << i.second.to_save << std::endl;
+//    for (auto i : statesGlobal[TOKEN_STRING]) {
+//        std::cout << i.first << "   " << enum_to_str[i.second.token] << "   " <<i.second.add << "  " << i.second.toSave << std::endl;
 //    }
 
 };
@@ -110,84 +110,84 @@ Scanner::Scanner(char* filename) {
 }
 
 void Scanner::CheckSymbol(int c) {
-    if (current_state.to_save && current_state.tokenType != START) {
-        to_save += (char)c;
+    if (currentState.toSave && currentState.token != START) {
+        toSave += (char)c;
     }
 }
 
 void Scanner::CheckError() {
-    if (current_state.tokenType == ERROR) {
-            std::cout << current_state.errorMsg << "(" << cur_pos.first << ", " << cur_pos.second + 1 << ")" << std::endl;
+    if (currentState.token == ERROR) {
+            std::cout << currentState.errorMsg << "(" << pos.first << ", " << pos.second + 1 << ")" << std::endl;
             exit(0);
     }
 }
 
-Lexem Scanner::SaveLexem(TokenType last, Lexem l) {
-    if (current_state.add) {
-        l.val += to_save.back();
-        if (current_state.find) {
+Lexem Scanner::SaveLexem(ScannerState last, Lexem l) {
+    if (currentState.add) {
+        l.val += toSave.back();
+        if (currentState.find) {
             if (doubleOperators.find(l.val) != doubleOperators.end()) {
-                l.tokenType = doubleOperators[l.val];
+                l.token = doubleOperators[l.val];
             }
         }
-        current_state = TokenType(START);
+        currentState = ScannerState(START);
     }
 
-    to_save = to_save.substr(l.val.length(), to_save.length() - l.val.length());
+    toSave = toSave.substr(l.val.length(), toSave.length() - l.val.length());
 
-    if (l.tokenType == IDENTIFICATOR) {
-        if (reserve_words.find(l.val) != reserve_words.end()) {
-            l.tokenType = reserve_words[l.val];
+    if (l.token == IDENTIFICATOR) {
+        if (reserveWords.find(l.val) != reserveWords.end()) {
+            l.token = reserveWords[l.val];
         }
     }
-    l.pos = std::make_pair(cur_pos.first, cur_pos.second - l.val.length() + 1);
+    l.pos = std::make_pair(pos.first, pos.second - l.val.length() + 1);
     return l;
 }
 
-TokenType Scanner::ChangeState(int c) {
-    TokenType last = current_state;
-    current_state = states_global[current_state.tokenType][(char)c];
+ScannerState Scanner::ChangeState(int c) {
+    ScannerState last = currentState;
+    currentState = statesGlobal[currentState.token][(char)c];
     CheckError();
     return last;
 }
 
 void Scanner::IncPos(char c) {
-    cur_pos.second++;
+    pos.second++;
     if (c == '\n') {
-        cur_pos.first++;
-        cur_pos.second = 0;
+        pos.first++;
+        pos.second = 0;
     }
 }
 
 Lexem Scanner::NextToken() {
     int c;
     Lexem l;
-    while ((backbuffer.length() > 0 && (c = backbuffer[0])) || ((c = getchar()) != EOF)) {
+    while ((backBuffer.length() > 0 && (c = backBuffer[0])) || ((c = getchar()) != EOF)) {
         bool increnemnt = false;
-        if (backbuffer.length() > 0) {
-            backbuffer = backbuffer.substr(1, backbuffer.length());
+        if (backBuffer.length() > 0) {
+            backBuffer = backBuffer.substr(1, backBuffer.length());
             increnemnt = true;
             IncPos(c);
         }
 
-        if (states_global[current_state.tokenType][(char)c].tokenType == DOUBLE_POINT) {
-            if (to_save.length() > 1) {
-                l = Lexem(to_save.substr(0, to_save.length() - 1), NUMBER, std::make_pair(cur_pos.first, cur_pos.second - l.val.length()));
-                to_save = to_save.substr(to_save.length() - 1, 1);
-                backbuffer = to_save.back();
+        if (statesGlobal[currentState.token][(char)c].token == DOUBLE_POINT) {
+            if (toSave.length() > 1) {
+                l = Lexem(toSave.substr(0, toSave.length() - 1), NUMBER, std::make_pair(pos.first, pos.second - l.val.length()));
+                toSave = toSave.substr(toSave.length() - 1, 1);
+                backBuffer = toSave.back();
                 return l;
             }
         }
 
-        TokenType last = ChangeState(c);
+        ScannerState last = ChangeState(c);
 
-        l = Lexem(to_save, last.tokenType);
+        l = Lexem(toSave, last.token);
 
         CheckSymbol(c);
 
 
-        bool flag = current_state.save;
-        if (current_state.save) {
+        bool flag = currentState.save;
+        if (currentState.save) {
             l = SaveLexem(last, l);
         }
 
@@ -203,13 +203,13 @@ Lexem Scanner::NextToken() {
 
     eof = true;
 
-    TokenType last = ChangeState(c);
+    ScannerState last = ChangeState(c);
 
-    if (current_state.save) {
-        l = Lexem(to_save, last.tokenType, std::make_pair(cur_pos.first, cur_pos.second - to_save.length() + 1));
-        if (l.tokenType == IDENTIFICATOR) {
-            if (reserve_words.find(l.val) != reserve_words.end()) {
-                l.tokenType = reserve_words[l.val];
+    if (currentState.save) {
+        l = Lexem(toSave, last.token, std::make_pair(pos.first, pos.second - toSave.length() + 1));
+        if (l.token == IDENTIFICATOR) {
+            if (reserveWords.find(l.val) != reserveWords.end()) {
+                l.token = reserveWords[l.val];
             }
         }
         return l;
@@ -217,7 +217,7 @@ Lexem Scanner::NextToken() {
 
     if (eof) {
         eof = false;
-        return Lexem("EOF", T_EOF, std::make_pair(cur_pos.first, cur_pos.second));
+        return Lexem("EOF", T_EOF, std::make_pair(pos.first, pos.second));
     }
 }
 

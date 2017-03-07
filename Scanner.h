@@ -7,7 +7,7 @@
 #include <map>
 #include <iostream>
 
-enum Token {
+enum TokenType {
     START = 0, NUMBER, REAL_NUMBER, NUMBER_E, NUMBER_E_POW, IDENTIFICATOR,
 
     BIT_NOT, HASH, HEX_VALUE, PERCENT, BIT_AND, OPEN_BRACKET, CLOSE_BRACKET, MULT,
@@ -29,7 +29,7 @@ enum Token {
     TOKEN_STRING, T_EOF, ERROR, COUNT,
 };
 
-static std::vector<std::string> enum_to_str {
+static std::vector<std::string> enumToStr {
     "START", "NUMBER", "REAL_NUMBER", "NUMBER", "NUMBER", "IDENTIFICATOR",
 
     "BIT_NOT", "HASH", "HEX_VALUE", "PERCENT", "BIT_AND", "OPEN_BRACKET", "CLOSE_BRACKET", "MULT",
@@ -54,7 +54,7 @@ static std::vector<std::string> enum_to_str {
     "TOKEN_STRING", "T_EOF", "ERROR", "COUNT"
 };
 
-static std::map <std::string, Token> reserve_words = {
+static std::map <std::string, TokenType> reserveWords = {
         {"and", AND},
         {"array", ARRAY},
         {"asm", ASM},
@@ -122,7 +122,7 @@ static std::map <std::string, Token> reserve_words = {
         {"char", CHAR}
 };
 
-static std::map <std::string, Token> doubleOperators = {
+static std::map <std::string, TokenType> doubleOperators = {
         {"<>", NOT_EQUAL},
         {">=", GREATER_OR_EQUAL_THAN},
         {"<=", LESS_OR_EQUAL_THAN},
@@ -138,7 +138,7 @@ static std::map <std::string, Token> doubleOperators = {
         {"..", DOUBLE_POINT},
 };
 
-static std::map <int, Token> tokenToTokenType = {
+static std::map <int, TokenType> tokenToTokenType = {
         {'+', ADD},
         {'-', SUB},
         {'*', MULT},
@@ -179,27 +179,27 @@ static std::vector <int> tokensStr = {
         '[', ']', '^', '_', '{', '}', ' ', '\n', '\t', '\0', EOF
 };
 
-struct TokenType {
-    Token tokenType;
+struct ScannerState {
+    TokenType token;
     bool add;
     bool save;
     bool find;
-    bool to_save;
+    bool toSave;
     std::string errorMsg;
-    TokenType(Token tokenType = START, bool add = false, bool save = false, bool find = false, bool to_save = true,
+    ScannerState(TokenType token = START, bool add = false, bool save = false, bool find = false, bool toSave = true,
               std::string errorMsg = ""):
-            tokenType(tokenType), add(add), save(save), find(find), to_save(to_save), errorMsg(errorMsg) {};
-    ~TokenType() {};
+            token(token), add(add), save(save), find(find), toSave(toSave), errorMsg(errorMsg) {};
+    ~ScannerState() {};
 };
 
-static std::vector <std::map <char, TokenType>> states_global(COUNT);
+static std::vector <std::map <char, ScannerState>> statesGlobal(COUNT);
 
 struct Lexem {
     std::string val;
-    Token tokenType;
+    TokenType token;
     std::pair <int, int> pos;
-    Lexem(std::string val = "START", Token tokenType = START, std::pair <int, int> pos = std::make_pair(1, 1)):
-            val(val), tokenType(tokenType), pos(pos) {};
+    Lexem(std::string val = "START", TokenType token = START, std::pair <int, int> pos = std::make_pair(1, 1)):
+            val(val), token(token), pos(pos) {};
 };
 
 class Scanner {
@@ -209,20 +209,20 @@ public:
 private:
     void CheckSymbol(int);
     void CheckError();
-    Lexem SaveLexem(TokenType, Lexem);
-    TokenType ChangeState(int);
+    Lexem SaveLexem(ScannerState, Lexem);
+    ScannerState ChangeState(int);
     void IncPos(char);
 
-    FILE* source_;
-    TokenType current_state;
-    std::string to_save = "";
-    std::string backbuffer = "";
+    FILE* source;
+    ScannerState currentState;
+    std::string toSave = "";
+    std::string backBuffer = "";
     bool eof = false;
-    std::pair <int, int> cur_pos = std::make_pair(1, 0);
+    std::pair <int, int> pos = std::make_pair(1, 0);
 };
 
 void InitStates();
-void fillWith(Token state, TokenType bl, TokenType sl, TokenType nums);
-void fillWith(Token state, bool add, bool save);
+void fillWith(TokenType state, ScannerState bl, ScannerState sl, ScannerState nums);
+void fillWith(TokenType state, bool add, bool save);
 
 #endif //COMPILER_SCANNER_H
