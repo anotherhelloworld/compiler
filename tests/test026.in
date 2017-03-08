@@ -1,0 +1,4 @@
+var
+  set1: set of 1..10;
+  set2: set of 'a'..'z';
+  set3: set of pear..orange;

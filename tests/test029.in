@@ -1,0 +1,4 @@
+var { asdas }
+ d:set of char;
+begin { asdasdas }
+ d:=['a','b']; 

@@ -1,0 +1,6 @@
+1         1         NUMBER                   123
+1         5         NUMBER                   321
+2         1         NUMBER                   9854e-23
+2         9         SUB                      -
+2         10        NUMBER                   567
+2         12        T_EOF                    EOF

@@ -1,0 +1,5 @@
+1         1         NUMBER                   1
+1         2         DOUBLE_POINT             ..
+1         4         POINT                    .
+1         5         NUMBER                   1213
+1         8         T_EOF                    EOF

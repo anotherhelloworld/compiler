@@ -1,0 +1,4 @@
+1         2         TOKEN_STRING             test test test test
+2         2         TOKEN_STRING             
+3         2         TOKEN_STRING             test
+3         6         T_EOF                    EOF
