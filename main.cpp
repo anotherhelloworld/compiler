@@ -9,7 +9,6 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    InitStates();
     if (argc == 1) {
         std::cout << "error: no input file";
     }

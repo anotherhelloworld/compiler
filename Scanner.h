@@ -192,8 +192,6 @@ struct ScannerState {
     ~ScannerState() {};
 };
 
-static std::vector <std::map <char, ScannerState>> statesGlobal(COUNT);
-
 struct Lexem {
     std::string val;
     TokenType token;
@@ -220,9 +218,5 @@ private:
     bool eof = false;
     std::pair <int, int> pos = std::make_pair(1, 0);
 };
-
-void InitStates();
-void fillWith(TokenType state, ScannerState bl, ScannerState sl, ScannerState nums);
-void fillWith(TokenType state, bool add, bool save);
 
 #endif //COMPILER_SCANNER_H

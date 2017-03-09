@@ -1,5 +1,7 @@
 #include "Scanner.h"
 
+static std::vector <std::map <char, ScannerState>> statesGlobal(COUNT);
+
 void fillWith(TokenType state, ScannerState bl, ScannerState sl, ScannerState nums) {
     for (char c = 'A'; c <= 'Z'; c++) {
         statesGlobal[state][c] = bl;
@@ -107,6 +109,7 @@ void InitStates() {
 
 Scanner::Scanner(char* filename) {
     freopen(filename, "r", stdin);
+    InitStates();
 }
 
 void Scanner::CheckSymbol(int c) {
@@ -220,6 +223,3 @@ Lexem Scanner::NextToken() {
         return Lexem("EOF", T_EOF, std::make_pair(pos.first, pos.second));
     }
 }
-
-
-
