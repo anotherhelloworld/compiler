@@ -210,6 +210,8 @@ private:
     Lexem SaveLexem(ScannerState, Lexem);
     ScannerState ChangeState(int);
     void IncPos(char);
+    void ReplaceEscapeSymbols(int, std::string);
+    Lexem TokenStrChgPos(Lexem);
 
     FILE* source;
     ScannerState currentState;
@@ -217,6 +219,7 @@ private:
     std::string backBuffer = "";
     bool eof = false;
     std::pair <int, int> pos = std::make_pair(1, 0);
+    int toSaveLenStr = 0;
 };
 
 #endif //COMPILER_SCANNER_H

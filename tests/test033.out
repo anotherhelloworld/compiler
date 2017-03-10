@@ -1,0 +1,13 @@
+1         2         TOKEN_STRING             sss
+aaa
+2         2         TOKEN_STRING             s\a
+3         2         TOKEN_STRING             sss	aaa
+4         2         TOKEN_STRING             sss
+aaa
+5         2         TOKEN_STRING             sss\aaa
+6         2         TOKEN_STRING             sss'aaa
+7         1         TOKEN_STRING             sssaaa
+8         2         TOKEN_STRING             sssaaa
+9         2         TOKEN_STRING             sssaaa
+10        2         TOKEN_STRING             sssaaa
+10        8         T_EOF                    EOF

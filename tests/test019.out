@@ -1,8 +1,6 @@
-1         1         FUNCTION                 function
-1         10        IDENTIFICATOR            foo
-1         18        IDENTIFICATOR            asd
-3         1         ARRAY                    array
-5         1         OF                       of
-5         7         MOD                      mod
-5         11        DIV                      div
-7         0         T_EOF                    EOF
+1         2         TOKEN_STRING             
+1         5         TOKEN_STRING             
+1         8         TOKEN_STRING             
+1         11        TOKEN_STRING             
+1         14        TOKEN_STRING             
+1         14        T_EOF                    EOF

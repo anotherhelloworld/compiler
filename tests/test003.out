@@ -1,4 +1,2 @@
-1         1         REAL_NUMBER              1.1
-2         1         REAL_NUMBER              123.321
-3         1         REAL_NUMBER              12.12
-3         5         T_EOF                    EOF
+3         1         CLOSE_BRACE              }
+3         1         T_EOF                    EOF

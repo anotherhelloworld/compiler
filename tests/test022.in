@@ -1,2 +1,4 @@
-a mod b
-c div b
+a, b, c: integer;
+a:=10;
+a+=c;
+b: boolean;

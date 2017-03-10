@@ -1,4 +1,6 @@
-1         2         TOKEN_STRING             test test test test
-2         2         TOKEN_STRING             
-3         2         TOKEN_STRING             test
-3         6         T_EOF                    EOF
+1         1         NUMBER                   123
+1         5         NUMBER                   321
+2         1         NUMBER                   9854e-23
+2         9         SUB                      -
+2         10        NUMBER                   567
+2         12        T_EOF                    EOF

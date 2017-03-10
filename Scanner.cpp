@@ -112,9 +112,48 @@ Scanner::Scanner(char* filename) {
     InitStates();
 }
 
+void Scanner::ReplaceEscapeSymbols(int replaceLen, std::string escapeSymbols) {
+    toSave.pop_back();
+    toSave += escapeSymbols;
+    toSaveLenStr += replaceLen;
+    return;
+}
+
+Lexem Scanner::TokenStrChgPos(Lexem l) {
+    if (l.token == TOKEN_STRING) {
+        l.pos = std::make_pair(pos.first, pos.second - toSaveLenStr + 1);
+    }
+    return l;
+}
+
 void Scanner::CheckSymbol(int c) {
-    if (currentState.toSave && currentState.token != START) {
+    if ((currentState.toSave && currentState.token != START) || (toSave.back() == '\\' && c == '\'')) {
+        if ((currentState.token == TOKEN_STRING && toSave.back() == '\\') || (toSave.back() == '\\' && c == '\'')) {
+            if ((char)c == 'n') {
+                return ReplaceEscapeSymbols(1, "\n");
+            }
+            if ((char)c == 't') {
+                return ReplaceEscapeSymbols(1, "\t");
+            }
+            if ((char)c == '\'') {
+                currentState = ScannerState(TOKEN_STRING);
+                return ReplaceEscapeSymbols(1, "\'");
+            }
+            if ((char)c == '\\') {
+                return ReplaceEscapeSymbols(1, "\\");
+            }
+            if ((char)c == 'b') {
+                return ReplaceEscapeSymbols(2, "\b");
+            }
+            if ((char)c == 'f') {
+                return ReplaceEscapeSymbols(1, "\f");
+            }
+            if ((char)c == 'v') {
+                return ReplaceEscapeSymbols(1, "\v");
+            }
+        }
         toSave += (char)c;
+        toSaveLenStr++;
     }
 }
 
@@ -143,8 +182,9 @@ Lexem Scanner::SaveLexem(ScannerState last, Lexem l) {
             l.token = reserveWords[l.val];
         }
     }
+
     l.pos = std::make_pair(pos.first, pos.second - l.val.length() + 1);
-    return l;
+    return TokenStrChgPos(l);
 }
 
 ScannerState Scanner::ChangeState(int c) {
@@ -165,6 +205,7 @@ void Scanner::IncPos(char c) {
 Lexem Scanner::NextToken() {
     int c;
     Lexem l;
+    toSaveLenStr = 0;
     while ((backBuffer.length() > 0 && (c = backBuffer[0])) || ((c = getchar()) != EOF)) {
         bool increnemnt = false;
         if (backBuffer.length() > 0) {
@@ -215,7 +256,7 @@ Lexem Scanner::NextToken() {
                 l.token = reserveWords[l.val];
             }
         }
-        return l;
+        return TokenStrChgPos(l);
     }
 
     if (eof) {

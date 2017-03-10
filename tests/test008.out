@@ -1,2 +1,9 @@
-1         2         TOKEN_STRING             sadsa
-Unexpected EOF in (4, 2)
+1         1         PROGRAM                  program
+1         9         IDENTIFICATOR            z1
+1         11        SEMI_COLON               ;
+2         1         VAR                      var
+2         5         IDENTIFICATOR            a
+2         6         COLON                    :
+2         8         INTEGER                  integer
+2         15        SEMI_COLON               ;
+2         15        T_EOF                    EOF

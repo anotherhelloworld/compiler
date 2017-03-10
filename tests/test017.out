@@ -1,6 +1,5 @@
-1         2         TOKEN_STRING             
-1         5         TOKEN_STRING             
-1         8         TOKEN_STRING             
-1         11        TOKEN_STRING             
-1         14        TOKEN_STRING             
-1         14        T_EOF                    EOF
+1         1         NUMBER                   1
+1         2         DOUBLE_POINT             ..
+1         4         POINT                    .
+1         5         NUMBER                   1213
+1         8         T_EOF                    EOF

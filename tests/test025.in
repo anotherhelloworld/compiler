@@ -1,4 +1,3 @@
-var
-  x: 1..10;
-  y: 'a'..'z';
-  z: pear..orange;
+for i:= 1
+
+fori := 1

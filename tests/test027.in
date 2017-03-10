@@ -1,1 +1,4 @@
-if i in [5..10] then
+var
+  x: 1..10;
+  y: 'a'..'z';
+  z: pear..orange;
