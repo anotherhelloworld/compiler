@@ -163,8 +163,7 @@ void Scanner::CheckSymbol(int c) {
 
 void Scanner::CheckError() {
     if (currentState.token == ERROR) {
-            std::cout << currentState.errorMsg << "(" << pos.first << ", " << pos.second + 1 << ")" << std::endl;
-            exit(0);
+        throw ScannerException(currentState.errorMsg + "(" + std::to_string(pos.first) + ", " + std::to_string(pos.second + 1) + ")");
     }
 }
 

@@ -37,15 +37,19 @@ void ExpressionUnOp::Print(int deep) {
 }
 
 Parser::Parser(char* filename): scanner(filename) {
-    Lexem l;
-    while (l.token != T_EOF) {
-        scanner.NextToken();
-        l = scanner.GetLexem();
-        if (l.token == NUMBER || l.token == REAL_NUMBER || l.token == IDENTIFICATOR || l.token == OPEN_BRACKET ||
+    try {
+        Lexem l;
+        while (l.token != T_EOF) {
+            scanner.NextToken();
+            l = scanner.GetLexem();
+            if (l.token == NUMBER || l.token == REAL_NUMBER || l.token == IDENTIFICATOR || l.token == OPEN_BRACKET ||
                 l.token == ADD || l.token == SUB || l.token == TRUE || l.token == FALSE || l.token == NOT) {
-            expression = ParseExpression();
-            return;
+                expression = ParseExpression();
+                return;
+            }
         }
+    } catch (ScannerException) {
+        throw ParserException("Syntax error");
     }
 }
 
@@ -97,8 +101,7 @@ Expression* Parser::ParseFactor() {
     if (lex.token == OPEN_BRACKET) {
         auto curExp = ParseExpression();
         if (scanner.GetLexem().token != CLOSE_BRACKET) {
-            std::cout << "error";
-            exit(0);
+            throw ParserException("Illegal expression");
         }
         scanner.NextToken();
         return curExp;
@@ -116,6 +119,5 @@ Expression* Parser::ParseFactor() {
         auto tmp = ParseFactor();
         return (Expression*)new ExpressionUnOp(lex, tmp);
     }
-    std::cout << "error";
-    exit(0);
+    throw ParserException("Illegal expression");
 }

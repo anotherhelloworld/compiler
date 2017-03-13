@@ -6,6 +6,7 @@
 #include <fstream>
 #include <map>
 #include <iostream>
+#include "Errors.h"
 
 enum TokenType {
     START = 0, NUMBER, REAL_NUMBER, NUMBER_E, NUMBER_E_POW, IDENTIFICATOR,
