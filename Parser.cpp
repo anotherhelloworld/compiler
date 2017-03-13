@@ -1,6 +1,7 @@
 #include "Parser.h"
 
 const char fill = ' ';
+const int fillFactor = 3;
 
 void Parser::Print() {
     expression->Print(0);
@@ -9,29 +10,29 @@ void Parser::Print() {
 void ExpressionBinOp::Print(int deep) {
     this->right->Print(deep + 1);
     std::string s;
-    s += std::string(deep * 2, fill);
+    s += std::string((unsigned long)(deep * fillFactor), fill);
     std::cout << s << this->operation.val << std::endl;
     this->left->Print(deep + 1);
 }
 
 void ExpressionInteger::Print(int deep) {
-    std::string s = std::string(deep * 2, fill);
+    std::string s = std::string((unsigned long)(deep * fillFactor), fill);
     std::cout << s << this->val.val << std::endl;
 }
 
 void ExpressionReal::Print(int deep) {
-    std::string s = std::string(deep * 2, fill);
+    std::string s = std::string((unsigned long)(deep * fillFactor), fill);
     std::cout << s << this->val.val << std::endl;
 }
 
 void ExpressionIdent::Print(int deep) {
-    std::string s = std::string(deep * 2, fill);
+    std::string s = std::string((unsigned long)(deep * fillFactor), fill);
     std::cout << s << this->val.val << std::endl;
 }
 
 void ExpressionUnOp::Print(int deep) {
     this->arg->Print(deep + 1);
-    std::string s = std::string(deep * 2, fill);
+    std::string s = std::string((unsigned long)(deep * fillFactor), fill);
     std::cout << s << this->operation.val << std::endl;
 }
 
@@ -55,26 +56,8 @@ Expression* Parser::ParseExpression() {
             scanner.GetLexem().token == EQUAL || scanner.GetLexem().token == NOT_EQUAL) {
         Lexem operation = scanner.GetLexem();
         scanner.NextToken();
-        if (scanner.GetLexem().token == OPEN_BRACKET) {
-            scanner.NextToken();
-            auto right = ParseExpression();
-            if (scanner.GetLexem().token == CLOSE_BRACKET) {
-                std::cout << "error";
-                exit(0);
-            }
-            scanner.NextToken();
-            if (scanner.GetLexem().token == ADD || scanner.GetLexem().token == SUB || scanner.GetLexem().token == OR ||
-                    scanner.GetLexem().token == XOR) {
-                auto operation2 = scanner.GetLexem();
-                scanner.NextToken();
-                left = (Expression*)new ExpressionBinOp(operation, left, (Expression*)new ExpressionBinOp(operation2, right, ParseSimpleExpression()));
-            } else {
-                left = (Expression*)new ExpressionBinOp(operation, left, right);
-            }
-        } else {
-            auto right = ParseSimpleExpression();
-            left = (Expression*)new ExpressionBinOp(operation, left, right);
-        }
+        auto right = ParseSimpleExpression();
+        left = (Expression*)new ExpressionBinOp(operation, left, right);
     }
     return left;
 }
@@ -85,27 +68,8 @@ Expression* Parser::ParseSimpleExpression() {
             scanner.GetLexem().token == XOR) {
         Lexem operation = scanner.GetLexem();
         scanner.NextToken();
-        if (scanner.GetLexem().token == OPEN_BRACKET) {
-            scanner.NextToken();
-            auto right = ParseExpression();
-            if (scanner.GetLexem().token != CLOSE_BRACKET) {
-                std::cout << "error";
-                exit(0);
-            }
-            scanner.NextToken();
-            if (scanner.GetLexem().token == MULT || scanner.GetLexem().token == DIVISION || scanner.GetLexem().token == SHR ||
-                scanner.GetLexem().token == AND || scanner.GetLexem().token == SHR || scanner.GetLexem().token == MOD ||
-                    scanner.GetLexem().token == DIV) {
-                auto operation2 = scanner.GetLexem();
-                scanner.NextToken();
-                left = (Expression*)new ExpressionBinOp(operation, left, (Expression*)new ExpressionBinOp(operation2, right, ParseTerm()));
-            } else {
-                left = (Expression*)new ExpressionBinOp(operation, left, right);
-            }
-        } else {
-            auto right = ParseTerm();
-            left = (Expression*)new ExpressionBinOp(operation, left, right);
-        }
+        auto right = ParseTerm();
+        left = (Expression*)new ExpressionBinOp(operation, left, right);
     }
     return left;
 }
@@ -117,19 +81,8 @@ Expression* Parser::ParseTerm() {
             scanner.GetLexem().token == DIV) {
         Lexem operation = scanner.GetLexem();
         scanner.NextToken();
-        if (scanner.GetLexem().token == OPEN_BRACKET) {
-            scanner.NextToken();
-            auto right = ParseExpression();
-            if (scanner.GetLexem().token != CLOSE_BRACKET) {
-                std::cout << "error";
-                exit(0);
-            }
-            scanner.NextToken();
-            left = (Expression*)new ExpressionBinOp(operation, left, right);
-        } else {
-            auto right = ParseFactor();
-            left = (Expression*)new ExpressionBinOp(operation, left, right);
-        }
+        auto right = ParseFactor();
+        left = (Expression*)new ExpressionBinOp(operation, left, right);
     }
     return left;
 }
@@ -144,7 +97,8 @@ Expression* Parser::ParseFactor() {
     if (lex.token == OPEN_BRACKET) {
         auto curExp = ParseExpression();
         if (scanner.GetLexem().token != CLOSE_BRACKET) {
-
+            std::cout << "error";
+            exit(0);
         }
         scanner.NextToken();
         return curExp;

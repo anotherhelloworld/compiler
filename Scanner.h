@@ -200,7 +200,6 @@ struct Lexem {
             val(val), token(token), pos(pos) {};
 };
 
-
 class Scanner {
 public:
     Scanner(char*);
