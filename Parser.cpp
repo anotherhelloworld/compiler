@@ -1,7 +1,6 @@
 #include "Parser.h"
 
 const char fill = ' ';
-const int fillFactor = 3;
 
 void Parser::Print() {
     expression->Print(0);
@@ -10,29 +9,29 @@ void Parser::Print() {
 void ExpressionBinOp::Print(int deep) {
     this->right->Print(deep + 1);
     std::string s;
-    s += std::string((unsigned long)(deep * fillFactor), fill);
+    s += std::string(deep, fill);
     std::cout << s << this->operation.val << std::endl;
     this->left->Print(deep + 1);
 }
 
 void ExpressionInteger::Print(int deep) {
-    std::string s = std::string((unsigned long)(deep * fillFactor), fill);
+    std::string s = std::string(deep, fill);
     std::cout << s << this->val.val << std::endl;
 }
 
 void ExpressionReal::Print(int deep) {
-    std::string s = std::string((unsigned long)(deep * fillFactor), fill);
+    std::string s = std::string(deep * fillFactor, fill);
     std::cout << s << this->val.val << std::endl;
 }
 
 void ExpressionIdent::Print(int deep) {
-    std::string s = std::string((unsigned long)(deep * fillFactor), fill);
+    std::string s = std::string(deep * fillFactor, fill);
     std::cout << s << this->val.val << std::endl;
 }
 
 void ExpressionUnOp::Print(int deep) {
     this->arg->Print(deep + 1);
-    std::string s = std::string((unsigned long)(deep * fillFactor), fill);
+    std::string s = std::string(deep * fillFactor, fill);
     std::cout << s << this->operation.val << std::endl;
 }
 
@@ -48,8 +47,8 @@ Parser::Parser(char* filename): scanner(filename) {
                 return;
             }
         }
-    } catch (ScannerException) {
-        throw ParserException("Syntax error");
+    } catch (ScannerException error) {
+        throw ParserException("Syntax error: " + error.getMsg());
     }
 }
 
@@ -80,8 +79,8 @@ Expression* Parser::ParseSimpleExpression() {
 
 Expression* Parser::ParseTerm() {
     auto left = ParseFactor();
-    while (scanner.GetLexem().token == MULT || scanner.GetLexem().token == DIVISION || scanner.GetLexem().token == SHR ||
-            scanner.GetLexem().token == AND || scanner.GetLexem().token == SHR || scanner.GetLexem().token == MOD ||
+    while (scanner.GetLexem().token == MULT || scanner.GetLexem().token == DIVISION || scanner.GetLexem().token == SHIFT_RIGHT ||
+            scanner.GetLexem().token == AND || scanner.GetLexem().token == SHIFT_LEFT || scanner.GetLexem().token == MOD ||
             scanner.GetLexem().token == DIV) {
         Lexem operation = scanner.GetLexem();
         scanner.NextToken();
@@ -101,7 +100,7 @@ Expression* Parser::ParseFactor() {
     if (lex.token == OPEN_BRACKET) {
         auto curExp = ParseExpression();
         if (scanner.GetLexem().token != CLOSE_BRACKET) {
-            throw ParserException("Illegal expression");
+            throw ParserException("Illegal expression: expected ')'");
         }
         scanner.NextToken();
         return curExp;
