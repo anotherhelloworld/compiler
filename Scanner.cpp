@@ -107,6 +107,10 @@ void InitStates() {
 
 };
 
+Lexem Scanner::GetLexem() {
+    return last;
+}
+
 Scanner::Scanner(char* filename) {
     freopen(filename, "r", stdin);
     InitStates();
@@ -202,7 +206,7 @@ void Scanner::IncPos(char c) {
     }
 }
 
-Lexem Scanner::NextToken() {
+void Scanner::NextToken() {
     int c;
     Lexem l;
     toSaveLenStr = 0;
@@ -219,7 +223,8 @@ Lexem Scanner::NextToken() {
                 l = Lexem(toSave.substr(0, toSave.length() - 1), NUMBER, std::make_pair(pos.first, pos.second - l.val.length()));
                 toSave = toSave.substr(toSave.length() - 1, 1);
                 backBuffer = toSave.back();
-                return l;
+                this->last = l;
+                return;
             }
         }
 
@@ -240,7 +245,8 @@ Lexem Scanner::NextToken() {
         }
 
         if (flag) {
-            return l;
+            this->last = l;
+            return;
         }
 
     }
@@ -256,11 +262,13 @@ Lexem Scanner::NextToken() {
                 l.token = reserveWords[l.val];
             }
         }
-        return TokenStrChgPos(l);
+        this->last = TokenStrChgPos(l);
+        return;
     }
 
     if (eof) {
         eof = false;
-        return Lexem("EOF", T_EOF, std::make_pair(pos.first, pos.second));
+        this->last = Lexem("EOF", T_EOF, std::make_pair(pos.first, pos.second));
+        return;
     }
 }

@@ -200,10 +200,12 @@ struct Lexem {
             val(val), token(token), pos(pos) {};
 };
 
+
 class Scanner {
 public:
     Scanner(char*);
-    Lexem NextToken();
+    void NextToken();
+    Lexem GetLexem();
 private:
     void CheckSymbol(int);
     void CheckError();
@@ -214,6 +216,7 @@ private:
     Lexem TokenStrChgPos(Lexem);
 
     FILE* source;
+    Lexem last;
     ScannerState currentState;
     std::string toSave = "";
     std::string backBuffer = "";
