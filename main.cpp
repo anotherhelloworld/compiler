@@ -17,14 +17,24 @@ int main(int argc, char* argv[]) {
         if (strcmp(argv[1], "-s") == 0) {
             Scanner scanner(argv[2]);
             Lexem l;
-            while (l.token != T_EOF) {
-                scanner.NextToken();
-                l = scanner.GetLexem();
-                cout << left << setw(10) << l.pos.first << setw(10) <<l.pos.second << setw(25) << enumToStr[l.token] << l.val << setw(10) << endl;
+            try {
+                while (l.token != T_EOF) {
+                    scanner.NextToken();
+                    l = scanner.GetLexem();
+                    cout << left << setw(10) << l.pos.first << setw(10) <<l.pos.second << setw(25) << enumToStr[l.token] << l.val << setw(10) << endl;
+                }
+            } catch (ScannerException error) {
+                return 0;
             }
+
         } else if (strcmp(argv[1], "-p") == 0) {
-            Parser parser(argv[2]);
-            parser.Print();
+            try {
+                Parser parser(argv[2]);
+                parser.Print();
+            } catch (ParserException error) {
+                return 0;
+            }
+
         }
         else {
             std::cout << "error: unknown argument" << std::endl;
