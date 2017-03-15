@@ -8,31 +8,25 @@ void Parser::Print() {
 
 void ExpressionBinOp::Print(int deep) {
     this->right->Print(deep + 1);
-    std::string s;
-    s += std::string(deep, fill);
-    std::cout << s << this->operation.val << std::endl;
+    std::cout << std::string(deep, fill) << this->operation.val << std::endl;
     this->left->Print(deep + 1);
 }
 
 void ExpressionInteger::Print(int deep) {
-    std::string s = std::string(deep, fill);
-    std::cout << s << this->val.val << std::endl;
+    std::cout << std::string(deep, fill) << this->val.val << std::endl;
 }
 
 void ExpressionReal::Print(int deep) {
-    std::string s = std::string(deep * fillFactor, fill);
-    std::cout << s << this->val.val << std::endl;
+    std::cout << std::string(deep, fill) << this->val.val << std::endl;
 }
 
 void ExpressionIdent::Print(int deep) {
-    std::string s = std::string(deep * fillFactor, fill);
-    std::cout << s << this->val.val << std::endl;
+    std::cout << std::string(deep, fill) << this->val.val << std::endl;
 }
 
 void ExpressionUnOp::Print(int deep) {
     this->arg->Print(deep + 1);
-    std::string s = std::string(deep * fillFactor, fill);
-    std::cout << s << this->operation.val << std::endl;
+    std::cout << std::string(deep, fill) << this->operation.val << std::endl;
 }
 
 Parser::Parser(char* filename): scanner(filename) {
@@ -53,19 +47,19 @@ Parser::Parser(char* filename): scanner(filename) {
 }
 
 Expression* Parser::ParseExpression() {
-    auto left = ParseSimpleExpression();
+    auto left = ParseNextExpression();
     while (scanner.GetLexem().token == GREATER_THAN || scanner.GetLexem().token == GREATER_OR_EQUAL_THAN ||
             scanner.GetLexem().token == LESS_THAN || scanner.GetLexem().token == LESS_OR_EQUAL_THAN ||
             scanner.GetLexem().token == EQUAL || scanner.GetLexem().token == NOT_EQUAL) {
         Lexem operation = scanner.GetLexem();
         scanner.NextToken();
-        auto right = ParseSimpleExpression();
+        auto right = ParseNextExpression();
         left = (Expression*)new ExpressionBinOp(operation, left, right);
     }
     return left;
 }
 
-Expression* Parser::ParseSimpleExpression() {
+Expression* Parser::ParseNextExpression() {
     auto left = ParseTerm();
     while (scanner.GetLexem().token == ADD || scanner.GetLexem().token == SUB || scanner.GetLexem().token == OR ||
             scanner.GetLexem().token == XOR) {

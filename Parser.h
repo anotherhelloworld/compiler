@@ -12,7 +12,7 @@ class Parser {
 public:
     Parser(char*);
     Expression* ParseExpression();
-    Expression* ParseSimpleExpression();
+    Expression* ParseNextExpression();
     Expression* ParseTerm();
     Expression* ParseFactor();
     void Print();
