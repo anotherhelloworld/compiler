@@ -11,11 +11,16 @@ public:
 class Parser {
 public:
     Parser(char*);
-    Expression* ParseExpression();
+
+    Parser(const Scanner &scanner, Expression *expression);
+
+    Expression* ParseExpression(int);
     Expression* ParseNextExpression();
-    Expression* ParseTerm();
+    Expression* ParseTerm(bool);
     Expression* ParseFactor();
+    std::vector <Expression*> ParseArrayIndecies();
     void Print();
+    bool PriorityCheck(int, TokenType);
 private:
     Scanner scanner;
     Expression* expression;
@@ -64,5 +69,14 @@ private:
     Lexem val;
 };
 
+class ExpressionArrayIndecies: Expression {
+public:
+    ExpressionArrayIndecies(Lexem operation, Expression* ident, std::vector<Expression*> indecies): operation(operation), ident(ident), indecies(indecies) {};
+    void Print(int);
+private:
+    Lexem operation;
+    Expression* ident;
+    std::vector<Expression*> indecies;
+};
 
 #endif //COMPILER_PARSER_H

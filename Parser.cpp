@@ -29,70 +29,72 @@ void ExpressionUnOp::Print(int deep) {
     std::cout << std::string(deep, fill) << this->operation.val << std::endl;
 }
 
+void ExpressionArrayIndecies::Print(int deep) {
+    this->ident->Print(deep + 1);
+    std::cout << std::string(deep, fill) << this->operation.val << std::endl;
+    for (int i = 0; i < indecies.size(); i++) {
+        this->indecies[i]->Print(deep + 1);
+    }
+
+}
+
+std::vector <int> priorities(COUNT, -1);
+std::vector <int> unarPriorities(COUNT, -1);
+
 Parser::Parser(char* filename): scanner(filename) {
-    try {
-        Lexem l;
-        while (l.token != T_EOF) {
-            scanner.NextToken();
-            l = scanner.GetLexem();
-            if (l.token == NUMBER || l.token == REAL_NUMBER || l.token == IDENTIFICATOR || l.token == OPEN_BRACKET ||
-                l.token == ADD || l.token == SUB || l.token == TRUE || l.token == FALSE || l.token == NOT) {
-                expression = ParseExpression();
-                return;
-            }
-        }
-    } catch (ScannerException error) {
-        throw ParserException("Syntax error: " + error.getMsg());
-    }
+    scanner.NextToken();
+    priorities[EQUAL] = 0;
+    priorities[NOT_EQUAL] = 0;
+    priorities[GREATER_THAN] = 0;
+    priorities[LESS_THAN] = 0;
+    priorities[LESS_OR_EQUAL_THAN];
+    priorities[GREATER_OR_EQUAL_THAN] = 0;
+
+    priorities[ADD] = 1;
+    priorities[SUB] = 1;
+    priorities[OR] = 1;
+    priorities[XOR] = 1;
+
+    priorities[MULT] = 2;
+    priorities[DIV] = 2;
+    priorities[DIVISION] = 2;
+    priorities[MOD] = 2;
+    priorities[AND] = 2;
+    priorities[SHIFT_RIGHT] = 2;
+    priorities[SHIFT_LEFT] = 2;
+
+    unarPriorities[NOT] = 3;
+    unarPriorities[SUB] = 3;
+    unarPriorities[ADD] = 3;
+
+    expression = ParseExpression(0);
 }
 
-Expression* Parser::ParseExpression() {
-    auto left = ParseNextExpression();
-    while (scanner.GetLexem().token == GREATER_THAN || scanner.GetLexem().token == GREATER_OR_EQUAL_THAN ||
-            scanner.GetLexem().token == LESS_THAN || scanner.GetLexem().token == LESS_OR_EQUAL_THAN ||
-            scanner.GetLexem().token == EQUAL || scanner.GetLexem().token == NOT_EQUAL) {
-        Lexem operation = scanner.GetLexem();
-        scanner.NextToken();
-        auto right = ParseNextExpression();
-        left = (Expression*)new ExpressionBinOp(operation, left, right);
+Expression* Parser::ParseExpression(int priority) {
+    if (priority == 3) {
+        return ParseFactor();
     }
-    return left;
-}
-
-Expression* Parser::ParseNextExpression() {
-    auto left = ParseTerm();
-    while (scanner.GetLexem().token == ADD || scanner.GetLexem().token == SUB || scanner.GetLexem().token == OR ||
-            scanner.GetLexem().token == XOR) {
-        Lexem operation = scanner.GetLexem();
+    Expression* res = ParseExpression(priority + 1);
+    Lexem lex = scanner.GetLexem();
+    while (PriorityCheck(priority, lex.token)) {
         scanner.NextToken();
-        auto right = ParseTerm();
-        left = (Expression*)new ExpressionBinOp(operation, left, right);
+        Expression* right = ParseExpression(priority + 1);
+        res = (Expression*)new ExpressionBinOp(lex, res, right);
+        lex = scanner.GetLexem();
     }
-    return left;
-}
-
-Expression* Parser::ParseTerm() {
-    auto left = ParseFactor();
-    while (scanner.GetLexem().token == MULT || scanner.GetLexem().token == DIVISION || scanner.GetLexem().token == SHIFT_RIGHT ||
-            scanner.GetLexem().token == AND || scanner.GetLexem().token == SHIFT_LEFT || scanner.GetLexem().token == MOD ||
-            scanner.GetLexem().token == DIV) {
-        Lexem operation = scanner.GetLexem();
-        scanner.NextToken();
-        auto right = ParseFactor();
-        left = (Expression*)new ExpressionBinOp(operation, left, right);
-    }
-    return left;
+    return res;
 }
 
 Expression* Parser::ParseFactor() {
     auto lex = scanner.GetLexem();
-    scanner.NextToken();
-    if (lex.token == SUB || lex.token == ADD) {
-        auto curExp = ParseExpression();
+    if (PriorityCheck(3, lex.token)) {
+        scanner.NextToken();
+        auto curExp = ParseExpression(0);
         return (Expression*)new ExpressionUnOp(lex, curExp);
     }
     if (lex.token == OPEN_BRACKET) {
-        auto curExp = ParseExpression();
+        scanner.NextToken();
+        auto curExp = ParseExpression(0);
         if (scanner.GetLexem().token != CLOSE_BRACKET) {
             throw ParserException("Illegal expression: expected ')'");
         }
@@ -100,17 +102,61 @@ Expression* Parser::ParseFactor() {
         return curExp;
     }
     if (lex.token == NUMBER) {
+        scanner.NextToken();
         return (Expression*)new ExpressionInteger(lex);
     }
     if (lex.token == REAL_NUMBER) {
+        scanner.NextToken();
         return (Expression*)new ExpressionReal(lex);
     }
     if (lex.token == IDENTIFICATOR) {
-        return (Expression*)new ExpressionIdent(lex);
-    }
-    if (lex.token == NOT) {
-        auto tmp = ParseFactor();
-        return (Expression*)new ExpressionUnOp(lex, tmp);
+        return ParseTerm(true);
     }
     throw ParserException("Illegal expression");
+}
+
+bool Parser::PriorityCheck(int priority, TokenType token) {
+    return (priorities[token] == priority || unarPriorities[token] == priority);
+}
+
+Expression *Parser::ParseTerm(bool flag) {
+    Lexem lex = scanner.GetLexem();
+    Expression* res = (Expression*)new ExpressionIdent(lex);
+    while (flag) {
+        scanner.NextToken();
+        lex = scanner.GetLexem();
+        if (lex.token == POINT) {
+            scanner.NextToken();
+            lex = scanner.GetLexem();
+            if (lex.token != IDENTIFICATOR) {
+                throw ParserException("Illegal expression: expected Identificator");
+            }
+            Expression* right = ParseTerm(false);
+            res = (Expression*)new ExpressionBinOp(Lexem(".", POINT), res, right);
+        } else if (lex.token == OPEN_SQUARE_BRACKET) {
+            std::vector<Expression*> indecies = ParseArrayIndecies();
+            res = (Expression*)new ExpressionArrayIndecies(Lexem("[", OPEN_SQUARE_BRACKET), res, indecies);
+            lex = scanner.GetLexem();
+            if (lex.token != CLOSE_SQUARE_BRACKET) {
+                throw ParserException("Illegal expression: expected ]");
+            }
+        } else {
+            flag = false;
+        }
+    }
+    return res;
+}
+
+std::vector <Expression*> Parser::ParseArrayIndecies() {
+    std::vector <Expression*> exprs;
+    Lexem lex;
+    scanner.NextToken();
+    exprs.push_back(ParseExpression(0));
+    lex = scanner.GetLexem();
+    while (lex.token == COMMA) {
+        scanner.NextToken();
+        exprs.push_back(ParseExpression(0));
+        lex = scanner.GetLexem();
+    }
+    return exprs;
 }
