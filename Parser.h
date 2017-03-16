@@ -18,7 +18,7 @@ public:
     Expression* ParseNextExpression();
     Expression* ParseTerm(bool);
     Expression* ParseFactor();
-    std::vector <Expression*> ParseArrayIndecies();
+    std::vector <Expression*> ParseArrayIndices();
     void Print();
     bool PriorityCheck(int, TokenType);
 private:

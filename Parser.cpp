@@ -134,7 +134,7 @@ Expression *Parser::ParseTerm(bool flag) {
             Expression* right = ParseTerm(false);
             res = (Expression*)new ExpressionBinOp(Lexem(".", POINT), res, right);
         } else if (lex.token == OPEN_SQUARE_BRACKET) {
-            std::vector<Expression*> indecies = ParseArrayIndecies();
+            std::vector<Expression*> indecies = ParseArrayIndices();
             res = (Expression*)new ExpressionArrayIndecies(Lexem("[", OPEN_SQUARE_BRACKET), res, indecies);
             lex = scanner.GetLexem();
             if (lex.token != CLOSE_SQUARE_BRACKET) {
@@ -147,7 +147,7 @@ Expression *Parser::ParseTerm(bool flag) {
     return res;
 }
 
-std::vector <Expression*> Parser::ParseArrayIndecies() {
+std::vector <Expression*> Parser::ParseArrayIndices() {
     std::vector <Expression*> exprs;
     Lexem lex;
     scanner.NextToken();
