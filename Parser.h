@@ -26,14 +26,22 @@ private:
     Expression* expression;
 };
 
-class ExpressionBinOp: Expression {
+class ExpressionBinOp: public Expression {
 public:
     ExpressionBinOp(Lexem operation, Expression* right, Expression* left): operation(operation), right(right), left(left) {};
     void Print(int);
-private:
+protected:
     Lexem operation;
     Expression* left;
     Expression* right;
+};
+
+class ExpressionTerm: Expression {
+public:
+    ExpressionTerm(const Lexem &val) : val(val) {};
+    void Print(int);
+protected:
+    Lexem val;
 };
 
 class ExpressionUnOp: Expression {
@@ -45,33 +53,30 @@ private:
     Expression* arg;
 };
 
-class ExpressionInteger: Expression {
+class ExpressionInteger: ExpressionTerm {
 public:
-    ExpressionInteger(Lexem val): val(val) {};
-    void Print(int);
-private:
-    Lexem val;
+    ExpressionInteger(const Lexem &val) : ExpressionTerm(val) {};
 };
 
-class ExpressionReal: Expression {
+class ExpressionReal: ExpressionTerm {
 public:
-    ExpressionReal(Lexem val): val(val) {};
-    void Print(int);
-private:
-    Lexem val;
+    ExpressionReal(const Lexem &val) : ExpressionTerm(val) {};
 };
 
-class ExpressionIdent: Expression {
+class ExpressionIdent: ExpressionTerm {
 public:
-    ExpressionIdent(Lexem val): val(val) {};
-    void Print(int);
-private:
-    Lexem val;
+    ExpressionIdent(const Lexem &val) : ExpressionTerm(val) {};
+};
+
+class ExpressionRecordAccess: ExpressionBinOp {
+public:
+    ExpressionRecordAccess(Expression* right, Expression* left): ExpressionBinOp(Lexem(".", POINT), right, left) {}
 };
 
 class ExpressionArrayIndecies: Expression {
 public:
-    ExpressionArrayIndecies(Lexem operation, Expression* ident, std::vector<Expression*> indecies): operation(operation), ident(ident), indecies(indecies) {};
+    ExpressionArrayIndecies(Lexem operation, Expression* ident, std::vector<Expression*> indecies):
+            operation(operation), ident(ident), indecies(indecies) {};
     void Print(int);
 private:
     Lexem operation;

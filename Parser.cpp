@@ -12,15 +12,7 @@ void ExpressionBinOp::Print(int deep) {
     this->left->Print(deep + 1);
 }
 
-void ExpressionInteger::Print(int deep) {
-    std::cout << std::string(deep, fill) << this->val.val << std::endl;
-}
-
-void ExpressionReal::Print(int deep) {
-    std::cout << std::string(deep, fill) << this->val.val << std::endl;
-}
-
-void ExpressionIdent::Print(int deep) {
+void ExpressionTerm::Print(int deep) {
     std::cout << std::string(deep, fill) << this->val.val << std::endl;
 }
 
@@ -132,7 +124,7 @@ Expression *Parser::ParseTerm(bool flag) {
                 throw ParserException("Illegal expression: expected Identificator");
             }
             Expression* right = ParseTerm(false);
-            res = (Expression*)new ExpressionBinOp(Lexem(".", POINT), res, right);
+            res = (Expression*)new ExpressionRecordAccess(res, right);
         } else if (lex.token == OPEN_SQUARE_BRACKET) {
             std::vector<Expression*> indecies = ParseArrayIndices();
             res = (Expression*)new ExpressionArrayIndecies(Lexem("[", OPEN_SQUARE_BRACKET), res, indecies);
