@@ -75,8 +75,8 @@ public:
 
 class ExpressionArrayIndecies: Expression {
 public:
-    ExpressionArrayIndecies(Lexem operation, Expression* ident, std::vector<Expression*> indecies):
-            operation(operation), ident(ident), indecies(indecies) {};
+    ExpressionArrayIndecies(Expression* ident, std::vector<Expression*> indecies):
+            operation(Lexem("[]", OPEN_SQUARE_BRACKET)), ident(ident), indecies(indecies) {};
     void Print(int);
 private:
     Lexem operation;

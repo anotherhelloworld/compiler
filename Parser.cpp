@@ -8,22 +8,22 @@ void Parser::Print() {
 
 void ExpressionBinOp::Print(int deep) {
     this->right->Print(deep + 1);
-    std::cout << std::string(deep, fill) << this->operation.val << std::endl;
+    std::cout << std::string(deep * 3, fill) << this->operation.val << std::endl;
     this->left->Print(deep + 1);
 }
 
 void ExpressionTerm::Print(int deep) {
-    std::cout << std::string(deep, fill) << this->val.val << std::endl;
+    std::cout << std::string(deep * 3, fill) << this->val.val << std::endl;
 }
 
 void ExpressionUnOp::Print(int deep) {
     this->arg->Print(deep + 1);
-    std::cout << std::string(deep, fill) << this->operation.val << std::endl;
+    std::cout << std::string(deep * 3, fill) << this->operation.val << std::endl;
 }
 
 void ExpressionArrayIndecies::Print(int deep) {
     this->ident->Print(deep + 1);
-    std::cout << std::string(deep, fill) << this->operation.val << std::endl;
+    std::cout << std::string(deep * 3, fill) << this->operation.val << std::endl;
     for (int i = 0; i < indecies.size(); i++) {
         this->indecies[i]->Print(deep + 1);
     }
@@ -88,7 +88,7 @@ Expression* Parser::ParseFactor() {
         scanner.NextToken();
         auto curExp = ParseExpression(0);
         if (scanner.GetLexem().token != CLOSE_BRACKET) {
-            throw ParserException("Illegal expression: expected ')'");
+            throw ParserException("Illegal expression: expected ')' " + lex.GetStrPos());
         }
         scanner.NextToken();
         return curExp;
@@ -104,7 +104,7 @@ Expression* Parser::ParseFactor() {
     if (lex.token == IDENTIFICATOR) {
         return ParseTerm(true);
     }
-    throw ParserException("Illegal expression");
+    throw ParserException("Illegal expression in pos " + lex.GetStrPos());
 }
 
 bool Parser::PriorityCheck(int priority, TokenType token) {
@@ -121,16 +121,16 @@ Expression *Parser::ParseTerm(bool flag) {
             scanner.NextToken();
             lex = scanner.GetLexem();
             if (lex.token != IDENTIFICATOR) {
-                throw ParserException("Illegal expression: expected Identificator");
+                throw ParserException("Illegal expression: expected Identificator " + lex.GetStrPos());
             }
             Expression* right = ParseTerm(false);
             res = (Expression*)new ExpressionRecordAccess(res, right);
         } else if (lex.token == OPEN_SQUARE_BRACKET) {
             std::vector<Expression*> indecies = ParseArrayIndices();
-            res = (Expression*)new ExpressionArrayIndecies(Lexem("[", OPEN_SQUARE_BRACKET), res, indecies);
+            res = (Expression*)new ExpressionArrayIndecies(res, indecies);
             lex = scanner.GetLexem();
             if (lex.token != CLOSE_SQUARE_BRACKET) {
-                throw ParserException("Illegal expression: expected ]");
+                throw ParserException("Illegal expression: expected ] " + lex.GetStrPos());
             }
         } else {
             flag = false;

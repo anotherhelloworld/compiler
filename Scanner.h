@@ -199,6 +199,9 @@ struct Lexem {
     std::pair <int, int> pos;
     Lexem(std::string val = "START", TokenType token = START, std::pair <int, int> pos = std::make_pair(1, 1)):
             val(val), token(token), pos(pos) {};
+    std::string GetStrPos() {
+        return "(" + std::to_string(pos.first) + ", " + std::to_string(pos.second) + ")";
+    }
 };
 
 class Scanner {
