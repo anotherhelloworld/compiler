@@ -87,9 +87,7 @@ Expression* Parser::ParseFactor() {
     if (lex.token == OPEN_BRACKET) {
         scanner.NextToken();
         auto curExp = ParseExpression(0);
-        if (scanner.GetLexem().token != CLOSE_BRACKET) {
-            throw ParserException("Illegal expression: expected ')' " + lex.GetStrPos());
-        }
+        CheckNextLexem(scanner.GetLexem(), Lexem(")", CLOSE_BRACKET));
         scanner.NextToken();
         return curExp;
     }
@@ -120,18 +118,14 @@ Expression *Parser::ParseTerm(bool flag) {
         if (lex.token == POINT) {
             scanner.NextToken();
             lex = scanner.GetLexem();
-            if (lex.token != IDENTIFICATOR) {
-                throw ParserException("Illegal expression: expected Identificator " + lex.GetStrPos());
-            }
+            CheckNextLexem(lex, Lexem("IDENTIFICATOR", IDENTIFICATOR));
             Expression* right = ParseTerm(false);
             res = (Expression*)new ExpressionRecordAccess(res, right);
         } else if (lex.token == OPEN_SQUARE_BRACKET) {
             std::vector<Expression*> indecies = ParseArrayIndices();
             res = (Expression*)new ExpressionArrayIndecies(res, indecies);
             lex = scanner.GetLexem();
-            if (lex.token != CLOSE_SQUARE_BRACKET) {
-                throw ParserException("Illegal expression: expected ] " + lex.GetStrPos());
-            }
+            CheckNextLexem(lex, Lexem("]", CLOSE_SQUARE_BRACKET));
         } else {
             flag = false;
         }
@@ -151,4 +145,11 @@ std::vector <Expression*> Parser::ParseArrayIndices() {
         lex = scanner.GetLexem();
     }
     return exprs;
+}
+
+void Parser::CheckNextLexem(Lexem cur, Lexem expc) {
+    if (cur.token != expc.token) {
+        cur.pos.second++;
+        throw ParserException("Illegal expression: expected '" + expc.val + "' " + cur.GetStrPos());
+    }
 }

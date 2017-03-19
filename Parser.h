@@ -21,6 +21,7 @@ public:
     std::vector <Expression*> ParseArrayIndices();
     void Print();
     bool PriorityCheck(int, TokenType);
+    void CheckNextLexem(Lexem, Lexem);
 private:
     Scanner scanner;
     Expression* expression;
