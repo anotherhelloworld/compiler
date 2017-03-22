@@ -11,19 +11,18 @@ public:
 class Parser {
 public:
     Parser(char*);
+    void Print();
+private:
     Expression* ParseExpression(int);
     Expression* ParseTerm(bool);
     Expression* ParseFactor();
     std::vector <Expression*> ParseArrayIndices();
-    void Print();
     bool PriorityCheck(int, TokenType);
     void CheckNextLexem(Lexem, Lexem);
     std::vector<int> priorities;
     std::vector<int> unarPriorities;
-private:
     Scanner scanner;
     Expression* expression;
-
 };
 
 class ExpressionBinOp: public Expression {
