@@ -10,8 +10,18 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
+    if (argc < 2) {
         std::cout << "error: no input file" << std::endl;
+    }
+    if (argc == 2) {
+        if (strcmp(argv[1], "-h") == 0) {
+            std::cout << "Makhliarchuk A. 2017" << std::endl;
+            std::cout << "-s filename --scanner" << std::endl;
+            std::cout << "-p filename --parser" << std::endl;
+            return 0;
+        } else {
+            std::cout << "error: no input file" << std::endl;
+        }
     }
     if (argc == 3) {
         if (strcmp(argv[1], "-s") == 0) {
@@ -26,11 +36,11 @@ int main(int argc, char* argv[]) {
             } catch (ScannerException error) {
                 return 0;
             }
-
         } else if (strcmp(argv[1], "-p") == 0) {
             try {
                 Parser parser(argv[2]);
                 parser.Print();
+
             } catch (ParserException error) {
                 return 0;
             }
