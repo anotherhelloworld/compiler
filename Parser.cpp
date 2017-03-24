@@ -60,6 +60,8 @@ Parser::Parser(char* filename): scanner(filename) {
     unarPriorities[ADD] = 3;
 
     expression = ParseExpression(0);
+    if (scanner.GetLexem().token != TokenType::T_EOF)
+        throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());
 }
 
 Expression* Parser::ParseExpression(int priority) {
