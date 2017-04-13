@@ -3,5 +3,5 @@ project(Compiler)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES main.cpp Scanner.cpp Scanner.h Parser.cpp Parser.h Errors.h)
-add_executable(Compiler ${SOURCE_FILES} Parser.cpp Parser.h Errors.h)
+set(SOURCE_FILES main.cpp Scanner.cpp Scanner.h Parser.cpp Parser.h Errors.h Symbol.cpp Symbol.h Expression.cpp Expression.h)
+add_executable(Compiler ${SOURCE_FILES} Parser.cpp Parser.h Errors.h Symbol.cpp Symbol.h Expression.cpp Expression.h)
