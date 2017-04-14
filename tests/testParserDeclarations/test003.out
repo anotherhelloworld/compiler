@@ -1,0 +1,11 @@
+Const   a
+   Type   integer
+   10
+
+Const   c
+   Type   double
+   0
+
+Const   b
+   250
+
