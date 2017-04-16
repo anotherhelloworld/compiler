@@ -3,6 +3,8 @@
 SymbolTable::SymbolTable(SymbolTable * parentTable): parentTable(parentTable) {
     symbols.push_back(new SymbolType("integer", DataType::INTEGER));
     symbols.push_back(new SymbolType("double", DataType::DOUBLE));
+    symbols.push_back(new SymbolType("char", DataType::CHAR));
+    symbols.push_back(new SymbolType("boolean", DataType::CHAR));
     stdTypeCount = symbols.size();
 };
 
@@ -87,6 +89,29 @@ void SymbolConst::Print(int spaces) {
         type->Print(spaces + 1);
     }
     initExpr->Print(spaces + 1);
+}
+
+void SymbolVar::Print(int spaces) {
+    for (int i = 0; i < spaces; i++) {
+        std::cout << " ";
+    }
+    std::cout << "Var" << "   " << name << std::endl;
+    type->Print(spaces + 1);
+    if (initExpr != nullptr) {
+        initExpr->Print(spaces + 1);
+    }
+}
+
+void SymbolArray::Print(int spaces) {
+    for (int i = 0; i < spaces; i++) {
+        std::cout << " ";
+    }
+    std::cout << "Array" << "   ";
+    left->Print(spaces);
+    std::cout << "   ";
+    right->Print(spaces);
+    std::cout << std::endl;
+    type->Print(spaces);
 }
 
 Symbol* SymbolType::GetType() {

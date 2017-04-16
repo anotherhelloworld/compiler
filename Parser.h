@@ -21,9 +21,9 @@ private:
     void ParseTypeDeclaration(SymbolTable*);
     void ParseVarDeclaration(SymbolTable*);
     Symbol* ParseType(SymbolTable*);
-    Symbol* ParseString(SymbolTable*);
     Expression* ParseInit(SymbolTable*);
     Expression* ParseInitializeList(SymbolTable*);
+    Symbol* ParseArrayDecl(SymbolTable*);
     void CheckConstant(SymbolTable*, Expression*);
     std::vector<int> priorities;
     std::vector<int> unarPriorities;

@@ -7,7 +7,7 @@
 #include "Expression.h"
 
 enum class DeclarationType {
-    CONST, TYPE,
+    D_NULL, CONST, TYPE, VAR,
 };
 
 enum class ArgumentType {
@@ -15,7 +15,7 @@ enum class ArgumentType {
 };
 
 enum class DataType {
-    BADTYPE, INTEGER, DOUBLE,
+    BADTYPE, INTEGER, DOUBLE, CHAR,
 };
 
 class Symbol {
@@ -59,6 +59,23 @@ class SymPointer: public Symbol {
 public:
     SymPointer(std::string name, Symbol* type): Symbol(name, DeclarationType::TYPE), type(type) {};
     Symbol* type;
+};
+
+class SymbolVar: public SymbolIdent {
+public:
+    SymbolVar(std::string name, Expression* initExpr, Symbol* type, ArgumentType argType):
+            SymbolIdent(name, DeclarationType ::VAR,initExpr, type, argType) {};
+    void Print(int);
+};
+
+class SymbolArray: public Symbol {
+public:
+    Symbol* type;
+    DataType dataType;
+    Expression* left;
+    Expression* right;
+    SymbolArray(Symbol* type, Expression* left, Expression* right): Symbol("", DeclarationType::TYPE), type(type), left(left), right(right) {};
+    void Print(int);
 };
 
 class SymbolTable {

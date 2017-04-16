@@ -79,6 +79,14 @@ Expression* Parser::ParseFactor() {
         scanner.NextToken();
         return (Expression*)new ExpressionReal(lex);
     }
+    if (lex.token == TOKEN_STRING) {
+        scanner.NextToken();
+        return (Expression*)new ExpressionChar(lex);
+    }
+    if (lex.token == TRUE || lex.token == FALSE) {
+        scanner.NextToken();
+        return (Expression*)new ExpressionBoolean(lex);
+    }
     if (lex.token == IDENTIFICATOR) {
         return ParseTerm(true);
     }
@@ -146,7 +154,8 @@ void Parser::ParseDeclaration(SymbolTable* symTable) {
             break;
         }
         if (lex.token == VAR) {
-
+            ParseVarDeclaration(symTable);
+            break;
         }
     }
 }
@@ -167,11 +176,11 @@ void Parser::ParseVarDeclaration(SymbolTable* symTable) {
             CheckNextLexem(lex, Lexem("IDENTIFICATOR", IDENTIFICATOR));
             names.push_back(scanner.GetLexem().val);
             namesPos.push_back(scanner.GetLexem().pos);
-            scanner.NextToken();
         }
-        scanner.NextToken();
+//        scanner.NextToken();
         Lexem lex = scanner.GetLexem();
         CheckNextLexem(lex, Lexem(":", COLON));
+        scanner.NextToken();
         Symbol* type = ParseType(symTable);
         ArgumentType argType = ArgumentType::RVALUE;
         if (strcasecmp(type->name.c_str(), "pointer") == 0 || type->name.length() == 0) {
@@ -188,6 +197,13 @@ void Parser::ParseVarDeclaration(SymbolTable* symTable) {
             std::pair <int, int> pos = scanner.GetLexem().pos;
             exp = ParseInit(symTable);
         }
+        for (int i = 0; i < names.size(); i++) {
+            symTable->CheckLocalSymbol(names[i], namesPos[i]);
+            symTable->Add(new SymbolVar(names[i], exp, type, argType));
+        }
+        lex = scanner.GetLexem();
+        CheckNextLexem(lex, Lexem(";", SEMI_COLON));
+        scanner.NextToken();
     }
 }
 
@@ -243,9 +259,10 @@ void Parser::ParseConstantDeclaration(SymbolTable* symTable) {
 }
 
 Symbol* Parser::ParseType(SymbolTable* symTable) {
-    if (scanner.GetLexem().token == STRING) {
-        return ParseString(symTable);
-    } else {
+    if (scanner.GetLexem().token == ARRAY) {
+        return ParseArrayDecl(symTable);
+    }
+    else {
         bool flag = false;
         if (scanner.GetLexem().token == CIRCUMFLEX) {
             flag = true;
@@ -265,25 +282,59 @@ Symbol* Parser::ParseType(SymbolTable* symTable) {
     }
 }
 
-Symbol* Parser::ParseString(SymbolTable* symTable) {
+Symbol* Parser::ParseArrayDecl(SymbolTable* symTable) {
     scanner.NextToken();
-    int length = -1;
     if (scanner.GetLexem().token == OPEN_SQUARE_BRACKET) {
         scanner.NextToken();
-        std::pair <int, int> position = scanner.GetLexem().pos;
-        Expression* length = ParseExpression(0);
-        CheckNextLexem(scanner.GetLexem(), Lexem("]", CLOSE_SQUARE_BRACKET));
+        Expression* leftExpr = ParseExpression(0);
+        CheckConstant(symTable, leftExpr);
         scanner.NextToken();
+        Lexem lex = scanner.GetLexem();
+        CheckNextLexem(lex, Lexem("..", DOUBLE_POINT));
+        Expression* rightExpr = ParseExpression(0);
+        CheckConstant(symTable, rightExpr);
+        SymbolArray* symbol = new SymbolArray(nullptr, leftExpr, rightExpr);
+        Symbol** symbolTypeInitialize = &symbol->type;
+        while (scanner.GetLexem().token == COMMA) {
+            scanner.NextToken();
+            leftExpr = ParseExpression(0);
+            CheckConstant(symTable, leftExpr);
+            scanner.NextToken();
+            Lexem lex = scanner.GetLexem();
+            CheckNextLexem(lex, Lexem("..", DOUBLE_POINT));
+            Expression* rightExpr = ParseExpression(0);
+            CheckConstant(symTable, rightExpr);
+            *symbolTypeInitialize = new SymbolArray(nullptr, leftExpr, rightExpr);
+            symbolTypeInitialize = &((SymbolArray*)*symbolTypeInitialize)->type;
+        }
+        scanner.NextToken();
+        lex = scanner.GetLexem();
+        CheckNextLexem(lex, Lexem("]", CLOSE_SQUARE_BRACKET));
+        scanner.NextToken();
+        lex = scanner.GetLexem();
+        CheckNextLexem(lex, Lexem("of", OF));
+        std::pair <int, int> pos = scanner.GetLexem().pos;
+        *symbolTypeInitialize = ParseType(symTable);
+        while (((SymbolType*)*symbolTypeInitialize)->dataType == DataType::BADTYPE) {
+            Symbol* symbol = symTable->GetSymbol((*symbolTypeInitialize)->name, pos);
+            *symbolTypeInitialize = symbol->GetType();
+        }
+        return symbol;
     }
+    scanner.NextToken();
+    Lexem lex = scanner.GetLexem();
+    CheckNextLexem(lex, Lexem("of", OF));
+    return nullptr;
 }
 
-Expression* Parser::ParseInit(SymbolTable *) {
+Expression* Parser::ParseInit(SymbolTable* symbolTable) {
     scanner.NextToken();
     int count = 0;
     if (scanner.GetLexem().token == OPEN_SQUARE_BRACKET) {
         //something;
     }
     Expression* exp = ParseExpression(0);
+    CheckConstant(symbolTable, exp);
     return exp;
 }
 
@@ -296,7 +347,7 @@ Expression* Parser::ParseInitializeList(SymbolTable* symbolTable) {
             scanner.NextToken();
             CheckNextLexem(scanner.GetLexem(), Lexem(")", CLOSE_BRACKET));
             if (scanner.GetLexem().token != COMMA) {
-//                return res;
+                return res;
             }
             continue;
         }
@@ -304,7 +355,7 @@ Expression* Parser::ParseInitializeList(SymbolTable* symbolTable) {
         CheckConstant(symbolTable, exp);
         res->initList.push_back(exp);
     } while (scanner.GetLexem().token == COMMA);
-//    return res;
+    return res;
 }
 
 void Parser::CheckConstant(SymbolTable* symbolTable, Expression* expr) {
@@ -314,7 +365,8 @@ void Parser::CheckConstant(SymbolTable* symbolTable, Expression* expr) {
         throw;
     }
     for (auto symbol: list->arguments) {
-        if (symbolTable->Find(symbol) != -1 && symbolTable->GetSymbol(symbol, scanner.GetLexem().pos)->declType != DeclarationType::CONST) {
+//        auto temp = symbolTable->GetSymbol(symbol, scanner.GetLexem().pos)->declType;
+        if (symbolTable->Find(symbol) != false && symbolTable->GetSymbol(symbol, scanner.GetLexem().pos)->declType != DeclarationType::CONST) {
             throw;
         }
     }

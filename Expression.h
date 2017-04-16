@@ -28,7 +28,7 @@ protected:
 
 class ExpressionTerm: Expression {
 public:
-    ExpressionTerm(const Lexem &val) : val(val) {};
+    ExpressionTerm(const Lexem &val): val(val) {};
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
 protected:
@@ -47,12 +47,22 @@ private:
 
 class ExpressionInteger: ExpressionTerm {
 public:
-    ExpressionInteger(const Lexem &val) : ExpressionTerm(val) {};
+    ExpressionInteger(const Lexem &val): ExpressionTerm(val) {};
 };
 
 class ExpressionReal: ExpressionTerm {
 public:
-    ExpressionReal(const Lexem &val) : ExpressionTerm(val) {};
+    ExpressionReal(const Lexem &val): ExpressionTerm(val) {};
+};
+
+class ExpressionChar: ExpressionTerm {
+public:
+    ExpressionChar(const Lexem &val): ExpressionTerm(val) {};
+};
+
+class ExpressionBoolean: ExpressionTerm {
+public:
+    ExpressionBoolean(const Lexem &val): ExpressionTerm(val) {};
 };
 
 class ExpressionIdent: ExpressionTerm {
@@ -77,7 +87,7 @@ private:
     std::vector<Expression*> indecies;
 };
 
-class ExpressionInitializeList: Expression {
+class ExpressionInitializeList: public Expression {
 public:
     std::vector<Expression*> initList;
     ExpressionInitializeList(std::vector<Expression*> initList = std::vector<Expression*>()): initList(initList) {};
