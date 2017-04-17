@@ -144,19 +144,20 @@ void Parser::CheckNextLexem(Lexem cur, Lexem expc) {
 
 void Parser::ParseDeclaration(SymbolTable* symTable) {
     Lexem lex = scanner.GetLexem();
-    while (lex.token != T_EOF) {
-        if (lex.token == CONST) {
+    while (scanner.GetLexem().token != T_EOF) {
+        if (scanner.GetLexem().token == CONST) {
             ParseConstantDeclaration(symTable);
-            break;
+            continue;
         }
-        if (lex.token == TYPE) {
+        if (scanner.GetLexem().token == TYPE) {
             ParseTypeDeclaration(symTable);
-            break;
+            continue;
         }
-        if (lex.token == VAR) {
+        if (scanner.GetLexem().token == VAR) {
             ParseVarDeclaration(symTable);
-            break;
+            continue;
         }
+
     }
 }
 
@@ -186,9 +187,12 @@ void Parser::ParseVarDeclaration(SymbolTable* symTable) {
         if (strcasecmp(type->name.c_str(), "pointer") == 0 || type->name.length() == 0) {
             argType = ArgumentType::RVALUE;
         }
+//        auto tempType = type;
         while (type->declType == DeclarationType::TYPE && ((SymbolType*)type)->dataType == DataType::BADTYPE) {
             type = ((SymbolType*)type)->type;
         }
+//        if ()
+//        ((SymbolType*)tempType)->type = type;
         if (names.size() > 1 && scanner.GetLexem().token == EQUAL) {
             throw;
         }
@@ -287,37 +291,43 @@ Symbol* Parser::ParseArrayDecl(SymbolTable* symTable) {
     if (scanner.GetLexem().token == OPEN_SQUARE_BRACKET) {
         scanner.NextToken();
         Expression* leftExpr = ParseExpression(0);
+        leftExpr->expressionType = ExpressionType::VAR;
         CheckConstant(symTable, leftExpr);
-        scanner.NextToken();
+//        scanner.NextToken();
         Lexem lex = scanner.GetLexem();
         CheckNextLexem(lex, Lexem("..", DOUBLE_POINT));
+        scanner.NextToken();
         Expression* rightExpr = ParseExpression(0);
+        rightExpr->expressionType = ExpressionType::VAR;
         CheckConstant(symTable, rightExpr);
         SymbolArray* symbol = new SymbolArray(nullptr, leftExpr, rightExpr);
         Symbol** symbolTypeInitialize = &symbol->type;
         while (scanner.GetLexem().token == COMMA) {
             scanner.NextToken();
             leftExpr = ParseExpression(0);
+            leftExpr->expressionType = ExpressionType::VAR;
             CheckConstant(symTable, leftExpr);
             scanner.NextToken();
             Lexem lex = scanner.GetLexem();
             CheckNextLexem(lex, Lexem("..", DOUBLE_POINT));
             Expression* rightExpr = ParseExpression(0);
+            rightExpr->expressionType = ExpressionType::VAR;
             CheckConstant(symTable, rightExpr);
             *symbolTypeInitialize = new SymbolArray(nullptr, leftExpr, rightExpr);
             symbolTypeInitialize = &((SymbolArray*)*symbolTypeInitialize)->type;
         }
-        scanner.NextToken();
+//        scanner.NextToken();
         lex = scanner.GetLexem();
         CheckNextLexem(lex, Lexem("]", CLOSE_SQUARE_BRACKET));
         scanner.NextToken();
         lex = scanner.GetLexem();
         CheckNextLexem(lex, Lexem("of", OF));
         std::pair <int, int> pos = scanner.GetLexem().pos;
+        scanner.NextToken();
         *symbolTypeInitialize = ParseType(symTable);
         while (((SymbolType*)*symbolTypeInitialize)->dataType == DataType::BADTYPE) {
-            Symbol* symbol = symTable->GetSymbol((*symbolTypeInitialize)->name, pos);
-            *symbolTypeInitialize = symbol->GetType();
+            Symbol* sym = symTable->GetSymbol((*symbolTypeInitialize)->name, pos);
+            *symbolTypeInitialize = sym->GetType();
         }
         return symbol;
     }
@@ -330,8 +340,12 @@ Symbol* Parser::ParseArrayDecl(SymbolTable* symTable) {
 Expression* Parser::ParseInit(SymbolTable* symbolTable) {
     scanner.NextToken();
     int count = 0;
-    if (scanner.GetLexem().token == OPEN_SQUARE_BRACKET) {
-        //something;
+    if (scanner.GetLexem().token == OPEN_BRACKET) {
+        Expression* exp = ParseInitializeList(symbolTable);
+        Lexem lex = scanner.GetLexem();
+        CheckNextLexem(lex, Lexem(")", CLOSE_BRACKET));
+        scanner.NextToken();
+        return exp;
     }
     Expression* exp = ParseExpression(0);
     CheckConstant(symbolTable, exp);
@@ -344,8 +358,9 @@ Expression* Parser::ParseInitializeList(SymbolTable* symbolTable) {
         scanner.NextToken();
         if (scanner.GetLexem().token == OPEN_BRACKET) {
             res->initList.push_back(ParseInitializeList(symbolTable));
-            scanner.NextToken();
+//            scanner.NextToken();
             CheckNextLexem(scanner.GetLexem(), Lexem(")", CLOSE_BRACKET));
+            scanner.NextToken();
             if (scanner.GetLexem().token != COMMA) {
                 return res;
             }

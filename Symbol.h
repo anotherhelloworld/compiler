@@ -15,7 +15,7 @@ enum class ArgumentType {
 };
 
 enum class DataType {
-    BADTYPE, INTEGER, DOUBLE, CHAR,
+    BADTYPE, INTEGER, DOUBLE, CHAR, ARRAY,
 };
 
 class Symbol {
@@ -74,7 +74,7 @@ public:
     DataType dataType;
     Expression* left;
     Expression* right;
-    SymbolArray(Symbol* type, Expression* left, Expression* right): Symbol("", DeclarationType::TYPE), type(type), left(left), right(right) {};
+    SymbolArray(Symbol* type, Expression* left, Expression* right): Symbol("", DeclarationType::TYPE), dataType(DataType::ARRAY), type(type), left(left), right(right) {};
     void Print(int);
 };
 

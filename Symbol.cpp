@@ -106,11 +106,9 @@ void SymbolArray::Print(int spaces) {
     for (int i = 0; i < spaces; i++) {
         std::cout << " ";
     }
-    std::cout << "Array" << "   ";
+    std::cout << "Array" << "   " << std::endl;
     left->Print(spaces);
-    std::cout << "   ";
     right->Print(spaces);
-    std::cout << std::endl;
     type->Print(spaces);
 }
 
