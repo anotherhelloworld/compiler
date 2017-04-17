@@ -1,4 +1,5 @@
 #include "Parser.h"
+//#include "CalculateExpression.h"
 
 void Parser::Print() {
     expression = ParseExpression(0);
@@ -177,6 +178,7 @@ void Parser::ParseVarDeclaration(SymbolTable* symTable) {
             CheckNextLexem(lex, Lexem("IDENTIFICATOR", IDENTIFICATOR));
             names.push_back(scanner.GetLexem().val);
             namesPos.push_back(scanner.GetLexem().pos);
+            scanner.NextToken();
         }
 //        scanner.NextToken();
         Lexem lex = scanner.GetLexem();
@@ -266,7 +268,9 @@ Symbol* Parser::ParseType(SymbolTable* symTable) {
     if (scanner.GetLexem().token == ARRAY) {
         return ParseArrayDecl(symTable);
     }
-    else {
+    else if (scanner.GetLexem().token == RECORD) {
+        return ParseRecord(symTable);
+    } else {
         bool flag = false;
         if (scanner.GetLexem().token == CIRCUMFLEX) {
             flag = true;
@@ -284,6 +288,45 @@ Symbol* Parser::ParseType(SymbolTable* symTable) {
         }
         return sym;
     }
+}
+
+int Parser::ParseArguments(SymbolTable* symTable) {
+    int res = 0;
+    while (scanner.GetLexem().token == IDENTIFICATOR || scanner.GetLexem().token == CONST ||
+            scanner.GetLexem().token == VAR) {
+        ArgumentType argType = ArgumentType::RVALUE;
+        if (scanner.GetLexem().token == CONST) {
+            argType = ArgumentType::CONSTANT;
+            scanner.NextToken();
+        }
+        if (scanner.GetLexem().token == VAR) {
+            argType = ArgumentType::VARIABLE;
+            scanner.NextToken();
+        }
+        ++res;
+        std::pair<int, int> pos = scanner.GetLexem().pos;
+        std::string name = scanner.GetLexem().val;
+        scanner.NextToken();
+        CheckNextLexem(scanner.GetLexem(), Lexem(":", COLON));
+        scanner.NextToken();
+        Symbol* type = ParseType(symTable);
+        symTable->CheckLocalSymbol(name, pos);
+        symTable->Add(new SymbolVar(name, nullptr, type, argType));
+        if (scanner.GetLexem().token != END && scanner.GetLexem().token != CLOSE_BRACKET) {
+            CheckNextLexem(scanner.GetLexem(), Lexem(";", SEMI_COLON));
+            scanner.NextToken();
+        }
+    }
+    return res;
+}
+
+Symbol* Parser::ParseRecord(SymbolTable* symbolTable) {
+    scanner.NextToken();
+    SymbolTable* tempTable = new SymbolTable(symbolTable);
+    int argc = ParseArguments(tempTable);
+    CheckNextLexem(scanner.GetLexem(), Lexem("END", END));
+    scanner.NextToken();
+    return new SymbolRecord(tempTable, "", argc);
 }
 
 Symbol* Parser::ParseArrayDecl(SymbolTable* symTable) {
@@ -307,9 +350,9 @@ Symbol* Parser::ParseArrayDecl(SymbolTable* symTable) {
             leftExpr = ParseExpression(0);
             leftExpr->expressionType = ExpressionType::VAR;
             CheckConstant(symTable, leftExpr);
-            scanner.NextToken();
             Lexem lex = scanner.GetLexem();
             CheckNextLexem(lex, Lexem("..", DOUBLE_POINT));
+            scanner.NextToken();
             Expression* rightExpr = ParseExpression(0);
             rightExpr->expressionType = ExpressionType::VAR;
             CheckConstant(symTable, rightExpr);

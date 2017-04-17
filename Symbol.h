@@ -6,8 +6,10 @@
 #include <algorithm>
 #include "Expression.h"
 
+class SymbolTable;
+
 enum class DeclarationType {
-    D_NULL, CONST, TYPE, VAR,
+    D_NULL, CONST, TYPE, VAR, RECORD,
 };
 
 enum class ArgumentType {
@@ -26,6 +28,7 @@ public:
     std::string name;
     DeclarationType declType;
     virtual Symbol* GetType();
+//    virtual int GetSize();
 };
 
 class SymbolType : public Symbol {
@@ -46,6 +49,7 @@ public:
     Symbol* type;
     Expression* initExpr;
     Symbol* GetType();
+    int offset;
 };
 
 class SymbolConst: public SymbolIdent {
@@ -78,6 +82,15 @@ public:
     void Print(int);
 };
 
+class SymbolRecord: public Symbol {
+public:
+    SymbolTable* table;
+    int argc;
+    SymbolRecord(SymbolTable* table, std::string name, int argc):
+            Symbol(name, DeclarationType::RECORD), table(table), argc(argc) {};
+    void Print(int);
+};
+
 class SymbolTable {
 public:
     SymbolTable(SymbolTable*);
@@ -87,9 +100,9 @@ public:
     int FindSymbol(std::string);
     void CheckLocalSymbol(std::string, std::pair<int, int>);
     bool Find(std::string);
+    std::vector<Symbol*> symbols;
 private:
     SymbolTable* parentTable;
-    std::vector<Symbol*> symbols;
     int stdTypeCount;
 };
 

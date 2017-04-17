@@ -67,6 +67,11 @@ Symbol* Symbol::GetType() {
     return nullptr;
 }
 
+//
+//int Symbol::GetSize() {
+//    return 0;
+//}
+
 void SymbolType::Print(int spaces) {
     if (name.size() == 0) {
         return;
@@ -82,7 +87,7 @@ void SymbolType::Print(int spaces) {
 
 void SymbolConst::Print(int spaces) {
     for (int i = 0; i < spaces; i++) {
-        std::cout << " ";
+        std::cout << "   ";
     };
     std::cout << "Const" << "   " << name << std::endl;
     if (type != nullptr) {
@@ -93,7 +98,7 @@ void SymbolConst::Print(int spaces) {
 
 void SymbolVar::Print(int spaces) {
     for (int i = 0; i < spaces; i++) {
-        std::cout << " ";
+        std::cout << "   ";
     }
     std::cout << "Var" << "   " << name << std::endl;
     type->Print(spaces + 1);
@@ -104,7 +109,7 @@ void SymbolVar::Print(int spaces) {
 
 void SymbolArray::Print(int spaces) {
     for (int i = 0; i < spaces; i++) {
-        std::cout << " ";
+        std::cout << "   ";
     }
     std::cout << "Array" << "   " << std::endl;
     left->Print(spaces);
@@ -118,4 +123,16 @@ Symbol* SymbolType::GetType() {
 
 Symbol* SymbolIdent::GetType() {
     return type;
+}
+
+void SymbolRecord::Print(int spaces) {
+    for (int i = 0; i < spaces; i++) {
+        std::cout << "   ";
+    }
+    std::cout << "Record" << std::endl;
+    this->table->Print(spaces + 1);
+    for (int i = 0; i < spaces; i++) {
+        std::cout << "   ";
+    }
+    std::cout << "End" << std::endl;
 }
