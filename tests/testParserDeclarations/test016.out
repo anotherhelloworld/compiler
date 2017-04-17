@@ -6,7 +6,7 @@ Const   b
    15
 
 Var   str
- Array   
+   Array   
    a
    b
    Type   integer

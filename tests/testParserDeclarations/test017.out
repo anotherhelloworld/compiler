@@ -1,6 +1,6 @@
-Var   str
+Type   myarr
    Array   
-   0
    1
+   100
    Type   integer
 

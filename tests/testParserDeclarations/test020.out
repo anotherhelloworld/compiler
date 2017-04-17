@@ -1,9 +1,12 @@
-Var   str
+Var   a
    Array   
-   0
    1
+   2
    Array   
-   0
+   3
    4
+   Array   
+   5
+   6
    Type   integer
 

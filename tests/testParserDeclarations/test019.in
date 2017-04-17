@@ -1,0 +1,7 @@
+type
+mytype1 = integer;
+mytype2 = mytype1;
+mytype3 = array[1..100] of mytype2;
+
+var
+arr: mytype3 = (1, 2, 3);
