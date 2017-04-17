@@ -1,0 +1,13 @@
+Const   a
+   10
+
+Const   b
+   Type   integer
+   15
+
+Var   str
+ Array   
+   a
+   b
+   Type   integer
+
