@@ -20,11 +20,13 @@ Parser::Parser(char* filename): scanner(filename) {
     priorities[LESS_THAN] = 0;
     priorities[LESS_OR_EQUAL_THAN];
     priorities[GREATER_OR_EQUAL_THAN] = 0;
+    priorities[ASSIGNMENT] = 0;
 
     priorities[ADD] = 1;
     priorities[SUB] = 1;
     priorities[OR] = 1;
     priorities[XOR] = 1;
+
 
     priorities[MULT] = 2;
     priorities[DIV] = 2;
@@ -38,6 +40,8 @@ Parser::Parser(char* filename): scanner(filename) {
     unarPriorities[SUB] = 3;
     unarPriorities[ADD] = 3;
 
+
+
 //    expression = ParseExpression(0);
 //    if (scanner.GetLexem().token != TokenType::T_EOF)
 //        throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());
@@ -50,6 +54,13 @@ Expression* Parser::ParseExpression(int priority) {
     Expression* res = ParseExpression(priority + 1);
     Lexem lex = scanner.GetLexem();
     while (PriorityCheck(priority, lex.token)) {
+        if (scanner.GetLexem().token == ASSIGNMENT) {
+            scanner.NextToken();
+            Expression* right = ParseExpression(priority + 1);
+            res = (Expression*)new ExpressionAssign(right, res);
+            lex = scanner.GetLexem();
+            return res;
+        }
         scanner.NextToken();
         Expression* right = ParseExpression(priority + 1);
         res = (Expression*)new ExpressionBinOp(lex, res, right);
@@ -157,6 +168,9 @@ void Parser::ParseDeclaration(SymbolTable* symTable) {
         if (scanner.GetLexem().token == VAR) {
             ParseVarDeclaration(symTable);
             continue;
+        }
+        if (scanner.GetLexem().token == BEGIN) {
+            return;
         }
 
     }
@@ -428,4 +442,67 @@ void Parser::CheckConstant(SymbolTable* symbolTable, Expression* expr) {
             throw;
         }
     }
+}
+
+Block* Parser::ParseBlock(SymbolTable* symbolTable, int state) {
+    if (scanner.GetLexem().token == BEGIN) {
+        return ParseCompoundBlock(symbolTable, state);
+    } else if (scanner.GetLexem().token == FOR) {
+        return ParseForBlock(symTable, state);
+    }
+}
+
+Block* Parser::ParseCompoundBlock(SymbolTable* symbolTable, int state) {
+    CheckNextLexem(scanner.GetLexem(), Lexem("begin", BEGIN));
+    scanner.NextToken();
+    BlockCompound* blockCompound = new BlockCompound();
+    blockCompound->listBlock = ParseBlockList(symbolTable, state);
+    CheckNextLexem(scanner.GetLexem(), Lexem("end", END));
+    scanner.NextToken();
+    return blockCompound;
+}
+
+std::set<TokenType> endBlockToken = {END, ELSE, UNTIL, POINT};
+
+std::vector<Block*> Parser::ParseBlockList(SymbolTable* symbolTable, int state) {
+    std::vector<Block*> ans;
+    while (endBlockToken.find(scanner.GetLexem().token) == endBlockToken.cend()) {
+        Block* block = ParseBlock(symTable, state);
+        if (block != nullptr) {
+            ans.push_back(block);
+        }
+    }
+    return ans;
+}
+
+Block* Parser::ParseForBlock(SymbolTable* symbolTable, int state) {
+    scanner.NextToken();
+    std::pair<int, int> pos = scanner.GetLexem().pos;
+    Expression* exp1 = ParseExpression(0);
+    bool toFlag = scanner.GetLexem().token == TO;
+    if (scanner.GetLexem().token == DOWNTO) {
+        scanner.NextToken();
+        toFlag = false;
+    } else {
+        CheckNextLexem(scanner.GetLexem(), Lexem("to", TO));
+        toFlag = true;
+    }
+    pos = scanner.GetLexem().pos;
+    scanner.NextToken();
+    Expression* exp2 = ParseExpression(0);
+    CheckNextLexem(scanner.GetLexem(), Lexem("do", DO));
+    scanner.NextToken();
+    Block* block = ParseBlock(symbolTable, state | 2);
+    scanner.NextToken();
+    return new BlockFor(exp1, exp2, toFlag, block);
+}
+
+Block* Parser::ParseBlockStart() {
+//    scanner.NextToken();
+    this->ParseDeclaration(this->symTable);
+    Block* block = new BlockCompound();
+    CheckNextLexem(scanner.GetLexem(), Lexem("begin", BEGIN));
+    scanner.NextToken();
+    ((BlockCompound*)block)->listBlock = this->ParseBlockList(this->symTable, 0);
+    return block;
 }

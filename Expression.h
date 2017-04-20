@@ -3,7 +3,7 @@
 #include "Scanner.h"
 
 enum class ExpressionType {
-    VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD,
+    VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD, ASSIGN,
 };
 
 struct ExpressionArgumentList {
@@ -97,6 +97,14 @@ public:
     std::vector<Expression*> initList;
     ExpressionInitializeList(std::vector<Expression*> initList = std::vector<Expression*>()):
             Expression(ExpressionType::VAR), initList(initList) {};
+    void Print(int);
+};
+
+class ExpressionAssign: public Expression {
+public:
+    Expression* left;
+    Expression* right;
+    ExpressionAssign(Expression* left, Expression* right): Expression(ExpressionType::ASSIGN), left(left), right(right) {};
     void Print(int);
 };
 

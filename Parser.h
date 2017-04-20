@@ -3,12 +3,16 @@
 #include "Scanner.h"
 #include "Symbol.h"
 #include "Expression.h"
+#include "Block.h"
+#include <set>
 
 class Parser {
 public:
     Parser(char*);
     void ParseDeclaration(SymbolTable*);
+    Block* ParseBlockStart();
     void Print();
+
     SymbolTable* symTable;
 private:
     Expression* ParseExpression(int);
@@ -25,6 +29,11 @@ private:
     Expression* ParseInitializeList(SymbolTable*);
     Symbol* ParseArrayDecl(SymbolTable*);
     Symbol* ParseRecord(SymbolTable*);
+    Block* ParseCompoundBlock(SymbolTable*, int);
+    Block* ParseForBlock(SymbolTable*, int);
+    Block* ParseBlock(SymbolTable*, int);
+    std::vector<Block*> ParseBlockList(SymbolTable*, int);
+    Block* ParseBlockIdent(SymbolTable*, int);
     int ParseArguments(SymbolTable*);
     void CheckConstant(SymbolTable*, Expression*);
     std::vector<int> priorities;

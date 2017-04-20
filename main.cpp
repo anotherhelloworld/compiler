@@ -52,6 +52,17 @@ int main(int argc, char* argv[]) {
             } catch (ParserException error) {
                 return 0;
             }
+        } else if (strcmp(argv[1], "-b") == 0) {
+            try {
+                Parser parser(argv[2]);
+//                parser.ParseDeclaration(parser.symTable);
+//                Block* block = new BlockCompound();
+//                ((BlockCompound*)block)->listBlock = parser.ParseBlockList(parser.symTable, 0);
+                Block* block = parser.ParseBlockStart();
+                block->Print(0);
+            } catch (ParserException error) {
+                return 0;
+            }
         }
         else {
             std::cout << "error: unknown argument" << std::endl;

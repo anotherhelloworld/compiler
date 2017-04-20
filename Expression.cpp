@@ -51,3 +51,12 @@ void ExpressionArrayIndecies::GetIdentificitationList(ExpressionArgumentList* li
         indecies[i]->GetIdentificitationList(list);
     }
 }
+
+void ExpressionAssign::Print(int spaces) {
+    right->Print(spaces + 1);
+    for (int i = 0; i < spaces; i++) {
+        std::cout << "   ";
+    }
+    std::cout << ":=" << std::endl;
+    left->Print(spaces + 1);
+}
