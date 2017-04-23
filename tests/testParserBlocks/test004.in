@@ -1,0 +1,7 @@
+function foo(): integer;
+begin
+end;
+var i: integer;
+begin
+    foo();
+end.

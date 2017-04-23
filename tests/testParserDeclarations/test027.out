@@ -1,0 +1,13 @@
+Procedure   foo   0
+   begin
+      for
+            i
+         :=
+            0
+      true
+         10
+      do
+         begin
+         end
+   end
+
