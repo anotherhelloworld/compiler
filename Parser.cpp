@@ -126,6 +126,21 @@ Expression *Parser::ParseTerm(bool flag) {
             res = (Expression*)new ExpressionArrayIndecies(res, indecies);
             lex = scanner.GetLexem();
             CheckNextLexem(lex, Lexem("]", CLOSE_SQUARE_BRACKET));
+        } else if (lex.token == OPEN_BRACKET) {
+            std::vector <Expression*> args;
+            scanner.NextToken();
+            if (scanner.GetLexem().token != CLOSE_BRACKET) {
+                args.push_back(ParseExpression(0));
+                while (scanner.GetLexem().token == COMMA) {
+                    scanner.NextToken();
+                    args.push_back(ParseExpression(0));
+                }
+            }
+            if (scanner.GetLexem().token != CLOSE_BRACKET) {
+                throw;
+            }
+            scanner.NextToken();
+            res = (Expression*)new ExpressionFuncCall(res, args);
         } else {
             flag = false;
         }
@@ -169,11 +184,56 @@ void Parser::ParseDeclaration(SymbolTable* symTable) {
             ParseVarDeclaration(symTable);
             continue;
         }
+        if (scanner.GetLexem().token == FUNCTION) {
+            ParseFuncDeclaration(symTable, DeclarationType::FUNC);
+            continue;
+        }
+        if (scanner.GetLexem().token == PROCEDURE) {
+            ParseFuncDeclaration(symTable, DeclarationType::PROCEDURE);
+            continue;
+        }
         if (scanner.GetLexem().token == BEGIN) {
             return;
         }
 
     }
+}
+
+void Parser::ParseFuncDeclaration(SymbolTable* symbolTable, DeclarationType declarationType) {
+    scanner.NextToken();
+    CheckNextLexem(scanner.GetLexem(), Lexem("IDENTIFICATOR", IDENTIFICATOR));
+    std::pair<int, int> pos = scanner.GetLexem().pos;
+    std::string name = scanner.GetLexem().val;
+    scanner.NextToken();
+    SymbolTable* localTable = new SymbolTable(symbolTable);
+    int argc = 0;
+    if (scanner.GetLexem().token == OPEN_BRACKET) {
+        scanner.NextToken();
+        int argc = ParseArguments(symbolTable);
+        CheckNextLexem(scanner.GetLexem(), Lexem(")", CLOSE_BRACKET));
+        scanner.NextToken();
+    }
+    Symbol* newSymbol = nullptr;
+    if (declarationType == DeclarationType::FUNC) {
+        CheckNextLexem(scanner.GetLexem(), Lexem(":", COLON));
+        scanner.NextToken();
+        Symbol* type = ParseType(symbolTable);
+        localTable->Add(new SymbolVar("Result", nullptr, type, ArgumentType::RVALUE));
+        CheckNextLexem(scanner.GetLexem(), Lexem(";", SEMI_COLON));
+        scanner.NextToken();
+        newSymbol = new SymbolFunction(name, localTable, nullptr, argc + 1, type);
+    }
+    if (declarationType == DeclarationType::PROCEDURE) {
+        CheckNextLexem(scanner.GetLexem(), Lexem(";", SEMI_COLON));
+        scanner.NextToken();
+        newSymbol = new SymbolProcedure(name, localTable, nullptr, argc);
+    }
+    std::vector <Symbol*> symbols = symbolTable->GetAllSymbols(name, pos);
+    SymbolCall* firstDecl = nullptr;
+    ParseDeclaration(localTable);
+    CheckNextLexem(scanner.GetLexem(), Lexem("begin", BEGIN));
+    symbolTable->Add(newSymbol);
+    ((SymbolCall*)newSymbol)->block = ParseBlock(localTable, 0);
 }
 
 void Parser::ParseVarDeclaration(SymbolTable* symTable) {
@@ -194,7 +254,6 @@ void Parser::ParseVarDeclaration(SymbolTable* symTable) {
             namesPos.push_back(scanner.GetLexem().pos);
             scanner.NextToken();
         }
-//        scanner.NextToken();
         Lexem lex = scanner.GetLexem();
         CheckNextLexem(lex, Lexem(":", COLON));
         scanner.NextToken();
@@ -203,12 +262,9 @@ void Parser::ParseVarDeclaration(SymbolTable* symTable) {
         if (strcasecmp(type->name.c_str(), "pointer") == 0 || type->name.length() == 0) {
             argType = ArgumentType::RVALUE;
         }
-//        auto tempType = type;
         while (type->declType == DeclarationType::TYPE && ((SymbolType*)type)->dataType == DataType::BADTYPE) {
             type = ((SymbolType*)type)->type;
         }
-//        if ()
-//        ((SymbolType*)tempType)->type = type;
         if (names.size() > 1 && scanner.GetLexem().token == EQUAL) {
             throw;
         }
@@ -449,6 +505,8 @@ Block* Parser::ParseBlock(SymbolTable* symbolTable, int state) {
         return ParseCompoundBlock(symbolTable, state);
     } else if (scanner.GetLexem().token == FOR) {
         return ParseForBlock(symTable, state);
+    } else if (scanner.GetLexem().token == IDENTIFICATOR) {
+        return ParseBlockIdent(symTable, state);
     }
 }
 
@@ -458,6 +516,8 @@ Block* Parser::ParseCompoundBlock(SymbolTable* symbolTable, int state) {
     BlockCompound* blockCompound = new BlockCompound();
     blockCompound->listBlock = ParseBlockList(symbolTable, state);
     CheckNextLexem(scanner.GetLexem(), Lexem("end", END));
+    scanner.NextToken();
+    CheckNextLexem(scanner.GetLexem(), Lexem(";", SEMI_COLON));
     scanner.NextToken();
     return blockCompound;
 }
@@ -479,7 +539,7 @@ Block* Parser::ParseForBlock(SymbolTable* symbolTable, int state) {
     scanner.NextToken();
     std::pair<int, int> pos = scanner.GetLexem().pos;
     Expression* exp1 = ParseExpression(0);
-    bool toFlag = scanner.GetLexem().token == TO;
+    bool toFlag;
     if (scanner.GetLexem().token == DOWNTO) {
         scanner.NextToken();
         toFlag = false;
@@ -493,8 +553,24 @@ Block* Parser::ParseForBlock(SymbolTable* symbolTable, int state) {
     CheckNextLexem(scanner.GetLexem(), Lexem("do", DO));
     scanner.NextToken();
     Block* block = ParseBlock(symbolTable, state | 2);
-    scanner.NextToken();
+//    scanner.NextToken();
     return new BlockFor(exp1, exp2, toFlag, block);
+}
+
+Block* Parser::ParseBlockIdent(SymbolTable* symTable, int state) {
+    std::pair<int, int> pos = scanner.GetLexem().pos;
+    Symbol* symbol = symTable->GetSymbol(scanner.GetLexem().val, pos);
+    Expression* exp = ParseExpression(0);
+    if (exp->expressionType == ExpressionType::ASSIGN) {
+        CheckNextLexem(scanner.GetLexem(), Lexem(";", SEMI_COLON));
+        scanner.NextToken();
+        return new BlockAssign(exp);
+    }
+    if (exp->expressionType == ExpressionType::FUNCCALL) {
+        CheckNextLexem(scanner.GetLexem(), Lexem(";", SEMI_COLON));
+        scanner.NextToken();
+        return new BlockFuncCall(exp);
+    }
 }
 
 Block* Parser::ParseBlockStart() {
@@ -504,5 +580,7 @@ Block* Parser::ParseBlockStart() {
     CheckNextLexem(scanner.GetLexem(), Lexem("begin", BEGIN));
     scanner.NextToken();
     ((BlockCompound*)block)->listBlock = this->ParseBlockList(this->symTable, 0);
+    scanner.NextToken();
+    CheckNextLexem(scanner.GetLexem(), Lexem(".", POINT));
     return block;
 }

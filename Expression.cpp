@@ -55,8 +55,19 @@ void ExpressionArrayIndecies::GetIdentificitationList(ExpressionArgumentList* li
 void ExpressionAssign::Print(int spaces) {
     right->Print(spaces + 1);
     for (int i = 0; i < spaces; i++) {
-        std::cout << "   ";
+        std::cout << indent;
     }
     std::cout << ":=" << std::endl;
+    left->Print(spaces + 1);
+}
+
+void ExpressionFuncCall::Print(int spaces) {
+    for (auto i: args) {
+        i->Print(spaces);
+    }
+    for (int i = 0; i < spaces; i++) {
+        std::cout << indent;
+    }
+    std::cout << "()" << std::endl;
     left->Print(spaces + 1);
 }

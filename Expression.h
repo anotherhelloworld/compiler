@@ -2,8 +2,10 @@
 #define COMPILER_EXPRESSION_H
 #include "Scanner.h"
 
+#define indent "   "
+
 enum class ExpressionType {
-    VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD, ASSIGN,
+    VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD, ASSIGN, FUNCCALL,
 };
 
 struct ExpressionArgumentList {
@@ -105,6 +107,14 @@ public:
     Expression* left;
     Expression* right;
     ExpressionAssign(Expression* left, Expression* right): Expression(ExpressionType::ASSIGN), left(left), right(right) {};
+    void Print(int);
+};
+
+class ExpressionFuncCall: public Expression {
+public:
+    Expression* left;
+    std::vector<Expression*> args;
+    ExpressionFuncCall(Expression* left, std::vector<Expression*> args): Expression(ExpressionType::FUNCCALL), left(left), args(args) {};
     void Print(int);
 };
 

@@ -27,7 +27,7 @@ enum TokenType {
     INTEGER, BYTE, WORD, SHORTINT, LONGINT, REAL, SINGLE, DOUBLE,
     EXTENDED, BOOLEAN, CHAR,
 
-    TOKEN_STRING, T_EOF, ERROR, COUNT,
+    TOKEN_STRING, T_EOF, ERROR, FORWARD, COUNT,
 };
 
 static std::vector<std::string> enumToStr {
@@ -52,7 +52,7 @@ static std::vector<std::string> enumToStr {
     "INTEGER", "BYTE", "WORD", "SHORTINT", "LONGINT", "REAL", "SINGLE", "DOUBLE",
     "EXTENDED", "BOOLEAN", "CHAR",
 
-    "TOKEN_STRING", "T_EOF", "ERROR", "COUNT"
+    "TOKEN_STRING", "T_EOF", "ERROR", "FORWARD", "COUNT"
 };
 
 static std::map <std::string, TokenType> reserveWords = {
@@ -120,7 +120,8 @@ static std::map <std::string, TokenType> reserveWords = {
         {"double", DOUBLE},
         {"extended", EXTENDED},
         {"boolean", BOOLEAN},
-        {"char", CHAR}
+        {"char", CHAR},
+        {"forward", FORWARD}
 };
 
 static std::map <std::string, TokenType> doubleOperators = {

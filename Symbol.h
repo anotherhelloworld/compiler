@@ -5,11 +5,12 @@
 #include <iostream>
 #include <algorithm>
 #include "Expression.h"
+#include "Block.h"
 
 class SymbolTable;
 
 enum class DeclarationType {
-    D_NULL, CONST, TYPE, VAR, RECORD,
+    D_NULL, CONST, TYPE, VAR, RECORD, FUNC, PROCEDURE,
 };
 
 enum class ArgumentType {
@@ -28,7 +29,7 @@ public:
     std::string name;
     DeclarationType declType;
     virtual Symbol* GetType();
-//    virtual int GetSize();
+    bool Same(std::string);
 };
 
 class SymbolType : public Symbol {
@@ -91,6 +92,30 @@ public:
     void Print(int);
 };
 
+class SymbolCall: public Symbol {
+public:
+    SymbolCall(DeclarationType declType, std::string name, SymbolTable* symbolTable, Block* block, int argc):
+            Symbol(name, declType), symbolTable(symbolTable), block(block), argc(argc) {};
+    SymbolTable* symbolTable;
+    Block* block;
+    int argc;
+};
+
+class SymbolFunction: public SymbolCall {
+public:
+    SymbolFunction(std::string name, SymbolTable* symbolTable, Block* block, int argc, Symbol* type):
+            SymbolCall(DeclarationType::FUNC, name, symbolTable, block, argc), type(type) {};
+    Symbol* type;
+    void Print(int);
+};
+
+class SymbolProcedure: public SymbolCall {
+public:
+    SymbolProcedure(std::string name, SymbolTable* symbolTable, Block* block, int argc):
+            SymbolCall(DeclarationType::PROCEDURE, name, symbolTable, block, argc) {};
+    void Print(int);
+};
+
 class SymbolTable {
 public:
     SymbolTable(SymbolTable*);
@@ -100,6 +125,7 @@ public:
     int FindSymbol(std::string);
     void CheckLocalSymbol(std::string, std::pair<int, int>);
     bool Find(std::string);
+    std::vector<Symbol*> GetAllSymbols(std::string, std::pair<int, int>);
     std::vector<Symbol*> symbols;
 private:
     SymbolTable* parentTable;

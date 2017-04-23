@@ -35,4 +35,19 @@ public:
     void Print(int);
 };
 
+class BlockFuncCall: public Block {
+public:
+    Expression* exp;
+    BlockFuncCall(Expression* exp): exp(exp) {};
+    void Print(int);
+};
+
+class BlockAssign: public Block {
+public:
+    Expression* exp;
+    BlockAssign(Expression* exp): exp(exp) {};
+    void Print(int);
+};
+
+
 #endif //COMPILER_BLOCK_H
