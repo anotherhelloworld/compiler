@@ -33,6 +33,9 @@ private:
     Block* ParseCompoundBlock(SymbolTable*, int);
     Block* ParseForBlock(SymbolTable*, int);
     Block* ParseBlock(SymbolTable*, int);
+    Block* ParseIfBlock(SymbolTable*, int);
+    Block* ParseWhileBlock(SymbolTable*, int);
+    Block* ParseRepeatBlock(SymbolTable*, int);
     std::vector<Block*> ParseBlockList(SymbolTable*, int);
     Block* ParseBlockIdent(SymbolTable*, int);
     int ParseArguments(SymbolTable*);

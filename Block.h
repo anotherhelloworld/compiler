@@ -49,5 +49,30 @@ public:
     void Print(int);
 };
 
+class BlockWhile: public BlockCondition {
+public:
+    Block* block;
+    BlockWhile(Expression* cond, Block* block): BlockCondition(cond), block(block) {};
+    void Print(int);
+};
 
+class BlockContinue: public Block {
+public:
+    void Print(int);
+};
+
+class BlockIf: public BlockCondition {
+public:
+    Block* blockThen;
+    Block* blockElse;
+    BlockIf(Expression* exp, Block* blockThen, Block* blockElse): BlockCondition(exp), blockThen(blockThen), blockElse(blockElse) {}
+    void Print(int);
+};
+
+class BlockRepeat: public BlockCondition {
+public:
+    std::vector<Block*> blocks;
+    BlockRepeat(Expression* exp, std::vector<Block*> blocks): BlockCondition(exp), blocks(blocks) {};
+    void Print(int);
+};
 #endif //COMPILER_BLOCK_H

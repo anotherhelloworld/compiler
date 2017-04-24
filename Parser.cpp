@@ -139,7 +139,7 @@ Expression *Parser::ParseTerm(bool flag) {
             if (scanner.GetLexem().token != CLOSE_BRACKET) {
                 throw;
             }
-            scanner.NextToken();
+//            scanner.NextToken();
             res = (Expression*)new ExpressionFuncCall(res, args);
         } else {
             flag = false;
@@ -262,9 +262,9 @@ void Parser::ParseVarDeclaration(SymbolTable* symTable) {
         if (strcasecmp(type->name.c_str(), "pointer") == 0 || type->name.length() == 0) {
             argType = ArgumentType::RVALUE;
         }
-        while (type->declType == DeclarationType::TYPE && ((SymbolType*)type)->dataType == DataType::BADTYPE) {
-            type = ((SymbolType*)type)->type;
-        }
+//        while (type->declType == DeclarationType::TYPE && ((SymbolType*)type)->dataType == DataType::BADTYPE) {
+//            type = ((SymbolType*)type)->type;
+//        }
         if (names.size() > 1 && scanner.GetLexem().token == EQUAL) {
             throw;
         }
@@ -507,8 +507,35 @@ Block* Parser::ParseBlock(SymbolTable* symbolTable, int state) {
         return ParseForBlock(symTable, state);
     } else if (scanner.GetLexem().token == IDENTIFICATOR) {
         return ParseBlockIdent(symTable, state);
+    } else if (scanner.GetLexem().token == WHILE) {
+        return ParseWhileBlock(symbolTable, state);
+    } else if (scanner.GetLexem().token == SEMI_COLON) {
+        scanner.NextToken();
+        return nullptr;
+    }
+    else if (scanner.GetLexem().token == CONTINUE) {
+        if (state & 2) {
+            scanner.NextToken();
+            CheckNextLexem(scanner.GetLexem(), Lexem(";", SEMI_COLON));
+            return new BlockContinue();
+        }
+    } else if (scanner.GetLexem().token == IF) {
+        return ParseIfBlock(symbolTable, 0);
+    } else if (scanner.GetLexem().token == REPEAT) {
+        return ParseRepeatBlock(symbolTable, state);
     }
 }
+
+Block* Parser::ParseWhileBlock(SymbolTable* symbolTable, int state) {
+    scanner.NextToken();
+    std::pair<int, int> pos = scanner.GetLexem().pos;
+    Expression* cond = ParseExpression(0);
+    CheckNextLexem(scanner.GetLexem(), Lexem("do", DO));
+    scanner.NextToken();
+    return new BlockWhile(cond, ParseBlock(symbolTable, state | 2));
+}
+
+std::set<TokenType> endBlockToken = {END, ELSE, UNTIL, POINT};
 
 Block* Parser::ParseCompoundBlock(SymbolTable* symbolTable, int state) {
     CheckNextLexem(scanner.GetLexem(), Lexem("begin", BEGIN));
@@ -517,12 +544,14 @@ Block* Parser::ParseCompoundBlock(SymbolTable* symbolTable, int state) {
     blockCompound->listBlock = ParseBlockList(symbolTable, state);
     CheckNextLexem(scanner.GetLexem(), Lexem("end", END));
     scanner.NextToken();
+    if (scanner.GetLexem().token == ELSE) {
+//        scanner.NextToken();
+        return blockCompound;
+    }
     CheckNextLexem(scanner.GetLexem(), Lexem(";", SEMI_COLON));
     scanner.NextToken();
     return blockCompound;
 }
-
-std::set<TokenType> endBlockToken = {END, ELSE, UNTIL, POINT};
 
 std::vector<Block*> Parser::ParseBlockList(SymbolTable* symbolTable, int state) {
     std::vector<Block*> ans;
@@ -583,4 +612,28 @@ Block* Parser::ParseBlockStart() {
     scanner.NextToken();
     CheckNextLexem(scanner.GetLexem(), Lexem(".", POINT));
     return block;
+}
+
+Block* Parser::ParseIfBlock(SymbolTable* symbolTable, int state) {
+    scanner.NextToken();
+    std::pair <int, int> pos = scanner.GetLexem().pos;
+    Expression* exp = ParseExpression(0);
+    CheckNextLexem(scanner.GetLexem(), Lexem("then", THEN));
+    scanner.NextToken();
+    Block* blockThen = ParseBlock(symTable, state);
+    Block* blockElse = nullptr;
+    if (scanner.GetLexem().token == ELSE) {
+        scanner.NextToken();
+        blockElse = ParseBlock(symbolTable, state);
+    }
+    return new BlockIf(exp, blockThen, blockElse);
+}
+
+Block* Parser::ParseRepeatBlock(SymbolTable* symbolTable, int state) {
+    scanner.NextToken();
+    std::vector<Block*> blocks = ParseBlockList(symbolTable, state | 2);
+    CheckNextLexem(scanner.GetLexem(), Lexem("until", UNTIL));
+    scanner.NextToken();
+    Expression* exp = ParseExpression(0);
+    return new BlockRepeat(exp, blocks);
 }
