@@ -1,0 +1,7 @@
+Function   foo   1
+   Var   Result
+      Type   integer
+
+   begin
+   end
+

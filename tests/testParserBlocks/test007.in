@@ -1,0 +1,6 @@
+var i: integer;
+begin
+    while true do begin
+        continue;
+    end;
+end.

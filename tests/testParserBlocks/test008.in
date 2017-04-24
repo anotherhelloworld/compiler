@@ -1,0 +1,7 @@
+var i: integer;
+begin
+    if (10 > 20) then
+        i := 1;
+    else
+        i := 2;
+end.

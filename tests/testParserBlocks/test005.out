@@ -1,0 +1,12 @@
+begin
+   while
+      true
+   do
+      begin
+            i
+         :=
+               i
+            +
+               1
+      end
+end

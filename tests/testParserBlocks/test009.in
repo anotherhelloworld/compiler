@@ -1,0 +1,8 @@
+var i: integer;
+begin
+    if (10 > 20) then begin
+    end
+    else begin
+        ;;;;;;
+    end;
+end.
