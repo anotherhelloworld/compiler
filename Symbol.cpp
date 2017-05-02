@@ -21,7 +21,6 @@ void SymbolTable::Add(Symbol* symbol) {
 
 int SymbolTable::FindSymbol(std::string name) {
     for (int i = 0; i < symbols.size(); i++) {
-//        if (symbols[i]->name.length() == name.length() && strncasecmp(symbols[i]->name.c_str(), name.c_str(), symbols[i]->name.length()) == 0) {
         if (symbols[i]->Same(name)) {
             return i;
         }
@@ -40,14 +39,16 @@ Symbol* SymbolTable::GetSymbol(std::string name, std::pair<int, int> pos) {
         temp = temp->parentTable;
     } while (temp != nullptr);
     if (index == -1) {
-
+        std::stringstream ss;
+        ss << "Unknown typename '" << name << "' (" << pos.first << ", " << pos.second <<").";
+        throw ParserException(ss.str());
     }
     return temp->symbols[index];
 }
 
 void SymbolTable::CheckLocalSymbol(std::string name, std::pair<int, int> pos) {
     if (FindSymbol(name) != -1) {
-        throw;
+        throw ParserException("Duplicate identificator '" + name + "'");
     }
 }
 
@@ -55,7 +56,6 @@ bool SymbolTable::Find(std::string name) {
     SymbolTable* temp = this;
     do {
         for (auto symbol: temp->symbols) {
-//            if (symbol->name.length() == name.length() && strncasecmp(symbol->name.c_str(), name.c_str(), symbol->name.length()) == 0) {
             if (symbol->Same(name)) {
                 return true;
             }
@@ -120,6 +120,14 @@ void SymbolVar::Print(int spaces) {
     if (initExpr != nullptr) {
         initExpr->Print(spaces + 1);
     }
+}
+
+void SymbolPointer::Print(int spaces) {
+    for (int i = 0; i < spaces; i++) {
+        std::cout << indent;
+    }
+    std::cout << "Type" << indent << name << std::endl;
+    type->Print(spaces + 1);
 }
 
 void SymbolArray::Print(int spaces) {

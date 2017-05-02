@@ -42,6 +42,7 @@ int main(int argc, char* argv[]) {
                 parser.Print();
 
             } catch (ParserException error) {
+                std::cout << error.getMsg() << std::endl;
                 return 0;
             }
         } else if (strcmp(argv[1], "-d") == 0) {
@@ -50,17 +51,16 @@ int main(int argc, char* argv[]) {
                 parser.ParseDeclaration(parser.symTable);
                 parser.symTable->Print(0);
             } catch (ParserException error) {
+                std::cout << error.getMsg() << std::endl;
                 return 0;
             }
         } else if (strcmp(argv[1], "-b") == 0) {
             try {
                 Parser parser(argv[2]);
-//                parser.ParseDeclaration(parser.symTable);
-//                Block* block = new BlockCompound();
-//                ((BlockCompound*)block)->listBlock = parser.ParseBlockList(parser.symTable, 0);
                 Block* block = parser.ParseBlockStart();
                 block->Print(0);
             } catch (ParserException error) {
+                std::cout << error.getMsg() << std::endl;
                 return 0;
             }
         }

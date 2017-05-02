@@ -21,12 +21,16 @@ private:
     std::string msg;
 public:
     ParserException(std::string msg): msg(msg) {
-        std::cout << msg << std::endl;
+//        std::cout << msg << std::endl;
     }
 
     const std::string &getMsg() const {
         return msg;
     }
 };
+
+//class ParserExceptionDecl: public ParserException {
+//    ParserExceptionDecl(std::string msg): ParserException(msg) {};
+//};
 
 #endif //COMPILER_ERRORS_H

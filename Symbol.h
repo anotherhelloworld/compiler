@@ -4,17 +4,15 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 #include "Expression.h"
 #include "Block.h"
+#include "Errors.h"
 
 class SymbolTable;
 
 enum class DeclarationType {
     D_NULL, CONST, TYPE, VAR, RECORD, FUNC, PROCEDURE,
-};
-
-enum class ArgumentType {
-    RVALUE, VARIABLE, CONSTANT, OUT,
 };
 
 enum class DataType {
@@ -44,9 +42,8 @@ public:
 
 class SymbolIdent: public Symbol {
 public:
-    ArgumentType argType;
-    SymbolIdent(std::string name, DeclarationType declType, Expression* initExpr, Symbol* type, ArgumentType argType):
-            Symbol(name, declType), initExpr(initExpr), type(type), argType(argType) {};
+    SymbolIdent(std::string name, DeclarationType declType, Expression* initExpr, Symbol* type):
+            Symbol(name, declType), initExpr(initExpr), type(type) {};
     Symbol* type;
     Expression* initExpr;
     Symbol* GetType();
@@ -55,21 +52,22 @@ public:
 
 class SymbolConst: public SymbolIdent {
 public:
-    SymbolConst(std::string name, Expression* initExpr, Symbol* type, ArgumentType argType):
-            SymbolIdent(name, DeclarationType::CONST, initExpr, type, argType) {};
+    SymbolConst(std::string name, Expression* initExpr, Symbol* type):
+            SymbolIdent(name, DeclarationType::CONST, initExpr, type) {};
     void Print(int);
 };
 
-class SymPointer: public Symbol {
+class SymbolPointer: public Symbol {
 public:
-    SymPointer(std::string name, Symbol* type): Symbol(name, DeclarationType::TYPE), type(type) {};
+    SymbolPointer(std::string name, Symbol* type): Symbol(name, DeclarationType::TYPE), type(type) {};
     Symbol* type;
+    void Print(int);
 };
 
 class SymbolVar: public SymbolIdent {
 public:
-    SymbolVar(std::string name, Expression* initExpr, Symbol* type, ArgumentType argType):
-            SymbolIdent(name, DeclarationType ::VAR,initExpr, type, argType) {};
+    SymbolVar(std::string name, Expression* initExpr, Symbol* type):
+            SymbolIdent(name, DeclarationType ::VAR,initExpr, type) {};
     void Print(int);
 };
 
