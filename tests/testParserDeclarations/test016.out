@@ -1,4 +1,5 @@
 Const   a
+   Type   integer
    10
 
 Const   b

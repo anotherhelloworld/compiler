@@ -1,6 +1,8 @@
 Const   a
+   Type   integer
    5
 
 Const   b
+   Type   real
    0.5
 

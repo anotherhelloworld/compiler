@@ -1,0 +1,9 @@
+var a, b, i: integer;
+begin
+    for i := 10 to 50 do begin
+        if (a > b) then
+            a := 10;
+        else if (a < b) ; then
+            a := 10;
+    end;
+end.

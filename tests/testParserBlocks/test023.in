@@ -1,0 +1,8 @@
+function a(): char;
+begin
+end;
+
+var a: integer;
+begin
+    a = a();
+end.

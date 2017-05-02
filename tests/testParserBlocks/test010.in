@@ -1,0 +1,7 @@
+var i: integer;
+begin
+    repeat
+    ;;;;;
+    i := 50;
+    until (i > 10);
+end.

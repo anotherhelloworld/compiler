@@ -1,0 +1,10 @@
+begin
+   until
+         i
+      >
+         10
+repeat
+         i
+      :=
+         50
+end

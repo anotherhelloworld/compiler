@@ -3,9 +3,10 @@ Const   a
    10
 
 Const   c
-   Type   double
+   Type   integer
    0
 
 Const   b
+   Type   integer
    250
 
