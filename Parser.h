@@ -4,6 +4,7 @@
 #include "Symbol.h"
 #include "Expression.h"
 #include "Block.h"
+#include "TypeChecker.h"
 #include <set>
 
 class Parser {
@@ -12,13 +13,13 @@ public:
     void ParseDeclaration(SymbolTable*);
     Block* ParseBlockStart();
     void Print();
-
+    bool testType = false;
     SymbolTable* symTable;
 private:
-    Expression* ParseExpression(int);
-    Expression* ParseTerm(bool);
-    Expression* ParseFactor();
-    std::vector <Expression*> ParseArrayIndices();
+    Expression* ParseExpression(SymbolTable*, int);
+    Expression* ParseTerm(SymbolTable*, bool);
+    Expression* ParseFactor(SymbolTable*);
+    std::vector <Expression*> ParseArrayIndices(SymbolTable*);
     bool PriorityCheck(int, TokenType);
     void CheckNextLexem(Lexem, Lexem);
     void ParseConstantDeclaration(SymbolTable*);
