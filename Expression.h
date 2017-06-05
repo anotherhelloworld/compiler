@@ -8,7 +8,7 @@ enum class DataType;
 class Symbol;
 
 enum class ExpressionType {
-    VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD, ASSIGN, FUNCCALL,
+    VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD, ASSIGN, FUNCCALL, INITLIST,
 };
 
 struct ExpressionArgumentList {
@@ -104,7 +104,7 @@ class ExpressionInitializeList: public Expression {
 public:
     std::vector<Expression*> initList;
     ExpressionInitializeList(std::vector<Expression*> initList = std::vector<Expression*>()):
-            Expression(ExpressionType::VAR), initList(initList) {};
+            Expression(ExpressionType::INITLIST), initList(initList) {};
     void Print(int);
 };
 

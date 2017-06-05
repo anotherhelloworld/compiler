@@ -44,6 +44,15 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* e
         Check(((SymbolType*)(symbol))->dataType, GetTypeID(expr));
         return;
     }
+    if (((SymbolType*)(symbol))->dataType == DataType::ARRAY) {
+        if (expr->expressionType != ExpressionType::INITLIST || ((ExpressionInitializeList*)expr)->initList.size() != ((SymbolArray*)symbol)->right - ((SymbolArray*)symbol)->left) {
+            throw TypeCheckerException("IncompatibleTypes");
+        }
+        for (int i = 0; i < ((ExpressionInitializeList*)expr)->initList.size(); i++) {
+            TypeChecker(symbolTable, symbol->GetType(), ((ExpressionInitializeList*)expr)->initList[i], pos);
+        }
+        return;
+    }
 }
 
 void TypeChecker::Check(DataType type1, DataType type2) {
