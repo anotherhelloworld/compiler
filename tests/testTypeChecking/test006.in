@@ -1,0 +1,7 @@
+var
+    a: integer = 10;
+    b : real = 10.00000;
+begin
+    while (a = b) do begin
+    end;
+end.

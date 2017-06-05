@@ -3,7 +3,7 @@ Const   a
    10
 
 Const   c
-   Type   integer
+   Type   real
    0
 
 Const   b

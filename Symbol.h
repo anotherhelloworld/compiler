@@ -5,18 +5,15 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
-#include "Expression.h"
-#include "Block.h"
+//#include "Block.h"
 #include "Errors.h"
+#include "TypeChecker.h"
 
 class SymbolTable;
+class Block;
 
 enum class DeclarationType {
     D_NULL, CONST, TYPE, VAR, RECORD, FUNC, PROCEDURE,
-};
-
-enum class DataType {
-    BADTYPE, INTEGER, DOUBLE, CHAR, ARRAY,
 };
 
 class Symbol {

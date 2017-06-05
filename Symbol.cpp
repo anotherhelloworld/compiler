@@ -1,8 +1,9 @@
 #include "Symbol.h"
+#include "Block.h"
 
 SymbolTable::SymbolTable(SymbolTable * parentTable): parentTable(parentTable) {
     symbols.push_back(new SymbolType("integer", DataType::INTEGER));
-    symbols.push_back(new SymbolType("double", DataType::DOUBLE));
+    symbols.push_back(new SymbolType("real", DataType::REAL));
     symbols.push_back(new SymbolType("char", DataType::CHAR));
     symbols.push_back(new SymbolType("boolean", DataType::CHAR));
     stdTypeCount = symbols.size();

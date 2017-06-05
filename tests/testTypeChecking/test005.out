@@ -1,0 +1,7 @@
+begin
+      a
+   :=
+         10
+      xor
+         10
+end

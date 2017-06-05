@@ -4,7 +4,7 @@ Var   a
          Type   integer
 
       Var   c
-         Type   double
+         Type   real
 
    End
 

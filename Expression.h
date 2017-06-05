@@ -1,8 +1,11 @@
 #ifndef COMPILER_EXPRESSION_H
 #define COMPILER_EXPRESSION_H
 #include "Scanner.h"
-
+//#include "Symbol.h"
 #define indent "   "
+
+enum class DataType;
+class Symbol;
 
 enum class ExpressionType {
     VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD, ASSIGN, FUNCCALL,
@@ -16,6 +19,7 @@ struct ExpressionArgumentList {
 
 class Expression {
 public:
+    DataType typeID;
     ExpressionType expressionType;
     Expression(ExpressionType expressionType): expressionType(expressionType) {};
     virtual void Print(int) {};
@@ -27,10 +31,10 @@ public:
     ExpressionBinOp(Lexem operation, Expression* right, Expression* left): Expression(ExpressionType::BINOP), operation(operation), right(right), left(left) {};
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
-protected:
-    Lexem operation;
     Expression* left;
     Expression* right;
+    Lexem operation;
+protected:
 };
 
 class ExpressionTerm: Expression {
@@ -74,7 +78,9 @@ public:
 
 class ExpressionIdent: ExpressionTerm {
 public:
+    Symbol* symbol;
     ExpressionIdent(const Lexem &val) : ExpressionTerm(val, ExpressionType::IDENT) {};
+    ExpressionIdent(const Lexem &val, Symbol* symbol) : symbol(symbol), ExpressionTerm(val, ExpressionType::IDENT) {};
 };
 
 class ExpressionRecordAccess: ExpressionBinOp {

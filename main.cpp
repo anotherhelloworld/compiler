@@ -63,6 +63,16 @@ int main(int argc, char* argv[]) {
                 std::cout << error.getMsg() << std::endl;
                 return 0;
             }
+        } else if (strcmp(argv[1], "-t") == 0) {
+            try {
+                Parser parser(argv[2]);
+                parser.testType = true;
+                Block* block = parser.ParseBlockStart();
+                block->Print(0);
+            } catch (TypeCheckerException error) {
+                std::cout << error.getMsg() << std::endl;
+                return 0;
+            }
         }
         else {
             std::cout << "error: unknown argument" << std::endl;
