@@ -20,11 +20,12 @@ std::map <DataType, std::map<TokenType, DataType> > operationsTypes = {
         }
 };
 
-DataType CastTable[4][4] = {
-        {DataType::INTEGER, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::REAL, DataType::REAL, DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR, DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BOOLEAN}
+DataType CastTable[5][5] = {
+        {DataType::INTEGER, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
+        {DataType::REAL,    DataType::REAL,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BOOLEAN, DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::ARRAY}
 };
 
 TypeChecker::TypeChecker(SymbolTable* symbolTable, Expression* expr, std::pair<int, int> pos): symbolTable(symbolTable), pos(pos) {
@@ -44,9 +45,15 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* e
         Check(((SymbolType*)(symbol))->dataType, GetTypeID(expr));
         return;
     }
+    if (((SymbolType*)(symbol))->dataType == DataType::CHAR) {
+        Check(((SymbolType*)(symbol))->dataType, GetTypeID(expr));
+        return;
+    }
     if (((SymbolType*)(symbol))->dataType == DataType::ARRAY) {
-        if (expr->expressionType != ExpressionType::INITLIST || ((ExpressionInitializeList*)expr)->initList.size() != ((SymbolArray*)symbol)->right - ((SymbolArray*)symbol)->left) {
-            throw TypeCheckerException("IncompatibleTypes");
+        if (expr->expressionType != ExpressionType::INITLIST || ((ExpressionInitializeList*)expr)->initList.size()
+                                                                != atoi(((ExpressionTerm*)(((SymbolArray*)symbol)->right))->val.val.c_str())
+                                                                   - atoi(((ExpressionTerm*)(((SymbolArray*)symbol)->left))->val.val.c_str()) + 1) {
+            throw TypeCheckerException(dataTypeString[(int)DataType::ARRAY], dataTypeString[(int)GetTypeID(expr->expressionType)], pos);
         }
         for (int i = 0; i < ((ExpressionInitializeList*)expr)->initList.size(); i++) {
             TypeChecker(symbolTable, symbol->GetType(), ((ExpressionInitializeList*)expr)->initList[i], pos);
@@ -57,7 +64,7 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* e
 
 void TypeChecker::Check(DataType type1, DataType type2) {
     if (!CanCast(type1, type2)) {
-        throw TypeCheckerException("IncompatibleTypes");
+        throw TypeCheckerException(dataTypeString[(int)type1], dataTypeString[(int)type2], pos);
     }
 }
 
@@ -68,6 +75,10 @@ bool TypeChecker::CanCast(DataType type1, DataType type2) {
 DataType TypeChecker::GetTypeID(Expression* expr) {
     if (expr->expressionType == ExpressionType::BINOP) {
         return GetTypeIDBinExpression(GetTypeID(((ExpressionBinOp*)expr)->left), GetTypeID(((ExpressionBinOp*)expr)->right), ((ExpressionBinOp*)expr)->operation.token);
+    }
+    if (expr->expressionType == ExpressionType::ARRAY) {
+
+
     }
     if (expr->expressionType == ExpressionType::IDENT) {
         Symbol* type = (((ExpressionIdent*)expr)->symbol)->GetType();
@@ -90,6 +101,12 @@ DataType TypeChecker::GetTypeID(ExpressionType exprType) {
     if (exprType == ExpressionType::REAL) {
         return DataType::REAL;
     }
+    if (exprType == ExpressionType::CHAR) {
+        return DataType::CHAR;
+    }
+    if (exprType == ExpressionType::ARRAY) {
+        return DataType::ARRAY;
+    }
     throw ParserException("Illegal exprexxion");
 }
 
@@ -100,7 +117,7 @@ DataType TypeChecker::GetTypeIDBinExpression(DataType left, DataType right, Toke
         left = right;
     }
     else {
-        throw TypeCheckerException("IncompatibleTypes");
+        throw TypeCheckerException(dataTypeString[(int)left], dataTypeString[(int)right], pos);
     }
     try {
         DataType res = operationsTypes.at(left).at(token);

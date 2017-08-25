@@ -141,6 +141,10 @@ void SymbolArray::Print(int spaces) {
     type->Print(spaces);
 }
 
+Symbol *SymbolArray::GetType() {
+    return type;
+}
+
 Symbol* SymbolType::GetType() {
     return type;
 }

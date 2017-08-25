@@ -76,6 +76,7 @@ public:
     Expression* right;
     SymbolArray(Symbol* type, Expression* left, Expression* right): Symbol("", DeclarationType::TYPE), dataType(DataType::ARRAY), type(type), left(left), right(right) {};
     void Print(int);
+    Symbol* GetType();
 };
 
 class SymbolRecord: public Symbol {

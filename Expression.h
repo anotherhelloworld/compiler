@@ -42,8 +42,8 @@ public:
     ExpressionTerm(const Lexem &val, ExpressionType expressionType): Expression(expressionType), val(val) {};
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
-protected:
     Lexem val;
+protected:
 };
 
 class ExpressionUnOp: Expression {
@@ -94,10 +94,10 @@ public:
             Expression(ExpressionType::ARRAY), operation(Lexem("[]", OPEN_SQUARE_BRACKET)), ident(ident), indecies(indecies) {};
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
+    std::vector<Expression*> indecies;
 private:
     Lexem operation;
     Expression* ident;
-    std::vector<Expression*> indecies;
 };
 
 class ExpressionInitializeList: public Expression {

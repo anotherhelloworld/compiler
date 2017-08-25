@@ -31,7 +31,9 @@ class TypeCheckerException {
 private:
     std::string msg;
 public:
-    TypeCheckerException(std::string msg): msg(msg) {};
+    TypeCheckerException(std::string type1, std::string type2, std::pair<int, int> pos):
+            msg("Incompatible types, expected \"" + type1 + "\" but \"" + type2 + "\" found in pos "
+            + "(" + std::to_string(pos.first) + ", " + std::to_string(pos.second) + ")") {};
 
     const std::string &getMsg() const {
         return msg;
