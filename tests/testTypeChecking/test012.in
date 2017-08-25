@@ -1,0 +1,6 @@
+var
+    i: integer;
+begin
+    for i := 10.7534 to 20 do begin
+    end;
+end.
