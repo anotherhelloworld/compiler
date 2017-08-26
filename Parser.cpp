@@ -1,5 +1,5 @@
 #include "Parser.h"
-//#include "CalculateExpression.h"
+#include "CalculateExpression.h"
 
 void Parser::Print() {
     expression = ParseExpression(symTable, 0);
@@ -127,6 +127,8 @@ Expression *Parser::ParseTerm(SymbolTable* symbolTable, bool flag) {
         Symbol* sym = symTable->GetSymbol(lex.val, lex.pos);
         res = (Expression*)new ExpressionIdent(lex, sym);
     } else {
+//        Symbol* sym = symTable->GetSymbol(lex.val, lex.pos);
+//        res = (Expression*)new ExpressionIdent(lex, sym);
         res = (Expression*)new ExpressionIdent(lex);
     }
     while (flag) {
@@ -427,28 +429,31 @@ Symbol* Parser::ParseArrayDecl(SymbolTable* symbolTable) {
     if (scanner.GetLexem().token == OPEN_SQUARE_BRACKET) {
         scanner.NextToken();
         Expression* leftExpr = ParseExpression(symbolTable, 0);
-        leftExpr->expressionType = ExpressionType::VAR;
         CheckConstant(symTable, leftExpr);
+        int A = CalculateExpression<int>(symbolTable, "INTEGER", scanner.GetLexem().pos).Calculate(leftExpr);
         Lexem lex = scanner.GetLexem();
         CheckNextLexem(lex, Lexem("..", DOUBLE_POINT));
         scanner.NextToken();
         Expression* rightExpr = ParseExpression(symbolTable, 0);
-        rightExpr->expressionType = ExpressionType::VAR;
+        // rightExpr->expressionType = ExpressionType::VAR;
         CheckConstant(symTable, rightExpr);
-        SymbolArray* symbol = new SymbolArray(nullptr, leftExpr, rightExpr);
+        int B = CalculateExpression<int>(symbolTable, "INTEGER", scanner.GetLexem().pos).Calculate(rightExpr);
+        SymbolArray* symbol = new SymbolArray(nullptr, A, B);
         Symbol** symbolTypeInitialize = &symbol->type;
         while (scanner.GetLexem().token == COMMA) {
             scanner.NextToken();
             leftExpr = ParseExpression(symbolTable, 0);
-            leftExpr->expressionType = ExpressionType::VAR;
+            // leftExpr->expressionType = ExpressionType::VAR;
             CheckConstant(symTable, leftExpr);
+            A = CalculateExpression<int>(symbolTable, "INTEGER", scanner.GetLexem().pos).Calculate(leftExpr);
             Lexem lex = scanner.GetLexem();
             CheckNextLexem(lex, Lexem("..", DOUBLE_POINT));
             scanner.NextToken();
             Expression* rightExpr = ParseExpression(symbolTable, 0);
-            rightExpr->expressionType = ExpressionType::VAR;
+            // rightExpr->expressionType = ExpressionType::VAR;
             CheckConstant(symTable, rightExpr);
-            *symbolTypeInitialize = new SymbolArray(nullptr, leftExpr, rightExpr);
+            B = CalculateExpression<int>(symbolTable, "INTEGER", scanner.GetLexem().pos).Calculate(rightExpr);
+            *symbolTypeInitialize = new SymbolArray(nullptr, A, B);
             symbolTypeInitialize = &((SymbolArray*)*symbolTypeInitialize)->type;
         }
         lex = scanner.GetLexem();
@@ -465,10 +470,10 @@ Symbol* Parser::ParseArrayDecl(SymbolTable* symbolTable) {
         }
         return symbol;
     }
-    scanner.NextToken();
     Lexem lex = scanner.GetLexem();
     CheckNextLexem(lex, Lexem("of", OF));
-    return nullptr;
+    scanner.NextToken();
+    return new SymbolDynArray(ParseType(symbolTable));
 }
 
 Expression* Parser::ParseInit(SymbolTable* symbolTable) {

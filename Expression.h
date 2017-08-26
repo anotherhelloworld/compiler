@@ -37,7 +37,7 @@ public:
 protected:
 };
 
-class ExpressionTerm: Expression {
+class ExpressionTerm: public Expression {
 public:
     ExpressionTerm(const Lexem &val, ExpressionType expressionType): Expression(expressionType), val(val) {};
     void Print(int);
@@ -56,7 +56,7 @@ private:
     Expression* arg;
 };
 
-class ExpressionInteger: ExpressionTerm {
+class ExpressionInteger: public ExpressionTerm {
 public:
     ExpressionInteger(const Lexem &val): ExpressionTerm(val, ExpressionType::INT) {};
 };
@@ -79,8 +79,8 @@ public:
 class ExpressionIdent: ExpressionTerm {
 public:
     Symbol* symbol;
-    ExpressionIdent(const Lexem &val) : ExpressionTerm(val, ExpressionType::IDENT) {};
-    ExpressionIdent(const Lexem &val, Symbol* symbol) : symbol(symbol), ExpressionTerm(val, ExpressionType::IDENT) {};
+    ExpressionIdent(const Lexem &val) : ExpressionTerm(val, ExpressionType::VAR) {};
+    ExpressionIdent(const Lexem &val, Symbol* symbol) : symbol(symbol), ExpressionTerm(val, ExpressionType::VAR) {};
 };
 
 class ExpressionRecordAccess: ExpressionBinOp {

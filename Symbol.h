@@ -18,7 +18,7 @@ enum class DeclarationType {
 
 class Symbol {
 public:
-    Symbol(std::string name, DeclarationType declType): name(name), declType(declType) {};
+    Symbol(std::string name = "", DeclarationType declType = DeclarationType::D_NULL): name(name), declType(declType) {};
     Symbol(Symbol* symbol): name(symbol->name), declType(symbol->declType) {};
     virtual void Print(int) {};
     std::string name;
@@ -68,13 +68,23 @@ public:
     void Print(int);
 };
 
-class SymbolArray: public Symbol {
+class SymbolDynArray : public Symbol {
 public:
     Symbol* type;
     DataType dataType;
-    Expression* left;
-    Expression* right;
-    SymbolArray(Symbol* type, Expression* left, Expression* right): Symbol("", DeclarationType::TYPE), dataType(DataType::ARRAY), type(type), left(left), right(right) {};
+    SymbolDynArray(Symbol* type): Symbol("", DeclarationType::TYPE), type(type), dataType(DataType::ARRAY) {};
+    void Print(int);
+    Symbol* GetType();
+};
+
+class SymbolArray: public SymbolDynArray {
+public:
+    Symbol* type;
+    DataType dataType;
+    int left;
+    int right;
+    SymbolArray(Symbol* type, int left, int right): 
+        SymbolDynArray(type), dataType(DataType::ARRAY), type(type), left(left), right(right) {};
     void Print(int);
     Symbol* GetType();
 };

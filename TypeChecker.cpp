@@ -53,7 +53,7 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* e
         if (expr->expressionType != ExpressionType::INITLIST || ((ExpressionInitializeList*)expr)->initList.size()
                                                                 != atoi(((ExpressionTerm*)(((SymbolArray*)symbol)->right))->val.val.c_str())
                                                                    - atoi(((ExpressionTerm*)(((SymbolArray*)symbol)->left))->val.val.c_str()) + 1) {
-            throw TypeCheckerException(dataTypeString[(int)DataType::ARRAY], dataTypeString[(int)GetTypeID(expr->expressionType)], pos);
+            throw TypeCheckerException(dataTypeString[(int)DataType::ARRAY], pos);
         }
         for (int i = 0; i < ((ExpressionInitializeList*)expr)->initList.size(); i++) {
             TypeChecker(symbolTable, symbol->GetType(), ((ExpressionInitializeList*)expr)->initList[i], pos);
@@ -64,7 +64,7 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* e
 
 void TypeChecker::Check(DataType type1, DataType type2) {
     if (!CanCast(type1, type2)) {
-        throw TypeCheckerException(dataTypeString[(int)type1], dataTypeString[(int)type2], pos);
+        throw TypeCheckerException(dataTypeString[(int)type1], pos);
     }
 }
 
@@ -80,7 +80,7 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
 
 
     }
-    if (expr->expressionType == ExpressionType::IDENT) {
+    if (expr->expressionType == ExpressionType::VAR) {
         Symbol* type = (((ExpressionIdent*)expr)->symbol)->GetType();
         if (type == nullptr) {
             return DataType::BADTYPE;
@@ -107,7 +107,7 @@ DataType TypeChecker::GetTypeID(ExpressionType exprType) {
     if (exprType == ExpressionType::ARRAY) {
         return DataType::ARRAY;
     }
-    throw ParserException("Illegal exprexxion");
+    throw ParserException("Illegal expression");
 }
 
 DataType TypeChecker::GetTypeIDBinExpression(DataType left, DataType right, TokenType token) {
@@ -117,7 +117,7 @@ DataType TypeChecker::GetTypeIDBinExpression(DataType left, DataType right, Toke
         left = right;
     }
     else {
-        throw TypeCheckerException(dataTypeString[(int)left], dataTypeString[(int)right], pos);
+        throw TypeCheckerException(dataTypeString[(int)left], pos);
     }
     try {
         DataType res = operationsTypes.at(left).at(token);

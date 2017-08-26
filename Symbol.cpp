@@ -131,13 +131,25 @@ void SymbolPointer::Print(int spaces) {
     type->Print(spaces + 1);
 }
 
+void SymbolDynArray::Print(int spaces) {
+    for (int i = 0; i < spaces; i++) {
+        std::cout << indent;
+    }
+    std::cout << "DynArray" << indent << name << std::endl;
+    type->Print(spaces);
+}
+
+Symbol* SymbolDynArray::GetType() {
+    return type;
+}
+
 void SymbolArray::Print(int spaces) {
     for (int i = 0; i < spaces; i++) {
         std::cout << indent;
     }
-    std::cout << "Array" << indent << std::endl;
-    left->Print(spaces);
-    right->Print(spaces);
+    std::cout << "Array" << indent << left << indent << right << std::endl;
+    // left->Print(spaces);
+    // right->Print(spaces);
     type->Print(spaces);
 }
 

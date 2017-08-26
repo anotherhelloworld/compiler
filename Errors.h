@@ -31,12 +31,24 @@ class TypeCheckerException {
 private:
     std::string msg;
 public:
-    TypeCheckerException(std::string type1, std::string type2, std::pair<int, int> pos):
-            msg("Incompatible types, expected \"" + type1 + "\" but \"" + type2 + "\" found in pos "
+    TypeCheckerException(std::string type, std::pair<int, int> pos):
+            msg("Incompatible types, expected \"" + type + "\" in pos "
             + "(" + std::to_string(pos.first) + ", " + std::to_string(pos.second) + ")") {};
 
     const std::string &getMsg() const {
         return msg;
     }
 };
+
+// class CompilerError {
+// public:
+//     std::pair <int, int> pos;
+//     std::string errorMsg;
+//     CompilerError(std::string errorMsg, std::pair<int, int> pos): errorMsg(errorMsg) {};
+// };
+
+// class TypeError: public CompilerError {
+// public:
+//     TypeError(std::string expectedType, std::pair<int, int> pos): TypeError("")
+// };
 #endif //COMPILER_ERRORS_H
