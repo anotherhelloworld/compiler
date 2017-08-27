@@ -1,4 +1,7 @@
 Procedure   foo   0
+   Var   i
+      Type   integer
+
    begin
       for
             i

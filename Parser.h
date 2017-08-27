@@ -14,6 +14,7 @@ public:
     Block* ParseBlockStart();
     void Print();
     bool testType = false;
+    bool testDeclarations = false;
     SymbolTable* symTable;
 private:
     Expression* ParseExpression(SymbolTable*, int);

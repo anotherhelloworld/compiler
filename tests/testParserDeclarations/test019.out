@@ -5,15 +5,11 @@ Type   mytype2
    Type   integer
 
 Type   mytype3
-   Array   
-   1
-   100
+   Array   1   100
    Type   integer
 
 Var   arr
-   Array   
-   1
-   100
+   Array   1   100
    Type   integer
    1
    2

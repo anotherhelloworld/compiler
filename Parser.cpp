@@ -123,8 +123,8 @@ bool Parser::PriorityCheck(int priority, TokenType token) {
 Expression *Parser::ParseTerm(SymbolTable* symbolTable, bool flag) {
     Lexem lex = scanner.GetLexem();
     Expression* res = nullptr;
-    if (testType) {
-        Symbol* sym = symTable->GetSymbol(lex.val, lex.pos);
+    if (testType || testDeclarations) {
+        Symbol* sym = symbolTable->GetSymbol(lex.val, lex.pos);
         res = (Expression*)new ExpressionIdent(lex, sym);
     } else {
 //        Symbol* sym = symTable->GetSymbol(lex.val, lex.pos);
@@ -534,9 +534,9 @@ Block* Parser::ParseBlock(SymbolTable* symbolTable, int state) {
     if (scanner.GetLexem().token == BEGIN) {
         return ParseCompoundBlock(symbolTable, state);
     } else if (scanner.GetLexem().token == FOR) {
-        return ParseForBlock(symTable, state);
+        return ParseForBlock(symbolTable, state);
     } else if (scanner.GetLexem().token == IDENTIFICATOR) {
-        return ParseBlockIdent(symTable, state);
+        return ParseBlockIdent(symbolTable, state);
     } else if (scanner.GetLexem().token == WHILE) {
         return ParseWhileBlock(symbolTable, state);
     } else if (scanner.GetLexem().token == SEMI_COLON) {
@@ -590,7 +590,7 @@ Block* Parser::ParseCompoundBlock(SymbolTable* symbolTable, int state) {
 std::vector<Block*> Parser::ParseBlockList(SymbolTable* symbolTable, int state) {
     std::vector<Block*> ans;
     while (endBlockToken.find(scanner.GetLexem().token) == endBlockToken.cend()) {
-        Block* block = ParseBlock(symTable, state);
+        Block* block = ParseBlock(symbolTable, state);
         if (block != nullptr) {
             ans.push_back(block);
         }

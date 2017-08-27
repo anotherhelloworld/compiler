@@ -1,5 +1,5 @@
 const 
-a = 10;
-b: integer = 15;
+    a = 10;
+    b: integer = 15;
 var
-str: array[a..b] of integer;
+    str: array[a..b] of integer;

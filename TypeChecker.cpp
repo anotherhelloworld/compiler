@@ -50,9 +50,11 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* e
         return;
     }
     if (((SymbolType*)(symbol))->dataType == DataType::ARRAY) {
-        if (expr->expressionType != ExpressionType::INITLIST || ((ExpressionInitializeList*)expr)->initList.size()
-                                                                != atoi(((ExpressionTerm*)(((SymbolArray*)symbol)->right))->val.val.c_str())
-                                                                   - atoi(((ExpressionTerm*)(((SymbolArray*)symbol)->left))->val.val.c_str()) + 1) {
+        int left = ((SymbolArray*)symbol)->left;
+        int right = ((SymbolArray*)symbol)->right;
+        int tmp = right - left + 1;
+        int tmp2 = ((ExpressionInitializeList*)expr)->initList.size();
+        if (expr->expressionType != ExpressionType::INITLIST || tmp2 != tmp) {
             throw TypeCheckerException(dataTypeString[(int)DataType::ARRAY], pos);
         }
         for (int i = 0; i < ((ExpressionInitializeList*)expr)->initList.size(); i++) {

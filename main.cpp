@@ -48,6 +48,8 @@ int main(int argc, char* argv[]) {
         } else if (strcmp(argv[1], "-d") == 0) {
             try {
                 Parser parser(argv[2]);
+                //parser.testType = true;
+                parser.testDeclarations = true;
                 parser.ParseDeclaration(parser.symTable);
                 parser.symTable->Print(0);
             } catch (ParserException error) {
