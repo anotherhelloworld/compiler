@@ -15,6 +15,7 @@ public:
     CalculateExpression(SymbolTable* table, std::string typeName, std::pair<int, int> pos): table(table), typeName(typeName), pos(pos) {};
     T Calculate(Expression* exp);
     template <class X_1, class X_2> void CheckType();
+    T CalculateBinExpression(ExpressionBinOp*);
 };
 
 
@@ -23,8 +24,11 @@ template <class T> T CalculateExpression<T>::Calculate(Expression* exp) {
         return Calculate(((SymbolVar*)table->GetSymbol(((ExpressionIdent*)exp)->symbol->name, pos))->initExpr);
     }
     if (exp->expressionType == ExpressionType::INT) {
-        CheckType<int, int>();
+        CheckType<int, T>();
         return atoi(((ExpressionInteger*)exp)->val.val.c_str());
+    }
+    if (exp->expressionType == ExpressionType::BINOP) {
+        return CalculateBinExpression((ExpressionBinOp*)exp);
     }
 }
 
@@ -33,4 +37,49 @@ template <class T> template <class X_1, class X_2> void CalculateExpression<T>::
         throw TypeCheckerException(typeName, pos);
     }
 }
-#endif //COMPILER_CALCULATEEXPRESSION_H
+
+template <class T> T CalculateExpression<T>::CalculateBinExpression(ExpressionBinOp* exp) {
+    if (exp->operation.token == ADD) {
+        CheckType<int, double>();
+        return Calculate(exp->right) + Calculate(exp->left);
+    }
+    if (exp->operation.token == SUB) {
+        CheckType<int, double>();
+        return Calculate(exp->right) - Calculate(exp->left);
+    }
+    if (exp->operation.token == MULT) {
+        CheckType<int, double>();
+        return Calculate(exp->right) * Calculate(exp->left);
+    }
+    if (exp->operation.token == DIV) {
+        CheckType<int, T>();
+    }
+    if (exp->operation.token == DIVISION) {
+        return Calculate(exp->right) / Calculate(exp->left);
+    }
+    if (exp->operation.token == MOD) {
+        CheckType<int, T>();
+        return (int)Calculate(exp->right) % (int)Calculate(exp->left);
+    }
+    if (exp->operation.token == XOR) {
+        CheckType<int, T>();
+        return (int)Calculate(exp->right) ^ (int)Calculate(exp->left);
+    }
+    if (exp->operation.token == AND) {
+        CheckType<int, T>();
+        return (int)Calculate(exp->right) & (int)Calculate(exp->left);
+    }
+    if (exp->operation.token == BIT_OR) {
+        CheckType<int, T>();
+        return (int)Calculate(exp->right) | (int)Calculate(exp->left);
+    }
+    if (exp->operation.token == SHL) {
+        CheckType<int, T>();
+        return (int)Calculate(exp->right) << (int)Calculate(exp->left);
+    }
+    if (exp->operation.token == SHR) {
+        CheckType<int, T>();
+        return (int)Calculate(exp->right) >> (int)Calculate(exp->left);
+    }
+}
+#endif

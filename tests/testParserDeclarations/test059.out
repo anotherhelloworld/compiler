@@ -1,0 +1,12 @@
+Const   a
+   Type   integer
+   10
+
+Const   b
+   Type   integer
+   15
+
+Var   arr
+   Array   5   10
+   Type   integer
+
