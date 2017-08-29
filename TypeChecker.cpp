@@ -7,6 +7,7 @@ std::map <DataType, std::map<TokenType, DataType> > operationsTypes = {
                         { EQUAL, DataType::BOOLEAN },
                         { XOR, DataType::INTEGER },
                         { ADD, DataType::INTEGER },
+                        { SUB, DataType::INTEGER },
                         { DIVISION, DataType::REAL },
                         { DIV, DataType::INTEGER }
                 }

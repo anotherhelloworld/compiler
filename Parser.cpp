@@ -353,6 +353,9 @@ void Parser::ParseConstantDeclaration(SymbolTable* symTable) {
             TypeChecker(symTable, type, exp, scanner.GetLexem().pos);
         } else {
             DataType typeID = TypeChecker(symTable, scanner.GetLexem().pos).GetTypeID(exp);
+//            if (typeID == -1) {
+//
+//            }
             type = new SymbolType(dataTypeString[(int)typeID], typeID);
         }
         symTable->CheckLocalSymbol(name, namePos);
