@@ -51,9 +51,9 @@ public:
     ExpressionUnOp(Lexem operation, Expression* arg): Expression(ExpressionType::UNOP), operation(operation), arg(arg) {};
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
-private:
     Lexem operation;
     Expression* arg;
+
 };
 
 class ExpressionInteger: public ExpressionTerm {

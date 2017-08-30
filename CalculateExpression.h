@@ -16,6 +16,7 @@ public:
     T Calculate(Expression* exp);
     template <class X_1, class X_2> void CheckType();
     T CalculateBinExpression(ExpressionBinOp*);
+    T CalculateUnExpression(ExpressionUnOp*);
 };
 
 
@@ -29,6 +30,9 @@ template <class T> T CalculateExpression<T>::Calculate(Expression* exp) {
     }
     if (exp->expressionType == ExpressionType::BINOP) {
         return CalculateBinExpression((ExpressionBinOp*)exp);
+    }
+    if (exp->expressionType == ExpressionType::UNOP) {
+        return CalculateUnExpression((ExpressionUnOp*)exp);
     }
 }
 
@@ -80,6 +84,21 @@ template <class T> T CalculateExpression<T>::CalculateBinExpression(ExpressionBi
     if (exp->operation.token == SHR) {
         CheckType<int, T>();
         return (int)Calculate(exp->right) >> (int)Calculate(exp->left);
+    }
+}
+
+template <class T> T CalculateExpression<T>::CalculateUnExpression(ExpressionUnOp* exp) {
+    if (exp->operation.token == SUB) {
+        CheckType<int, double>();
+        return - Calculate(exp->arg);
+    }
+    if (exp->operation.token == ADD) {
+        CheckType<int, double>();
+        return + Calculate(exp->arg);
+    }
+    if (exp->operation.token == NOT) {
+        CheckType<int, double>();
+        return ! Calculate(exp->arg);
     }
 }
 #endif
