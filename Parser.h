@@ -27,6 +27,7 @@ private:
     void ParseTypeDeclaration(SymbolTable*);
     void ParseVarDeclaration(SymbolTable*);
     void ParseFuncDeclaration(SymbolTable*, DeclarationType);
+    void ParseLabelDeclaration(SymbolTable*);
     Symbol* ParseType(SymbolTable*);
     Expression* ParseInit(SymbolTable*);
     Expression* ParseInitializeList(SymbolTable*);

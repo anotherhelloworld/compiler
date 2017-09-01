@@ -1,7 +1,5 @@
 #include "Block.h"
 
-
-
 void Block::Print(int) {};
 
 void BlockCompound::Print(int spaces) {
