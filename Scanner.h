@@ -210,6 +210,9 @@ public:
     Scanner(char*);
     void NextToken();
     Lexem GetLexem();
+    Lexem GetNextLexem();
+    void CheckNextLexem(TokenType, std::string);
+    void CheckCurLexem(TokenType, std::string);
 private:
     void CheckSymbol(int);
     void CheckError();

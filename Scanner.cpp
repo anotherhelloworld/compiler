@@ -271,3 +271,22 @@ void Scanner::NextToken() {
         return;
     }
 }
+
+Lexem Scanner::GetNextLexem() {
+    this->NextToken();
+    return this->GetLexem();
+}
+
+void Scanner::CheckCurLexem(TokenType expcToken, std::string expcName) {
+    Lexem lex = this->GetLexem();
+    if (lex.token != expcToken) {
+        lex.pos.second++;
+        throw ParserException("Illegal expression: expected '" + expcName + "' " + lex.GetStrPos());
+    }
+}
+
+void Scanner::CheckNextLexem(TokenType expcToken, std::string expcName) {
+    this->NextToken();
+    this->CheckCurLexem(expcToken, expcName);
+}
+
