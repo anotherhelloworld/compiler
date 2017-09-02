@@ -4,6 +4,8 @@
 //#include "Symbol.h"
 #define indent "   "
 
+void printIndent(int spaces);
+
 enum class DataType;
 class Symbol;
 

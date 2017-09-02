@@ -92,9 +92,7 @@ void SymbolType::Print(int spaces) {
     if (name.size() == 0) {
         return;
     }
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    };
+    printIndent(spaces);
     std::cout << "Type" << indent << name << std::endl;
     if (type != nullptr) {
         type->Print(spaces + 1);
@@ -102,9 +100,7 @@ void SymbolType::Print(int spaces) {
 }
 
 void SymbolConst::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    };
+    printIndent(spaces);
     std::cout << "Const" << indent << name << std::endl;
     if (type != nullptr) {
         type->Print(spaces + 1);
@@ -113,9 +109,7 @@ void SymbolConst::Print(int spaces) {
 }
 
 void SymbolVar::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "Var" << indent << name << std::endl;
     type->Print(spaces + 1);
     if (initExpr != nullptr) {
@@ -124,17 +118,13 @@ void SymbolVar::Print(int spaces) {
 }
 
 void SymbolPointer::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "Type" << indent << name << std::endl;
     type->Print(spaces + 1);
 }
 
 void SymbolDynArray::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "DynArray" << indent << name << std::endl;
     type->Print(spaces);
 }
@@ -144,12 +134,8 @@ Symbol* SymbolDynArray::GetType() {
 }
 
 void SymbolArray::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "Array" << indent << left << indent << right << std::endl;
-    // left->Print(spaces);
-    // right->Print(spaces);
     type->Print(spaces);
 }
 
@@ -166,31 +152,28 @@ Symbol* SymbolIdent::GetType() {
 }
 
 void SymbolRecord::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "Record" << std::endl;
     this->table->Print(spaces + 1);
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "End" << std::endl;
 }
 
 void SymbolFunction::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "Function" << indent << name << indent << argc << std::endl;
     symbolTable->Print(spaces + 1);
     block->Print(spaces + 1);
 }
 
 void SymbolProcedure::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "Procedure" << indent << name << indent << argc << std::endl;
     symbolTable->Print(spaces + 1);
     block->Print(spaces + 1);
+}
+
+void SymbolLabel::Print(int spaces) {
+    printIndent(spaces);
+    std::cout << "Label" << indent << name << std::endl;
 }

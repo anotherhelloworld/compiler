@@ -13,7 +13,7 @@ class SymbolTable;
 class Block;
 
 enum class DeclarationType {
-    D_NULL, CONST, TYPE, VAR, RECORD, FUNC, PROCEDURE,
+    D_NULL, CONST, TYPE, VAR, RECORD, FUNC, PROCEDURE, LABEL
 };
 
 class Symbol {
@@ -119,6 +119,12 @@ class SymbolProcedure: public SymbolCall {
 public:
     SymbolProcedure(std::string name, SymbolTable* symbolTable, Block* block, int argc):
             SymbolCall(DeclarationType::PROCEDURE, name, symbolTable, block, argc) {};
+    void Print(int);
+};
+
+class SymbolLabel: public Symbol {
+public:
+    SymbolLabel(std::string name): Symbol(name, DeclarationType::LABEL) {};
     void Print(int);
 };
 

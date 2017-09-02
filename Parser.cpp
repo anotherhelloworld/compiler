@@ -217,9 +217,13 @@ void Parser::ParseDeclaration(SymbolTable* table) {
 }
 
 void Parser::ParseLabelDeclaration(SymbolTable* table) {
-    scanner.NextToken();
-
-    return;
+    scanner.CheckNextLexem(IDENTIFICATOR, "IDENTIFICATOR");
+    while (scanner.GetLexem().token == IDENTIFICATOR) {
+        table->CheckLocalSymbol(scanner.GetLexem().val, scanner.GetLexem().pos);
+        table->Add(new SymbolLabel(scanner.GetLexem().val));
+        scanner.CheckNextLexem(SEMI_COLON, ";");
+        scanner.NextToken();
+    }
 } 
 
 void Parser::ParseFuncDeclaration(SymbolTable* table, DeclarationType declarationType) {

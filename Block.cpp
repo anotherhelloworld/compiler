@@ -3,33 +3,23 @@
 void Block::Print(int) {};
 
 void BlockCompound::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "begin" << std::endl;
     for (auto i: listBlock) {
         i->Print(spaces + 1);
     }
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "end" << std::endl;
 };
 
 void BlockFor::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "for" << std::endl;
     exp1->Print(spaces + 1);
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     toFlag ? std::cout << "true" << std::endl : std::cout << "false" << std::endl;
     exp2->Print(spaces + 1);
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "do" << std::endl;
     if (block != nullptr) {
         block->Print(spaces + 1);
@@ -37,9 +27,7 @@ void BlockFor::Print(int spaces) {
 }
 
 void BlockFuncCall::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "Call" << std::endl;
     exp->Print(spaces + 1);
 }
@@ -49,14 +37,10 @@ void BlockAssign::Print(int spaces) {
 }
 
 void BlockWhile::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "while" << std::endl;
     exp->Print(spaces + 1);
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "do" << std::endl;
     if (block != nullptr) {
         block->Print(spaces + 1);
@@ -64,36 +48,26 @@ void BlockWhile::Print(int spaces) {
 }
 
 void BlockContinue::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "continue" << std::endl;
 }
 
 void BlockIf::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "if" << std::endl;
     exp->Print(spaces + 1);
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "then" << std::endl;
     blockThen->Print(spaces + 1);
     if (blockElse != nullptr) {
-        for (int i = 0; i < spaces; i++) {
-            std::cout << indent;
-        }
+        printIndent(spaces);
         std::cout << "else" << std::endl;
         blockElse->Print(spaces + 1);
     }
 }
 
 void BlockRepeat::Print(int spaces) {
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "until" << std::endl;
     exp->Print(spaces + 1);
     std::cout << "repeat" << std::endl;

@@ -3,6 +3,12 @@
 const char fill = ' ';
 const int mult = 3;
 
+void printIndent(int spaces) {
+    for (int i = 0; i < spaces; i++) {
+        std::cout << indent;
+    };
+}
+
 void ExpressionBinOp::Print(int deep) {
     this->right->Print(deep + 1);
     std::cout << std::string(deep * mult, fill) << this->operation.val << std::endl;
@@ -54,9 +60,7 @@ void ExpressionArrayIndecies::GetIdentificitationList(ExpressionArgumentList* li
 
 void ExpressionAssign::Print(int spaces) {
     right->Print(spaces + 1);
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << ":=" << std::endl;
     left->Print(spaces + 1);
 }
@@ -65,9 +69,7 @@ void ExpressionFuncCall::Print(int spaces) {
     for (auto i: args) {
         i->Print(spaces);
     }
-    for (int i = 0; i < spaces; i++) {
-        std::cout << indent;
-    }
+    printIndent(spaces);
     std::cout << "()" << std::endl;
     left->Print(spaces + 1);
 }
