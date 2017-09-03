@@ -1,0 +1,4 @@
+const
+    a = 'abc';
+    b = 'qwerty';
+    constarr: array[1..2] of string = (a, b);

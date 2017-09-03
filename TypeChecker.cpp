@@ -21,12 +21,13 @@ std::map <DataType, std::map<TokenType, DataType> > operationsTypes = {
         }
 };
 
-DataType CastTable[5][5] = {
-        {DataType::INTEGER, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::REAL,    DataType::REAL,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BOOLEAN, DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::ARRAY}
+DataType CastTable[6][6] = {
+        {DataType::INTEGER, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
+        {DataType::REAL,    DataType::REAL,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BOOLEAN, DataType::BADTYPE, DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::ARRAY,   DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::STRING}
 };
 
 TypeChecker::TypeChecker(SymbolTable* symbolTable, Expression* expr, std::pair<int, int> pos): symbolTable(symbolTable), pos(pos) {
@@ -43,6 +44,10 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* e
         return;
     }
     if (((SymbolType*)(symbol))->dataType == DataType::REAL) {
+        Check(((SymbolType*)(symbol))->dataType, GetTypeID(expr));
+        return;
+    }
+    if (((SymbolType*)(symbol))->dataType == DataType::CHAR) {
         Check(((SymbolType*)(symbol))->dataType, GetTypeID(expr));
         return;
     }

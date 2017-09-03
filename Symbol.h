@@ -128,6 +128,14 @@ public:
     void Print(int);
 };
 
+class SymbolString: public Symbol {
+public:
+    int length;
+    DataType dataType;
+    SymbolString(int length): length(length), dataType(dataType) {};
+    void Print(int);
+};
+
 class SymbolTable {
 public:
     SymbolTable(SymbolTable*);

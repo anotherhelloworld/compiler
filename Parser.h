@@ -28,11 +28,13 @@ private:
     void ParseVarDeclaration(SymbolTable*);
     void ParseFuncDeclaration(SymbolTable*, DeclarationType);
     void ParseLabelDeclaration(SymbolTable*);
+
     Symbol* ParseType(SymbolTable*);
     Expression* ParseInit(SymbolTable*);
     Expression* ParseInitializeList(SymbolTable*);
     Symbol* ParseArrayDecl(SymbolTable*);
     Symbol* ParseRecord(SymbolTable*);
+    Symbol* ParseString(SymbolTable*);
     Block* ParseCompoundBlock(SymbolTable*, int);
     Block* ParseForBlock(SymbolTable*, int);
     Block* ParseBlock(SymbolTable*, int);

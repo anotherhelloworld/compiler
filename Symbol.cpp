@@ -6,6 +6,7 @@ SymbolTable::SymbolTable(SymbolTable * parentTable): parentTable(parentTable) {
     symbols.push_back(new SymbolType("real", DataType::REAL));
     symbols.push_back(new SymbolType("char", DataType::CHAR));
     symbols.push_back(new SymbolType("boolean", DataType::CHAR));
+    symbols.push_back(new SymbolType("string", DataType::STRING));
     stdTypeCount = symbols.size();
 };
 
@@ -176,4 +177,10 @@ void SymbolProcedure::Print(int spaces) {
 void SymbolLabel::Print(int spaces) {
     printIndent(spaces);
     std::cout << "Label" << indent << name << std::endl;
+}
+
+void SymbolString::Print(int spaces) {
+    printIndent(spaces);
+    std::cout << "string" << indent;
+    length != -1 ? std::cout << length << std::endl : std::cout << std::endl;
 }

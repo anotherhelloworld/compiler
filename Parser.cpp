@@ -363,6 +363,9 @@ Symbol* Parser::ParseType(SymbolTable* table) {
     if (scanner.GetLexem().token == ARRAY) {
         return ParseArrayDecl(table);
     }
+    else if (scanner.GetLexem().token == STRING) {
+        return ParseString(table);
+    }
     else if (scanner.GetLexem().token == RECORD) {
         return ParseRecord(table);
     } else {
@@ -461,6 +464,21 @@ Symbol* Parser::ParseArrayDecl(SymbolTable* table) {
     scanner.CheckCurLexem(OF, "of");
     scanner.NextToken();
     return new SymbolDynArray(ParseType(table));
+}
+
+Symbol* Parser::ParseString(SymbolTable* table) {
+    scanner.NextToken();
+    int length = -1;
+    if (scanner.GetLexem().token == OPEN_SQUARE_BRACKET) {
+        scanner.NextToken();
+        std::pair<int, int> pos = scanner.GetLexem().pos;
+        auto expLength = ParseExpression(table, 0);
+        CheckConstant(table, expLength);
+        length = CalculateExpression<int>(table, "INTEGER", pos).Calculate(expLength);
+        scanner.CheckCurLexem(CLOSE_SQUARE_BRACKET, "]");
+        scanner.NextToken();
+    }
+    return new SymbolString(length);
 }
 
 Expression* Parser::ParseInit(SymbolTable* table) {
