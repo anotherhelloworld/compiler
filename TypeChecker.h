@@ -8,7 +8,7 @@ class SymbolTable;
 class Symbol;
 
 enum class DataType {
-    BADTYPE = -1, INTEGER = 0, REAL = 1, CHAR = 2, BOOLEAN = 3, ARRAY = 4, STRING = 5 
+    BADTYPE = -1, INTEGER = 0, REAL = 1, CHAR = 2, BOOLEAN = 3, ARRAY = 4, STRING = 5, RECORD = 6
 };
 
 static std::vector<std::string> dataTypeString = {
@@ -29,6 +29,13 @@ private:
     DataType GetTypeIDBinExpression(DataType, DataType, TokenType);
     SymbolTable* symbolTable;
     std::pair<int, int> pos;
+};
+
+class CmpArguments {
+public:
+    bool Compare(Symbol*, Symbol*);
+private:
+    bool CompareTypes(Symbol*, Symbol*);
 };
 
 #endif //COMPILER_TYPECHECKER_H

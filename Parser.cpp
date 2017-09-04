@@ -235,7 +235,7 @@ void Parser::ParseFuncDeclaration(SymbolTable* table, DeclarationType declaratio
     int argc = 0;
     if (scanner.GetLexem().token == OPEN_BRACKET) {
         scanner.NextToken();
-        int argc = ParseArguments(table);
+        argc = ParseArguments(localTable);
         scanner.CheckCurLexem(CLOSE_BRACKET, ")");
         scanner.NextToken();
     }
@@ -254,12 +254,37 @@ void Parser::ParseFuncDeclaration(SymbolTable* table, DeclarationType declaratio
         scanner.NextToken();
         newSymbol = new SymbolProcedure(name, localTable, nullptr, argc);
     }
-    std::vector <Symbol*> symbols = table->GetAllSymbols(name, pos);
-    SymbolCall* firstDecl = nullptr;
+    auto symbols = table->GetAllSymbols(name, pos);
+    SymbolCall* firstDeclSym = nullptr;
+    for (auto it = symbols.begin(); it != symbols.end(); it++) {
+        if (CmpArguments().Compare(newSymbol, *it)) {
+            if ((*it)->declType == declarationType && ((SymbolCall*)(*it))->block == nullptr) {
+                firstDeclSym = (SymbolCall*)(*it);
+                localTable = firstDeclSym->symbolTable;
+            } else {
+                throw DuplicateIdent(name, pos);
+            }
+        }
+    }
+    if (scanner.GetLexem().token == FORWARD) {
+        if (firstDeclSym != nullptr) {
+            throw DuplicateIdent(name, pos);
+        }
+        scanner.CheckNextLexem(SEMI_COLON, ";");
+        scanner.NextToken();
+        declForwardCall.push_back({newSymbol, pos});
+        table->Add(newSymbol);
+        return;
+    }
+
     ParseDeclaration(localTable);
     scanner.CheckCurLexem(BEGIN, "begin");
-    table->Add(newSymbol);
-    ((SymbolCall*)newSymbol)->block = ParseBlock(localTable, 0);
+    if (firstDeclSym != nullptr) {
+        firstDeclSym->block = ParseBlock(localTable, 0);
+    } else {
+        table->Add(newSymbol);
+        ((SymbolCall*)newSymbol)->block = ParseBlock(localTable, 0);
+    }
 }
 
 void Parser::ParseVarDeclaration(SymbolTable* table) {

@@ -40,6 +40,22 @@ public:
     }
 };
 
+static std::string StrPos(std::pair <int, int> pos) {
+    return "Line " + std::to_string(pos.first + 1) + " Column " + std::to_string(pos.second + 1);
+}
+
+class Error {
+public:
+    std::pair<int, int> pos;
+    std::string errorMsg;
+    Error(std::string errorMsg, std::pair<int, int> pos): errorMsg(errorMsg) {};
+};
+
+class DuplicateIdent : public Error {
+public:
+    DuplicateIdent(std::string idName, std::pair<int, int> pos): Error("Duplicate identifier \"" + idName + "\". " + StrPos(pos), pos) {};
+};
+
 // class CompilerError {
 // public:
 //     std::pair <int, int> pos;

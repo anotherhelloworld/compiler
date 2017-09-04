@@ -17,6 +17,7 @@ public:
     template <class X_1, class X_2> void CheckType();
     T CalculateBinExpression(ExpressionBinOp*);
     T CalculateUnExpression(ExpressionUnOp*);
+    T CalculateArrayIndex(ExpressionArrayIndecies*);
 };
 
 
@@ -33,6 +34,9 @@ template <class T> T CalculateExpression<T>::Calculate(Expression* exp) {
     }
     if (exp->expressionType == ExpressionType::UNOP) {
         return CalculateUnExpression((ExpressionUnOp*)exp);
+    }
+    if (exp->expressionType == ExpressionType::ARRAY) {
+        return CalculateArrayIndex((ExpressionArrayIndecies*)exp);
     }
 }
 
@@ -100,5 +104,20 @@ template <class T> T CalculateExpression<T>::CalculateUnExpression(ExpressionUnO
         CheckType<int, double>();
         return ! Calculate(exp->arg);
     }
+}
+
+template <class T> T CalculateExpression<T>::CalculateArrayIndex(ExpressionArrayIndecies* exp) {
+    Expression* identExp = exp->ident;
+    std::vector<int> idxs;
+    for (int i = 0; i < exp->indecies.size(); i++) {
+        idxs.push_back(Calculate(exp->indecies[i]));
+    }
+    ExpressionInitializeList* exprList = (ExpressionInitializeList*)((SymbolConst*)table->GetSymbol(((ExpressionTerm*)identExp)->val.val.c_str(), pos))->initExpr;
+    for (int i = 0; i < idxs.size(); i++) {
+        exprList = (ExpressionInitializeList*)exprList->initList[idxs[i]];
+    }
+
+    return Calculate(exprList);
+
 }
 #endif

@@ -97,7 +97,6 @@ public:
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
     std::vector<Expression*> indecies;
-private:
     Lexem operation;
     Expression* ident;
 };

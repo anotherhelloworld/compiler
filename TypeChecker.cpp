@@ -21,13 +21,14 @@ std::map <DataType, std::map<TokenType, DataType> > operationsTypes = {
         }
 };
 
-DataType CastTable[6][6] = {
-        {DataType::INTEGER, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::REAL,    DataType::REAL,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BOOLEAN, DataType::BADTYPE, DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::ARRAY,   DataType::BADTYPE},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::STRING}
+DataType CastTable[7][7] = {
+        {DataType::INTEGER, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::STRING},
+        {DataType::REAL,    DataType::REAL,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::STRING},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::STRING},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BOOLEAN, DataType::BADTYPE, DataType::BADTYPE, DataType::STRING},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::ARRAY,   DataType::BADTYPE, DataType::STRING},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::STRING,  DataType::BADTYPE}, 
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::RECORD}
 };
 
 TypeChecker::TypeChecker(SymbolTable* symbolTable, Expression* expr, std::pair<int, int> pos): symbolTable(symbolTable), pos(pos) {
@@ -135,3 +136,49 @@ DataType TypeChecker::GetTypeIDBinExpression(DataType left, DataType right, Toke
     }
 }
 
+bool CmpArguments::CompareTypes(Symbol* type1, Symbol* type2) {
+    if (((SymbolType*)type1)->dataType != ((SymbolType*)type2)->dataType) {
+        return false;
+    }
+    bool ans;
+    if (((SymbolType*)type1)->dataType == DataType::BOOLEAN) {
+        return true;
+    }
+    if (((SymbolType*)type1)->dataType == DataType::CHAR) {
+        return true;
+    }
+    if (((SymbolType*)type1)->dataType == DataType::REAL) {
+        return true;
+    }
+    if (((SymbolType*)type1)->dataType == DataType::INTEGER) {
+        return true;
+    }
+    if (((SymbolType*)type1)->dataType == DataType::ARRAY) {
+        return Compare(type1->GetType(), type2->GetType());
+    }
+    if (((SymbolType*)type1)->dataType == DataType::RECORD) {
+        ans = true;
+        if (((SymbolRecord*)type1->GetType())->argc != ((SymbolRecord*)(type2->GetType()))->argc) {
+            return false;
+        }
+        for (int i = 0; i < ((SymbolRecord*)type1->GetType())->table->symbols.size(); i++) {
+            ans = ans && Compare(((SymbolRecord*)type1->GetType())->table->symbols[i], ((SymbolRecord*)type2->GetType())->table->symbols[i]);
+        }
+        return ans;
+    }
+    return false;
+}
+
+bool CmpArguments::Compare(Symbol* sym1, Symbol* sym2) {
+    auto symR1 = (SymbolFunction*)sym1;
+    auto symR2 = (SymbolFunction*)sym2;
+    if (symR1->argc != symR2->argc) {
+        return false;
+    }
+    for (int i = 0; i < symR1->argc; i++) {
+        if (symR1->symbolTable->symbols[i]->GetType() != symR2->symbolTable->symbols[i]->GetType()) {
+            return false;
+        }
+    }
+    return true;
+}
