@@ -51,6 +51,8 @@ private:
     Block* ParseWhileBlock(SymbolTable*, int);
     Block* ParseRepeatBlock(SymbolTable*, int);
     Block* ParseBlockIdent(SymbolTable*, int);
+    Block* ParseGoToBlock(SymbolTable*, int);
+    Block* ParseTryBlock(SymbolTable*, int);
 
     std::vector<Block*> ParseBlockList(SymbolTable*, int);
 

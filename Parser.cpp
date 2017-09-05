@@ -562,6 +562,10 @@ void Parser::CheckConstant(SymbolTable* table, Expression* expr) {
 Block* Parser::ParseBlock(SymbolTable* table, int state) {
     if (scanner.GetLexem().token == BEGIN) {
         return ParseCompoundBlock(table, state);
+    } else if (scanner.GetLexem().token == GOTO) {
+        return ParseGoToBlock(table, state);
+    } else if (scanner.GetLexem().token == TRY) {
+        return ParseTryBlock(table, state);
     } else if (scanner.GetLexem().token == FOR) {
         return ParseForBlock(table, state);
     } else if (scanner.GetLexem().token == IDENTIFICATOR) {
@@ -570,6 +574,8 @@ Block* Parser::ParseBlock(SymbolTable* table, int state) {
         return ParseWhileBlock(table, state);
     } else if (scanner.GetLexem().token == SEMI_COLON) {
         scanner.NextToken();
+        return nullptr;
+    } else if (scanner.GetLexem().token == EXCEPT || scanner.GetLexem().token == FINALLY || scanner.GetLexem().token == END) {
         return nullptr;
     }
     else if (scanner.GetLexem().token == CONTINUE) {
@@ -598,7 +604,7 @@ Block* Parser::ParseWhileBlock(SymbolTable* table, int state) {
     return new BlockWhile(cond, ParseBlock(table, state | 2));
 }
 
-std::set<TokenType> endBlockToken = {END, ELSE, UNTIL, POINT};
+std::set<TokenType> endBlockToken = {END, ELSE, UNTIL, POINT, FINALLY, EXCEPT};
 
 Block* Parser::ParseCompoundBlock(SymbolTable* table, int state) {
     scanner.CheckCurLexem(BEGIN, "begin");
@@ -705,4 +711,32 @@ Block* Parser::ParseRepeatBlock(SymbolTable* table, int state) {
     scanner.NextToken();
     Expression* exp = ParseExpression(table, 0);
     return new BlockRepeat(exp, blocks);
+}
+
+Block* Parser::ParseGoToBlock(SymbolTable* table, int state) {
+    scanner.CheckNextLexem(IDENTIFICATOR, "IDENTIFICATOR");
+    auto symbol = table->GetSymbol(scanner.GetLexem().val, scanner.GetLexem().pos);
+    scanner.CheckNextLexem(SEMI_COLON, ";");
+    return new BlockGoTo(symbol);
+}
+
+Block* Parser::ParseTryBlock(SymbolTable* table, int state) {
+    scanner.NextToken();
+    auto block1 = ParseBlockList(table, state);
+    std::vector <Block*> block2;
+    if (scanner.GetLexem().token == EXCEPT) {
+        scanner.NextToken();
+        block2 = ParseBlockList(table, state);
+        scanner.CheckCurLexem(END, "end");
+        scanner.NextToken();
+        return new BlockTryExcept(block1, block2);
+    }
+    if (scanner.GetLexem().token == FINALLY) {
+        scanner.NextToken();
+        block2 = ParseBlockList(table, state);
+        scanner.CheckCurLexem(END, "end");
+        scanner.NextToken();
+        return new BlockTryFinally(block1, block2);
+    }
+    throw UnexpectedSymbol("EXCEPT", scanner.GetLexem().val, scanner.GetLexem().pos);
 }

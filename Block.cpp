@@ -1,4 +1,5 @@
 #include "Block.h"
+#include "Symbol.h"
 
 void Block::Print(int) {};
 
@@ -75,3 +76,38 @@ void BlockRepeat::Print(int spaces) {
         block->Print(spaces + 1);
     }
 }
+
+void BlockGoTo::Print(int spaces) {
+    printIndent(spaces);
+    std::cout << "goto" << indent << labelSym->name << std::endl;
+};
+
+void BlockTryExcept::Print(int spaces) {
+    printIndent(spaces);
+    std::cout << "try" << std::endl;
+    for (auto it = blockListTry.begin(); it != blockListTry.end(); it++) {
+        (*it)->Print(spaces + 1);
+    }
+    printIndent(spaces);
+    std::cout << "except" << std::endl;
+    for (auto it = blockListExcept.begin(); it != blockListExcept.end(); it++) {
+        (*it)->Print(spaces + 1);
+    }
+    printIndent(spaces);
+    std::cout << "end" << std::endl;
+} 
+
+void BlockTryFinally::Print(int spaces) {
+    printIndent(spaces);
+    std::cout << "try" << std::endl;
+    for (auto it = blockListTry.begin(); it != blockListTry.end(); it++) {
+        (*it)->Print(spaces + 1);
+    }
+    printIndent(spaces);
+    std::cout << "finally" << std::endl;
+    for (auto it = blockListFinally.begin(); it != blockListFinally.end(); it++) {
+        (*it)->Print(spaces + 1);
+    }
+    printIndent(spaces);
+    std::cout << "end" << std::endl;
+} 

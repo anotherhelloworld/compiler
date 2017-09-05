@@ -44,6 +44,15 @@ static std::string StrPos(std::pair <int, int> pos) {
     return "Line " + std::to_string(pos.first + 1) + " Column " + std::to_string(pos.second + 1);
 }
 
+static std::string CheckSymbol(std::string str) {
+    if (str.length() == 1) {
+        if (str[0] < 0 || str[0] > 127) {
+            return "EOF";
+        }
+    }
+    return str;
+}
+
 class Error {
 public:
     std::pair<int, int> pos;
@@ -54,6 +63,12 @@ public:
 class DuplicateIdent : public Error {
 public:
     DuplicateIdent(std::string idName, std::pair<int, int> pos): Error("Duplicate identifier \"" + idName + "\". " + StrPos(pos), pos) {};
+};
+
+class UnexpectedSymbol : public Error {
+public:
+    UnexpectedSymbol(std::string symbol, std::string found, std::pair <int, int> pos):
+    Error("\"Symbol " + symbol + "\" expected but \"" + CheckSymbol(found) + "\" found in " + StrPos(pos), pos) {};
 };
 
 // class CompilerError {

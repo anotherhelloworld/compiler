@@ -75,4 +75,27 @@ public:
     BlockRepeat(Expression* exp, std::vector<Block*> blocks): BlockCondition(exp), blocks(blocks) {};
     void Print(int);
 };
+
+class BlockGoTo: public Block {
+public:
+    Symbol* labelSym;
+    BlockGoTo(Symbol* labelSym): labelSym(labelSym) {};
+    void Print(int);
+};
+
+class BlockTryExcept: public Block {
+public:
+    std::vector<Block*> blockListTry;
+    std::vector<Block*> blockListExcept;
+    BlockTryExcept(std::vector<Block*> blockListTry, std::vector<Block*> blockListExcept): blockListTry(blockListTry), blockListExcept(blockListExcept) {};
+    void Print(int);
+};
+
+class BlockTryFinally: public Block {
+public:
+    std::vector<Block*> blockListTry;
+    std::vector<Block*> blockListFinally;
+    BlockTryFinally(std::vector<Block*> blockListTry, std::vector<Block*> blockListFinally): blockListTry(blockListTry), blockListFinally(blockListFinally) {};
+    void Print(int);
+};
 #endif //COMPILER_BLOCK_H
