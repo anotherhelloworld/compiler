@@ -1,0 +1,23 @@
+begin
+   try
+      for
+            i
+         :=
+            0
+      true
+         100
+      do
+         begin
+            for
+                  j
+               :=
+                  0
+            true
+               100
+            do
+               begin
+               end
+         end
+   finally
+   end
+end

@@ -575,7 +575,9 @@ Block* Parser::ParseBlock(SymbolTable* table, int state) {
     } else if (scanner.GetLexem().token == SEMI_COLON) {
         scanner.NextToken();
         return nullptr;
-    } else if (scanner.GetLexem().token == EXCEPT || scanner.GetLexem().token == FINALLY || scanner.GetLexem().token == END) {
+    } else if (scanner.GetLexem().token == EXCEPT ||
+               scanner.GetLexem().token == FINALLY ||
+               scanner.GetLexem().token == END) {
         return nullptr;
     }
     else if (scanner.GetLexem().token == CONTINUE) {
@@ -606,6 +608,14 @@ Block* Parser::ParseWhileBlock(SymbolTable* table, int state) {
 
 std::set<TokenType> endBlockToken = {END, ELSE, UNTIL, POINT, FINALLY, EXCEPT};
 
+
+void Parser::CheckSemiColon() {
+    if (endBlockToken.find(scanner.GetLexem().token) == endBlockToken.cend()) {
+        scanner.CheckCurLexem(SEMI_COLON, ";");
+        scanner.NextToken();
+    }
+}
+
 Block* Parser::ParseCompoundBlock(SymbolTable* table, int state) {
     scanner.CheckCurLexem(BEGIN, "begin");
     scanner.NextToken();
@@ -616,8 +626,9 @@ Block* Parser::ParseCompoundBlock(SymbolTable* table, int state) {
     if (scanner.GetLexem().token == ELSE) {
         return blockCompound;
     }
-    scanner.CheckCurLexem(SEMI_COLON, ";");
-    scanner.NextToken();
+    // scanner.CheckCurLexem(SEMI_COLON, ";");
+    // scanner.NextToken();
+    CheckSemiColon();
     return blockCompound;
 }
 

@@ -58,6 +58,7 @@ private:
 
     int ParseArguments(SymbolTable*);
     void CheckConstant(SymbolTable*, Expression*);
+    void CheckSemiColon();
     std::vector<int> priorities;
     std::vector<int> unarPriorities;
     Scanner scanner;
