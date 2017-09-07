@@ -53,12 +53,16 @@ private:
     Block* ParseBlockIdent(SymbolTable*, int);
     Block* ParseGoToBlock(SymbolTable*, int);
     Block* ParseTryBlock(SymbolTable*, int);
+    Block* ParseRaiseBlock(SymbolTable*, int);
 
     std::vector<Block*> ParseBlockList(SymbolTable*, int);
 
     int ParseArguments(SymbolTable*);
     void CheckConstant(SymbolTable*, Expression*);
     void CheckSemiColon();
+    // void CastFunction(SymbolTable*, std::string, std::string);
+    // void ReserveCastFunc(SymbolTable*);
+
     std::vector<int> priorities;
     std::vector<int> unarPriorities;
     Scanner scanner;

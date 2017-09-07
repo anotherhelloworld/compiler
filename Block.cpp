@@ -13,6 +13,10 @@ void BlockCompound::Print(int spaces) {
     std::cout << "end" << std::endl;
 };
 
+void BlockCompound::Add(Block* block) {
+    listBlock.push_back(block);
+}
+
 void BlockFor::Print(int spaces) {
     printIndent(spaces);
     std::cout << "for" << std::endl;
@@ -111,3 +115,14 @@ void BlockTryFinally::Print(int spaces) {
     printIndent(spaces);
     std::cout << "end" << std::endl;
 } 
+
+void BlockBreak::Print(int spaces) {
+    printIndent(spaces);
+    std::cout << "break" << std::endl;
+}
+
+void BlockRaise::Print(int spaces) {
+    printIndent(spaces + 1);
+    std::cout << "raise" << std::endl;
+    exp->Print(spaces + 1);
+}

@@ -64,7 +64,7 @@ public:
 class SymbolVar: public SymbolIdent {
 public:
     SymbolVar(std::string name, Expression* initExpr, Symbol* type):
-            SymbolIdent(name, DeclarationType ::VAR,initExpr, type) {};
+            SymbolIdent(name, DeclarationType ::VAR, initExpr, type) {};
     void Print(int);
 };
 
@@ -147,9 +147,10 @@ public:
     bool Find(std::string);
     std::vector<Symbol*> GetAllSymbols(std::string, std::pair<int, int>);
     std::vector<Symbol*> symbols;
+    int stdTypeCount;
 private:
     SymbolTable* parentTable;
-    int stdTypeCount;
+    
 };
 
 #endif //COMPILER_SYMBOL_H

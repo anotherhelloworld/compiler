@@ -98,4 +98,16 @@ public:
     BlockTryFinally(std::vector<Block*> blockListTry, std::vector<Block*> blockListFinally): blockListTry(blockListTry), blockListFinally(blockListFinally) {};
     void Print(int);
 };
+
+class BlockBreak: public Block {
+public:
+    void Print(int);
+};
+
+class BlockRaise: public Block {
+public:
+    Expression* exp;
+    BlockRaise(Expression* exp): exp(exp) {};
+    void Print(int);
+};
 #endif //COMPILER_BLOCK_H

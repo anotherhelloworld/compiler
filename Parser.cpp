@@ -40,12 +40,37 @@ Parser::Parser(char* filename): scanner(filename) {
     unarPriorities[SUB] = 3;
     unarPriorities[ADD] = 3;
 
+//    ReserveCastFunc(symTable);
 
 
 //    expression = ParseExpression(0);
 //    if (scanner.GetLexem().token != TokenType::T_EOF)
 //        throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());
 }
+
+// void Parser::CastFunction(SymbolTable* table, std::string type1, std::string type2) {
+//     auto newTable = new SymbolTable(table);
+//     Symbol* symArg = new SymbolVar("arg0", nullptr, table->GetSymbol(type2, std::make_pair(0, 0)));
+//     newTable->Add(symArg);
+//     Symbol* symRes = new SymbolVar("result", nullptr, table->GetSymbol(type1, std::make_pair(0, 0)));
+//     newTable->Add(symRes);
+//     auto block = new BlockCompound();
+//     block->Add(new BlockAssign(new ExpressionAssign(new ExpressionIdent(Lexem("result", START, std::make_pair(0, 0)), newTable->GetSymbol("result", std::make_pair(0, 0))),
+//         new ExpressionIdent(Lexem("arg0", START, std::make_pair(0, 0)), newTable->GetSymbol("arg0", std::make_pair(0, 0))))));
+//     auto symFunc = new SymbolFunction(type1, newTable, new BlockCompound(), 2, table->GetSymbol(type1, std::make_pair(0, 0)));
+//     table->Add(symFunc);
+//     table->stdTypeCount++;
+// }
+
+// void Parser::ReserveCastFunc(SymbolTable* table) {
+//     CastFunction(table, "real", "integer");
+//     CastFunction(table, "integer", "char");
+//     CastFunction(table, "char", "integer");
+//     table->Add(new SymbolProcedure("write", new SymbolTable(table), nullptr, -1));
+//     table->Add(new SymbolProcedure("writeln", new SymbolTable(table), nullptr, -2));
+//     table->stdTypeCount++;
+//     table->stdTypeCount++;
+// }
 
 Expression* Parser::ParseExpression(SymbolTable* table, int priority) {
     if (priority == 3) {
@@ -582,14 +607,26 @@ Block* Parser::ParseBlock(SymbolTable* table, int state) {
     }
     else if (scanner.GetLexem().token == CONTINUE) {
         if (state & 2) {
-            scanner.CheckNextLexem(SEMI_COLON, ";");
+//            scanner.CheckNextLexem(SEMI_COLON, ";");
+            scanner.NextToken();
+            CheckSemiColon();
             return new BlockContinue();
         }
-    } else if (scanner.GetLexem().token == IF) {
-        return ParseIfBlock(table, 0);
+    } else if (scanner.GetLexem().token == RAISE) {
+        return ParseRaiseBlock(table, state);
+    }
+    else if (scanner.GetLexem().token == IF) {
+        return ParseIfBlock(table, state);
     } else if (scanner.GetLexem().token == REPEAT) {
         return ParseRepeatBlock(table, state);
-    } else {
+    } else if (scanner.GetLexem().token == BREAK) {
+        if (state & 2) {
+            scanner.NextToken();
+            CheckSemiColon();
+            return new BlockBreak();
+        }
+    }
+    else {
         throw ParserException("Illegal Expression in pos " + scanner.GetLexem().GetStrPos());
     }
 }
@@ -670,18 +707,28 @@ Block* Parser::ParseForBlock(SymbolTable* table, int state) {
     return new BlockFor(exp1, exp2, toFlag, block);
 }
 
+Block* Parser::ParseRaiseBlock(SymbolTable* table, int state) {
+    scanner.NextToken();
+    std::pair <int, int> pos = scanner.GetLexem().pos;
+    auto exp = ParseExpression(table, state);
+    TypeChecker(table, DataType::STRING, exp, pos);
+    return new BlockRaise(exp);
+}
+
 Block* Parser::ParseBlockIdent(SymbolTable* table, int state) {
     std::pair<int, int> pos = scanner.GetLexem().pos;
     Symbol* symbol = symTable->GetSymbol(scanner.GetLexem().val, pos);
     Expression* exp = ParseExpression(table, 0);
     if (exp->expressionType == ExpressionType::ASSIGN) {
-        scanner.CheckCurLexem(SEMI_COLON, ";");
-        scanner.NextToken();
+//        scanner.CheckCurLexem(SEMI_COLON, ";");
+//        scanner.NextToken();
+        CheckSemiColon();
         return new BlockAssign(exp);
     }
     if (exp->expressionType == ExpressionType::FUNCCALL) {
-        scanner.CheckCurLexem(SEMI_COLON, ";");
-        scanner.NextToken();
+//        scanner.CheckCurLexem(SEMI_COLON, ";");
+        // scanner.NextToken();
+        CheckSemiColon();
         return new BlockFuncCall(exp);
     }
     throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());

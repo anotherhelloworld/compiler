@@ -1,0 +1,6 @@
+procedure a(a: integer; b: real);
+begin
+end;
+begin
+    a(10, real(20));
+end.

@@ -9,7 +9,7 @@ for i in range(0, count):
     ans = (subprocess.check_output(['/Users/a1/Documents/stuff/c++ stuff/compiler/bin/Debug/Compiler', '-d', '/Users/a1/Documents/stuff/c++ stuff/compiler/tests/testParserDeclarations/'
      + testnum + '.in']))
     expectedAns = fo.read()
-    # print(ans)
+
     if (ans == expectedAns):
         print("OK")
     else:

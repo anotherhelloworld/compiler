@@ -78,7 +78,7 @@ public:
     ExpressionBoolean(const Lexem &val): ExpressionTerm(val, ExpressionType::BOOLEAN) {};
 };
 
-class ExpressionIdent: ExpressionTerm {
+class ExpressionIdent: public ExpressionTerm {
 public:
     Symbol* symbol;
     ExpressionIdent(const Lexem &val) : ExpressionTerm(val, ExpressionType::VAR) {};

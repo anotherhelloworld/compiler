@@ -67,7 +67,7 @@ void ExpressionAssign::Print(int spaces) {
 
 void ExpressionFuncCall::Print(int spaces) {
     for (auto i: args) {
-        i->Print(spaces);
+        i->Print(spaces + 1);
     }
     printIndent(spaces);
     std::cout << "()" << std::endl;
