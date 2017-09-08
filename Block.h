@@ -110,4 +110,21 @@ public:
     BlockRaise(Expression* exp): exp(exp) {};
     void Print(int);
 };
+
+class CaseNode {
+public:
+    Expression* exp1;
+    Expression* exp2;
+    Block* block;
+    CaseNode(Expression* exp1, Expression* exp2, Block* block): exp1(exp1), exp2(exp2), block(block) {};
+};
+
+class BlockCase: public BlockCondition {
+public:
+    Block* blockElse;
+    vector <CaseNode> caseList;
+    BlockCase(Expression* exp): BlockCondition(exp), blockElse(nullptr) {};
+    void Add(CaseNode);
+    void Print(int);
+};
 #endif //COMPILER_BLOCK_H

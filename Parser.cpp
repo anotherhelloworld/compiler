@@ -39,8 +39,9 @@ Parser::Parser(char* filename): scanner(filename) {
     unarPriorities[NOT] = 3;
     unarPriorities[SUB] = 3;
     unarPriorities[ADD] = 3;
-
-//    ReserveCastFunc(symTable);
+    unarPriorities[DOG] = 3;
+    unarPriorities[CIRCUMFLEX] = 3;
+   ReserveCastFunc(symTable);
 
 
 //    expression = ParseExpression(0);
@@ -48,29 +49,29 @@ Parser::Parser(char* filename): scanner(filename) {
 //        throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());
 }
 
-// void Parser::CastFunction(SymbolTable* table, std::string type1, std::string type2) {
-//     auto newTable = new SymbolTable(table);
-//     Symbol* symArg = new SymbolVar("arg0", nullptr, table->GetSymbol(type2, std::make_pair(0, 0)));
-//     newTable->Add(symArg);
-//     Symbol* symRes = new SymbolVar("result", nullptr, table->GetSymbol(type1, std::make_pair(0, 0)));
-//     newTable->Add(symRes);
-//     auto block = new BlockCompound();
-//     block->Add(new BlockAssign(new ExpressionAssign(new ExpressionIdent(Lexem("result", START, std::make_pair(0, 0)), newTable->GetSymbol("result", std::make_pair(0, 0))),
-//         new ExpressionIdent(Lexem("arg0", START, std::make_pair(0, 0)), newTable->GetSymbol("arg0", std::make_pair(0, 0))))));
-//     auto symFunc = new SymbolFunction(type1, newTable, new BlockCompound(), 2, table->GetSymbol(type1, std::make_pair(0, 0)));
-//     table->Add(symFunc);
-//     table->stdTypeCount++;
-// }
+void Parser::CastFunction(SymbolTable* table, std::string type1, std::string type2) {
+    auto newTable = new SymbolTable(table);
+    Symbol* symArg = new SymbolVar("arg0", nullptr, table->GetSymbol(type2, std::make_pair(0, 0)));
+    newTable->Add(symArg);
+    Symbol* symRes = new SymbolVar("result", nullptr, table->GetSymbol(type1, std::make_pair(0, 0)));
+    newTable->Add(symRes);
+    auto block = new BlockCompound();
+    block->Add(new BlockAssign(new ExpressionAssign(new ExpressionIdent(Lexem("result", START, std::make_pair(0, 0)), newTable->GetSymbol("result", std::make_pair(0, 0))),
+        new ExpressionIdent(Lexem("arg0", START, std::make_pair(0, 0)), newTable->GetSymbol("arg0", std::make_pair(0, 0))))));
+    auto symFunc = new SymbolFunction(type1, newTable, new BlockCompound(), 2, table->GetSymbol(type1, std::make_pair(0, 0)));
+    table->Add(symFunc);
+    table->stdTypeCount++;
+}
 
-// void Parser::ReserveCastFunc(SymbolTable* table) {
-//     CastFunction(table, "real", "integer");
-//     CastFunction(table, "integer", "char");
-//     CastFunction(table, "char", "integer");
-//     table->Add(new SymbolProcedure("write", new SymbolTable(table), nullptr, -1));
-//     table->Add(new SymbolProcedure("writeln", new SymbolTable(table), nullptr, -2));
-//     table->stdTypeCount++;
-//     table->stdTypeCount++;
-// }
+void Parser::ReserveCastFunc(SymbolTable* table) {
+    CastFunction(table, "real", "integer");
+    CastFunction(table, "integer", "char");
+    CastFunction(table, "char", "integer");
+    table->Add(new SymbolProcedure("write", new SymbolTable(table), nullptr, -1));
+    table->Add(new SymbolProcedure("writeln", new SymbolTable(table), nullptr, -2));
+    table->stdTypeCount++;
+    table->stdTypeCount++;
+}
 
 Expression* Parser::ParseExpression(SymbolTable* table, int priority) {
     if (priority == 3) {
@@ -110,6 +111,9 @@ Expression* Parser::ParseFactor(SymbolTable* table) {
     if (PriorityCheck(3, lex.token)) {
         scanner.NextToken();
         auto curExp = ParseExpression(table, 0);
+        if (lex.token == DOG) {
+            return (Expression*)new ExpressionPointer(curExp);
+        }
         return (Expression*)new ExpressionUnOp(lex, curExp);
     }
     if (lex.token == OPEN_BRACKET) {
@@ -179,7 +183,10 @@ Expression *Parser::ParseTerm(SymbolTable* table, bool flag) {
                 throw;
             }
             res = (Expression*)new ExpressionFuncCall(res, args);
-        } else {
+        } else if (lex.token == CIRCUMFLEX) {
+            res = (Expression*)new ExpressionDereference(res);
+        }
+        else {
             flag = false;
         }
     }
@@ -600,6 +607,8 @@ Block* Parser::ParseBlock(SymbolTable* table, int state) {
     } else if (scanner.GetLexem().token == SEMI_COLON) {
         scanner.NextToken();
         return nullptr;
+    } else if (scanner.GetLexem().token == CASE) {
+        return ParseCaseBlock(table, state);
     } else if (scanner.GetLexem().token == EXCEPT ||
                scanner.GetLexem().token == FINALLY ||
                scanner.GetLexem().token == END) {
@@ -707,6 +716,22 @@ Block* Parser::ParseForBlock(SymbolTable* table, int state) {
     return new BlockFor(exp1, exp2, toFlag, block);
 }
 
+std::set<DataType> ordinalTypes = {DataType::STRING, DataType::CHAR, DataType::INTEGER, DataType::BOOLEAN};
+
+Block* Parser::ParseCaseBlock(SymbolTable* table, int state) {
+    scanner.NextToken();
+    auto pos = scanner.GetLexem().pos;
+    auto exp = ParseExpression(table);
+    auto dataType = exp->typeID;
+    if (ordinalTypes.find(dataType) == ordinalTypes.end()) {
+        throw "ordinalTypeException";
+    }
+    auto blockCase = new BlockCase(exp);
+    scanner.CheckCurLexem(OF);
+    scanner.NextToken();
+    
+}
+
 Block* Parser::ParseRaiseBlock(SymbolTable* table, int state) {
     scanner.NextToken();
     std::pair <int, int> pos = scanner.GetLexem().pos;
@@ -717,17 +742,13 @@ Block* Parser::ParseRaiseBlock(SymbolTable* table, int state) {
 
 Block* Parser::ParseBlockIdent(SymbolTable* table, int state) {
     std::pair<int, int> pos = scanner.GetLexem().pos;
-    Symbol* symbol = symTable->GetSymbol(scanner.GetLexem().val, pos);
+    Symbol* symbol = table->GetSymbol(scanner.GetLexem().val, pos);
     Expression* exp = ParseExpression(table, 0);
     if (exp->expressionType == ExpressionType::ASSIGN) {
-//        scanner.CheckCurLexem(SEMI_COLON, ";");
-//        scanner.NextToken();
         CheckSemiColon();
         return new BlockAssign(exp);
     }
     if (exp->expressionType == ExpressionType::FUNCCALL) {
-//        scanner.CheckCurLexem(SEMI_COLON, ";");
-        // scanner.NextToken();
         CheckSemiColon();
         return new BlockFuncCall(exp);
     }

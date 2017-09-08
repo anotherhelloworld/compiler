@@ -73,3 +73,13 @@ void ExpressionFuncCall::Print(int spaces) {
     std::cout << "()" << std::endl;
     left->Print(spaces + 1);
 }
+
+void ExpressionPointer::Print(int spaces) {
+    exp->Print(spaces + 1);
+    std::cout << std::string(spaces * mult, fill) << "@" << std::endl;
+}
+
+void ExpressionDereference::Print(int spaces) {
+    exp->Print(spaces + 1);
+    std::cout << std::string(spaces * mult, fill) << "^" << std::endl;
+}

@@ -10,7 +10,7 @@ enum class DataType;
 class Symbol;
 
 enum class ExpressionType {
-    VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD, ASSIGN, FUNCCALL, INITLIST,
+    VAR, BINOP, UNOP, INT, REAL, CHAR, BOOLEAN, IDENT, ARRAY, RECORD, ASSIGN, FUNCCALL, INITLIST, POINTER, DEREFERENCE
 };
 
 struct ExpressionArgumentList {
@@ -122,6 +122,20 @@ public:
     Expression* left;
     std::vector<Expression*> args;
     ExpressionFuncCall(Expression* left, std::vector<Expression*> args): Expression(ExpressionType::FUNCCALL), left(left), args(args) {};
+    void Print(int);
+};
+
+class ExpressionPointer: public Expression {
+public:
+    Expression* exp;
+    ExpressionPointer(Expression* exp): exp(exp), Expression(ExpressionType::POINTER) {};
+    void Print(int);
+};
+
+class ExpressionDereference: public Expression {
+public:
+    Expression* exp;
+    ExpressionDereference(Expression* exp): exp(exp), Expression(ExpressionType::DEREFERENCE) {};
     void Print(int);
 };
 

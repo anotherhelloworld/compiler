@@ -126,3 +126,16 @@ void BlockRaise::Print(int spaces) {
     std::cout << "raise" << std::endl;
     exp->Print(spaces + 1);
 }
+
+void BlockCase::Add(CaseNode caseNode) {
+    caseList.push_back(caseNode);
+}
+
+void BlockCase::Print(int spaces) {
+    printIndent(spaces);
+    std::cout << "case" << std::endl;
+    exp->Print(spaces);
+    for (auto it = caseList.begin(); it != caseList.end(); it++) {
+        (*it).block->Print(spaces + 1);
+    }
+}

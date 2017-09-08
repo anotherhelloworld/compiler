@@ -1,0 +1,11 @@
+begin
+      b
+   :=
+         a
+      @
+   Call
+            b
+         ^
+      ()
+         write
+end

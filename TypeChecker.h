@@ -8,11 +8,11 @@ class SymbolTable;
 class Symbol;
 
 enum class DataType {
-    BADTYPE = -1, INTEGER = 0, REAL = 1, CHAR = 2, BOOLEAN = 3, ARRAY = 4, STRING = 5, RECORD = 6
+    BADTYPE = -1, INTEGER = 0, REAL = 1, CHAR = 2, BOOLEAN = 3, ARRAY = 4, STRING = 5, RECORD = 6, POINTER = 7, 
 };
 
 static std::vector<std::string> dataTypeString = {
-        "integer", "real", "char", "boolean", "array"
+        "integer", "real", "char", "boolean", "array", "string", "record", "pointer"
 };
 
 class TypeChecker {

@@ -21,14 +21,15 @@ std::map <DataType, std::map<TokenType, DataType> > operationsTypes = {
         }
 };
 
-DataType CastTable[7][7] = {
-        {DataType::INTEGER, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::STRING},
-        {DataType::REAL,    DataType::REAL,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::STRING},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::STRING},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BOOLEAN, DataType::BADTYPE, DataType::BADTYPE, DataType::STRING},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::ARRAY,   DataType::BADTYPE, DataType::STRING},
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::STRING,  DataType::BADTYPE}, 
-        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::RECORD}
+DataType CastTable[8][8] = {
+        {DataType::INTEGER, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE,  DataType::BADTYPE},
+        {DataType::REAL,    DataType::REAL,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE,  DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::CHAR,    DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE,  DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BOOLEAN, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE,  DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::ARRAY,   DataType::BADTYPE, DataType::BADTYPE,  DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::STRING,  DataType::BADTYPE, DataType::BADTYPE, DataType::STRING,  DataType::BADTYPE,  DataType::BADTYPE}, 
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::RECORD,   DataType::BADTYPE},
+        {DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE, DataType::BADTYPE,  DataType::POINTER}
 };
 
 TypeChecker::TypeChecker(SymbolTable* symbolTable, Expression* expr, std::pair<int, int> pos): symbolTable(symbolTable), pos(pos) {

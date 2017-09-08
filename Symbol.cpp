@@ -8,6 +8,7 @@ SymbolTable::SymbolTable(SymbolTable * parentTable): parentTable(parentTable) {
     symbols.push_back(new SymbolType("boolean", DataType::CHAR));
     symbols.push_back(new SymbolType("string", DataType::STRING));
     symbols.push_back(new SymbolType("record", DataType::RECORD));
+    symbols.push_back(new SymbolType("pointer", DataType::POINTER));
     stdTypeCount = symbols.size();
 };
 

@@ -3,6 +3,6 @@
 2         5         COMMA                    ,
 2         7         IDENTIFICATOR            double1
 2         14        COLON                    :
-2         16        DOUBLE                   double
+2         16        IDENTIFICATOR            double
 2         22        SEMI_COLON               ;
 2         22        T_EOF                    EOF
