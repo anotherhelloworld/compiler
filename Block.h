@@ -122,7 +122,7 @@ public:
 class BlockCase: public BlockCondition {
 public:
     Block* blockElse;
-    vector <CaseNode> caseList;
+    std::vector <CaseNode> caseList;
     BlockCase(Expression* exp): BlockCondition(exp), blockElse(nullptr) {};
     void Add(CaseNode);
     void Print(int);

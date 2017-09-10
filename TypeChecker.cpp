@@ -4,20 +4,56 @@
 std::map <DataType, std::map<TokenType, DataType> > operationsTypes = {
         { DataType::INTEGER,
                 {
-                        { EQUAL, DataType::BOOLEAN },
-                        { XOR, DataType::INTEGER },
-                        { ADD, DataType::INTEGER },
-                        { SUB, DataType::INTEGER },
-                        { DIVISION, DataType::REAL },
-                        { DIV, DataType::INTEGER }
+                        { EQUAL,     DataType::BOOLEAN },
+                        { XOR,       DataType::INTEGER },
+                        { ADD,       DataType::INTEGER },
+                        { SUB,       DataType::INTEGER },
+                        { DIVISION,  DataType::REAL    },
+                        { DIV,       DataType::INTEGER },
+                        { MULT,      DataType::INTEGER },
+                        { MOD,          DataType::INTEGER },
+                        { NOT_EQUAL,    DataType::BOOLEAN },
+                        { GREATER_THAN, DataType::BOOLEAN },
+                        { GREATER_OR_EQUAL_THAN, DataType::BOOLEAN },
+                        { LESS_THAN, DataType::BOOLEAN },
+                        { LESS_OR_EQUAL_THAN, DataType::BOOLEAN },
+                        { SHL, DataType::INTEGER },
+                        { SHR, DataType::INTEGER },
+                        { AND, DataType::INTEGER },
+                        { OR, DataType::INTEGER }
+
                 }
         },
         { DataType::REAL,
                 {
                         { EQUAL, DataType::BOOLEAN },
                         { ADD, DataType::REAL },
-                        { DIVISION, DataType::REAL }
+                        { DIVISION, DataType::REAL },
+                        { MULT, DataType::REAL },
+                        { NOT_EQUAL, DataType::REAL },
+                        { GREATER_THAN, DataType::BOOLEAN },
+                        { LESS_THAN, DataType::BOOLEAN },
+                        { GREATER_OR_EQUAL_THAN, DataType::BOOLEAN },
+                        { LESS_OR_EQUAL_THAN, DataType::BOOLEAN },
+                        { SUB, DataType::REAL }
                 }
+        },
+//        { DataType::CHAR,
+//                {
+//
+//                }
+//        },
+        { DataType::BOOLEAN,
+                {
+                    { XOR, DataType::BOOLEAN },
+                    { AND, DataType::BOOLEAN },
+                    { OR, DataType::BOOLEAN }
+                }
+        },
+        { DataType::POINTER,
+            {
+                {SUB, DataType::INTEGER}
+            }
         }
 };
 
@@ -70,6 +106,10 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* e
         }
         return;
     }
+}
+
+TypeChecker::TypeChecker(SymbolTable* table, Expression* left, Expression* right, std::pair<int, int> pos): symbolTable(table), pos(pos) {
+    Check(GetTypeID(left), GetTypeID(right));
 }
 
 void TypeChecker::Check(DataType type1, DataType type2) {

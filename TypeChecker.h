@@ -17,10 +17,11 @@ static std::vector<std::string> dataTypeString = {
 
 class TypeChecker {
 public:
-    TypeChecker(SymbolTable* symbolTable, Expression* expr, std::pair<int, int> pos);
-    TypeChecker(SymbolTable* symbolTable, std::pair<int, int> pos): symbolTable(symbolTable), pos(pos) {};
+    TypeChecker(SymbolTable*, Expression*, std::pair<int, int>);
+    TypeChecker(SymbolTable*, std::pair<int, int> pos): symbolTable(symbolTable), pos(pos) {};
     TypeChecker(SymbolTable*, DataType, Expression*, std::pair<int, int>);
     TypeChecker(SymbolTable*, Symbol*, Expression*, std::pair<int, int>);
+    TypeChecker(SymbolTable*, Expression*, Expression*, std::pair <int, int>);
     void Check(DataType, DataType);
     bool CanCast(DataType, DataType);
     DataType GetTypeID(Expression*);

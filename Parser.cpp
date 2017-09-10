@@ -721,16 +721,45 @@ std::set<DataType> ordinalTypes = {DataType::STRING, DataType::CHAR, DataType::I
 Block* Parser::ParseCaseBlock(SymbolTable* table, int state) {
     scanner.NextToken();
     auto pos = scanner.GetLexem().pos;
-    auto exp = ParseExpression(table);
+    auto exp = ParseExpression(table, state);
     auto dataType = exp->typeID;
     if (ordinalTypes.find(dataType) == ordinalTypes.end()) {
         throw "ordinalTypeException";
     }
     auto blockCase = new BlockCase(exp);
-    scanner.CheckCurLexem(OF);
+    scanner.CheckCurLexem(OF, "of");
     scanner.NextToken();
-    
+    if (scanner.GetLexem().token == ELSE || scanner.GetLexem().token == END) {
+        throw IllegalExpression(scanner.GetLexem().pos);
+    }
+    while (scanner.GetLexem().token != ELSE && scanner.GetLexem().token != END) {
+        auto pos = scanner.GetLexem().pos;
+        Expression* exp1 = ParseExpression(table, state);
+        TypeChecker(table, exp, exp1, pos);
+        CheckConstant(table, exp1);
+        Expression* exp2 = nullptr;
+        if (scanner.GetLexem().token == DOUBLE_POINT) {
+            scanner.NextToken();
+            pos = scanner.GetLexem().pos;
+            exp2 = ParseExpression(table, state);
+            TypeChecker(table, exp, exp2, pos);
+        }
+        scanner.CheckCurLexem(COLON, ":");
+        scanner.NextToken();
+        auto block = ParseBlock(table, state);
+        blockCase->Add(CaseNode(exp1, exp2, block));
+    }
+    if (scanner.GetLexem().token == ELSE) {
+        scanner.NextToken();
+        blockCase->blockElse = ParseBlock(table, state);
+    }
+    scanner.CheckCurLexem(END, "end");
+    scanner.NextToken();
+    CheckSemiColon();
+    return blockCase;
 }
+
+
 
 Block* Parser::ParseRaiseBlock(SymbolTable* table, int state) {
     scanner.NextToken();

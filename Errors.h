@@ -60,15 +60,20 @@ public:
     Error(std::string errorMsg, std::pair<int, int> pos): errorMsg(errorMsg) {};
 };
 
-class DuplicateIdent : public Error {
+class DuplicateIdent: public Error {
 public:
     DuplicateIdent(std::string idName, std::pair<int, int> pos): Error("Duplicate identifier \"" + idName + "\". " + StrPos(pos), pos) {};
 };
 
-class UnexpectedSymbol : public Error {
+class UnexpectedSymbol: public Error {
 public:
     UnexpectedSymbol(std::string symbol, std::string found, std::pair <int, int> pos):
     Error("\"Symbol " + symbol + "\" expected but \"" + CheckSymbol(found) + "\" found in " + StrPos(pos), pos) {};
+};
+
+class IllegalExpression: public Error {
+public:
+    IllegalExpression(std::pair<int, int> pos): Error("Error: Illegal expression. " + StrPos(pos), pos) {};
 };
 
 // class CompilerError {
