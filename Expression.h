@@ -85,12 +85,12 @@ public:
     ExpressionIdent(const Lexem &val, Symbol* symbol) : symbol(symbol), ExpressionTerm(val, ExpressionType::VAR) {};
 };
 
-class ExpressionRecordAccess: ExpressionBinOp {
+class ExpressionRecordAccess: public ExpressionBinOp {
 public:
     ExpressionRecordAccess(Expression* right, Expression* left): ExpressionBinOp(Lexem(".", POINT), right, left) {}
 };
 
-class ExpressionArrayIndecies: Expression {
+class ExpressionArrayIndecies: public Expression {
 public:
     ExpressionArrayIndecies(Expression* ident, std::vector<Expression*> indecies):
             Expression(ExpressionType::ARRAY), operation(Lexem("[]", OPEN_SQUARE_BRACKET)), ident(ident), indecies(indecies) {};

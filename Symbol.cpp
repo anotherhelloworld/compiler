@@ -5,7 +5,7 @@ SymbolTable::SymbolTable(SymbolTable * parentTable): parentTable(parentTable) {
     symbols.push_back(new SymbolType("integer", DataType::INTEGER));
     symbols.push_back(new SymbolType("real", DataType::REAL));
     symbols.push_back(new SymbolType("char", DataType::CHAR));
-    symbols.push_back(new SymbolType("boolean", DataType::CHAR));
+    symbols.push_back(new SymbolType("boolean", DataType::BOOLEAN));
     symbols.push_back(new SymbolType("string", DataType::STRING));
     symbols.push_back(new SymbolType("record", DataType::RECORD));
     symbols.push_back(new SymbolType("pointer", DataType::POINTER));

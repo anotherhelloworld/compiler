@@ -158,6 +158,7 @@ Expression *Parser::ParseTerm(SymbolTable* table, bool flag) {
     } else {
         res = (Expression*)new ExpressionIdent(lex);
     }
+    Expression* res2 = nullptr;
     while (flag) {
         scanner.NextToken();
         lex = scanner.GetLexem();
