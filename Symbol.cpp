@@ -52,7 +52,8 @@ Symbol* SymbolTable::GetSymbol(std::string name, std::pair<int, int> pos) {
 
 void SymbolTable::CheckLocalSymbol(std::string name, std::pair<int, int> pos) {
     if (FindSymbol(name) != -1) {
-        throw ParserException("Duplicate identificator '" + name + "'");
+        //throw ParserException("Duplicate IDENTIFIER '" + name + "'");
+        throw DuplicateIdent(name, pos);
     }
 }
 

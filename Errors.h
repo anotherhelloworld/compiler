@@ -41,7 +41,7 @@ public:
 };
 
 static std::string StrPos(std::pair <int, int> pos) {
-    return "Line " + std::to_string(pos.first + 1) + " Column " + std::to_string(pos.second + 1);
+    return "Line " + std::to_string(pos.first) + " Column " + std::to_string(pos.second);
 }
 
 static std::string CheckSymbol(std::string str) {
@@ -62,29 +62,28 @@ public:
 
 class DuplicateIdent: public Error {
 public:
-    DuplicateIdent(std::string idName, std::pair<int, int> pos): Error("Duplicate identifier \"" + idName + "\". " + StrPos(pos), pos) {};
+    DuplicateIdent(std::string name, std::pair<int, int> pos): Error("Duplicate identifier \"" + name + "\". " + StrPos(pos), pos) {};
 };
 
-class UnexpectedSymbol: public Error {
+class UnexpectedExpression: public Error {
 public:
-    UnexpectedSymbol(std::string symbol, std::string found, std::pair <int, int> pos):
-    Error("\"Symbol " + symbol + "\" expected but \"" + CheckSymbol(found) + "\" found in " + StrPos(pos), pos) {};
+    UnexpectedExpression(std::string expected, std::string found, std::pair <int, int> pos):
+    Error("Expression \"" + expected + "\" expected but \"" + CheckSymbol(found) + "\" found in " + StrPos(pos), pos) {};
 };
 
 class IllegalExpression: public Error {
 public:
-    IllegalExpression(std::pair<int, int> pos): Error("Error: Illegal expression. " + StrPos(pos), pos) {};
+    IllegalExpression(std::pair<int, int> pos): Error("Illegal expression. " + StrPos(pos), pos) {};
 };
 
-// class CompilerError {
-// public:
-//     std::pair <int, int> pos;
-//     std::string errorMsg;
-//     CompilerError(std::string errorMsg, std::pair<int, int> pos): errorMsg(errorMsg) {};
-// };
+class ExpectedConstExpression: public Error {
+public:
+    ExpectedConstExpression(std::pair<int, int> pos): Error("Const expression expected " + StrPos(pos), pos) {};
+};
 
-// class TypeError: public CompilerError {
-// public:
-//     TypeError(std::string expectedType, std::pair<int, int> pos): TypeError("")
-// };
+class TypeNotFound: public Error {
+public:
+    TypeNotFound(std::string name, std::pair<int, int> pos): Error("Unknown typename \"" + CheckSymbol(name) + "\" " + StrPos(pos), pos) {};
+};
+
 #endif //COMPILER_ERRORS_H

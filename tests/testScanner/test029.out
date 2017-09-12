@@ -1,5 +1,5 @@
 1         1         IF                       if
-1         4         IDENTIFICATOR            i
+1         4         IDENTIFIER            i
 1         6         IN                       in
 1         9         OPEN_SQUARE_BRACKET      [
 1         10        NUMBER                   5

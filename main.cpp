@@ -52,8 +52,8 @@ int main(int argc, char* argv[]) {
                 parser.testDeclarations = true;
                 parser.ParseDeclaration(parser.symTable);
                 parser.symTable->Print(0);
-            } catch (ParserException error) {
-                std::cout << error.getMsg() << std::endl;
+            } catch (Error error) {
+                std::cout << error.errorMsg << std::endl;
                 return 0;
             }
         } else if (strcmp(argv[1], "-b") == 0) {

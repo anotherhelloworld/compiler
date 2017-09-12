@@ -1,5 +1,5 @@
 1         1         BEGIN                    begin
-2         3         IDENTIFICATOR            writeln
+2         3         IDENTIFIER            writeln
 2         10        OPEN_BRACKET             (
 2         12        TOKEN_STRING             Hello, World!
 2         26        CLOSE_BRACKET            )

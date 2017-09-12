@@ -6,7 +6,7 @@ for i in range(0, count):
     testnum = 'test' + '0' * (len(str(100)) - len(str(i))) + str(i)
     fo = open(testnum + '.out')
     # print(testnum)
-    ans = (subprocess.check_output(['/Users/a1/Documents/stuff/c++ stuff/compiler/bin/Debug/Compiler', '-d', '/Users/a1/Documents/stuff/c++ stuff/compiler/tests/testParserDeclarations/'
+    ans = (subprocess.check_output(['/Users/a1/Documents/stuff/cstuff/compiler/bin/Debug/Compiler', '-d', '/Users/a1/Documents/stuff/cstuff/compiler/tests/testParserDeclarations/'
      + testnum + '.in']))
     expectedAns = fo.read()
 

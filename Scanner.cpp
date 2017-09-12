@@ -29,7 +29,7 @@ void fillWith(TokenType state, bool add, bool save) {
 void InitStates() {
     for (int i = START; i < statesGlobal.size(); i++) {
         if (i == START) {
-            fillWith(START, ScannerState(IDENTIFICATOR), ScannerState(IDENTIFICATOR), ScannerState(NUMBER));
+            fillWith(START, ScannerState(IDENTIFIER), ScannerState(IDENTIFIER), ScannerState(NUMBER));
             fillWith(START, false, false);
         }
         if (i == NUMBER || i == REAL_NUMBER) {
@@ -48,12 +48,12 @@ void InitStates() {
             fillWith((TokenType)i, false, true);
         }
         if (i >= BIT_NOT && i < COMMENT) {
-            fillWith((TokenType)i, ScannerState(IDENTIFICATOR, false, true), ScannerState(IDENTIFICATOR, false, true), ScannerState(NUMBER, false, true));
+            fillWith((TokenType)i, ScannerState(IDENTIFIER, false, true), ScannerState(IDENTIFIER, false, true), ScannerState(NUMBER, false, true));
             fillWith((TokenType)i, false, true);
         }
-        if (i == IDENTIFICATOR) {
-            fillWith(IDENTIFICATOR, ScannerState(IDENTIFICATOR), ScannerState(IDENTIFICATOR), ScannerState(IDENTIFICATOR));
-            fillWith(IDENTIFICATOR, false, true);
+        if (i == IDENTIFIER) {
+            fillWith(IDENTIFIER, ScannerState(IDENTIFIER), ScannerState(IDENTIFIER), ScannerState(IDENTIFIER));
+            fillWith(IDENTIFIER, false, true);
         }
         if (i == COMMENT || i == SINGLE_COMMENT) {
             fillWith((TokenType)i, ScannerState((TokenType)i, false, false, false, false), ScannerState((TokenType)i, false, false, false, false),
@@ -93,7 +93,7 @@ void InitStates() {
     statesGlobal[GREATER_THAN]['>'] = ScannerState(GREATER_THAN, true, true, true);
     statesGlobal[DIVISION]['/']  = ScannerState(DIVISION, true, true, true);
     statesGlobal[MULT]['*']  = ScannerState(MULT, true, true, true);
-    statesGlobal[IDENTIFICATOR]['_'] = ScannerState(IDENTIFICATOR);
+    statesGlobal[IDENTIFIER]['_'] = ScannerState(IDENTIFIER);
     statesGlobal[DIVISION]['/'] = ScannerState(SINGLE_COMMENT, false, false, false, false);
     statesGlobal[SINGLE_COMMENT]['\n'] = ScannerState(START, false, false, false, false);
     statesGlobal[SINGLE_COMMENT]['\t'] = ScannerState(START, false, false, false, false);
@@ -180,7 +180,7 @@ Lexem Scanner::SaveLexem(ScannerState last, Lexem l) {
 
     toSave = toSave.substr(l.val.length(), toSave.length() - l.val.length());
 
-    if (l.token == IDENTIFICATOR) {
+    if (l.token == IDENTIFIER) {
         if (reserveWords.find(l.val) != reserveWords.end()) {
             l.token = reserveWords[l.val];
         }
@@ -256,7 +256,7 @@ void Scanner::NextToken() {
 
     if (currentState.save) {
         l = Lexem(toSave, last.token, std::make_pair(pos.first, pos.second - toSave.length() + 1));
-        if (l.token == IDENTIFICATOR) {
+        if (l.token == IDENTIFIER) {
             if (reserveWords.find(l.val) != reserveWords.end()) {
                 l.token = reserveWords[l.val];
             }
@@ -281,7 +281,8 @@ void Scanner::CheckCurLexem(TokenType expcToken, std::string expcName) {
     Lexem lex = this->GetLexem();
     if (lex.token != expcToken) {
         lex.pos.second++;
-        throw ParserException("Illegal expression: expected '" + expcName + "' " + lex.GetStrPos());
+//        throw ParserException("Illegal expression: expected '" + expcName + "' " + lex.GetStrPos());
+        throw UnexpectedExpression(expcName, lex.val, lex.pos);
     }
 }
 
