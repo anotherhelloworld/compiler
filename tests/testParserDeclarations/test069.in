@@ -1,2 +1,0 @@
-var
-    str: string[10] = 'qwerty';

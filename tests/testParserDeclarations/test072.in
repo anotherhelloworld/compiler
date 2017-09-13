@@ -1,4 +1,0 @@
-type
-    MyType = array[1..6] of string[50];
-var
-    arr: MyType = ('qwe', 'rty', 'asd', 'fgh', 'zxc', 'vbn');

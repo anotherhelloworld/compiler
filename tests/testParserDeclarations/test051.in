@@ -1,2 +1,4 @@
-var a: integer = 10;
-const b = a;
+type
+    a = ^integer;
+
+var b: a;

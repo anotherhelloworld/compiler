@@ -1,1 +1,30 @@
-Illegal expression: expected ')' (2, 37)
+Type   Rec
+   Record
+      Var   a
+         Type   integer
+
+      Var   b
+         Type   integer
+
+      Var   c
+         Record
+            Var   a
+               Type   integer
+
+            Var   b
+               Type   integer
+
+         End
+
+   End
+
+Var   a
+   Record
+      Var   a
+         Type   integer
+
+      Var   b
+         Type   real
+
+   End
+

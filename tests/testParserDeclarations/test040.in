@@ -1,1 +1,2 @@
-type integer = type;
+var
+    a : array [1..2] of array[1..1] of string = (('Hello'), ('World'));

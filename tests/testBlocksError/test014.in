@@ -1,0 +1,5 @@
+var a, b: real;
+begin
+    a := 100
+    b := 50
+end.

@@ -1,2 +1,4 @@
-var
-a: array[1..10] integer;
+const
+    a = 'abc';
+    b = 'qwerty';
+    constarr: array[1..2] of string = (a, b);

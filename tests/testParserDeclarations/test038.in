@@ -1,1 +1,2 @@
-type a qwe;
+var
+    str: string = 'qwerty';

@@ -1,1 +1,4 @@
-Illegal expression: expected 'IDENTIFIER' (1, 6)
+Var   a
+   Type   pointer
+      Type   integer
+

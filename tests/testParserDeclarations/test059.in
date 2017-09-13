@@ -1,4 +1,0 @@
-const a = 10;
-const b = 15;
-var
-    arr: array[b - a..10] of integer;

@@ -1,3 +1,0 @@
-function a(const a: integer): integer;
-begin
-end;

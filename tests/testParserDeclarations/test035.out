@@ -1,1 +1,6 @@
-Illegal expression: expected ':' (1, 8)
+Label   a
+
+Label   b
+
+Label   c
+

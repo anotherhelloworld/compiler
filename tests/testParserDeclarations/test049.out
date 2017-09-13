@@ -1,1 +1,50 @@
-Illegal expression: expected 'IDENTIFIER' (1, 7)
+Type   TPoint
+   Record
+      Var   x
+         Type   real
+
+      Var   y
+         Type   real
+
+   End
+
+Function   P   4
+   Var   a
+      Type   integer
+
+   Var   b
+      Type   integer
+
+   Var   Point
+      Record
+         Var   x
+            Type   real
+
+         Var   y
+            Type   real
+
+      End
+
+   Var   Result
+      Record
+         Var   x
+            Type   real
+
+         Var   y
+            Type   real
+
+      End
+
+   Var   NewPoint
+      Record
+         Var   x
+            Type   real
+
+         Var   y
+            Type   real
+
+      End
+
+   begin
+   end
+

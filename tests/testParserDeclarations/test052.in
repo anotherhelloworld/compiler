@@ -1,3 +1,5 @@
-var
-a: integer = 10;
-b: array[1..a] of integer;
+procedure a () ; forward;
+
+procedure a() ;
+begin
+end;

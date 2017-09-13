@@ -1,0 +1,5 @@
+procedure foo(); forward;
+
+procedure foo(b: integer);
+begin
+end;

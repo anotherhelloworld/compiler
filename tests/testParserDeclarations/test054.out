@@ -1,1 +1,10 @@
-Illegal expression: expected 'IDENTIFIER' (2, 8)
+Function   a   2
+   Var   a
+      Type   integer
+
+   Var   Result
+      Type   integer
+
+   begin
+   end
+

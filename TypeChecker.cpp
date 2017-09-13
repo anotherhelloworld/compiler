@@ -128,13 +128,8 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
     }
     if (expr->expressionType == ExpressionType::ARRAY) {
         Expression* aiExp = expr;
-//        int count = ((ExpressionArrayIndecies*)aiExp)->indecies.size();
         Symbol* sym = nullptr;
-//        auto arrayExp = ((ExpressionArrayIndecies*)(((ExpressionArrayIndecies*)aiExp)->ident))->ident;
         auto arrayExp = ((ExpressionArrayIndecies*)aiExp)->ident;
-//        for (int i = 0; i < count - 1; i++) {
-//            arrayExp = ((ExpressionArrayIndecies*)arrayExp)->ident;
-//        }
         auto temp = arrayExp->expressionType;
         int count = 1;
         while (temp != ExpressionType::VAR) {
@@ -142,13 +137,6 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
             arrayExp = ((ExpressionArrayIndecies*)arrayExp)->ident;
             temp = arrayExp->expressionType;
         }
-
-//        if (arrayExp->expressionType == ExpressionType::VAR) {
-//            sym = ((ExpressionIdent*)(arrayExp))->symbol;
-//        } else if (arrayExp->expressionType == ExpressionType::RECORD) {
-//            sym = ((ExpressionIdent*)(((ExpressionRecordAccess*)(((ExpressionArrayIndecies*)aiExp)->ident))->right))->symbol;
-//        }
-
         for (int i = 0; i < count; i++) {
             if (arrayExp->expressionType == ExpressionType::VAR) {
                 sym = ((ExpressionIdent*)(arrayExp))->symbol;
@@ -156,8 +144,6 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
                 sym = ((ExpressionIdent*)(((ExpressionRecordAccess*)(((ExpressionArrayIndecies*)aiExp)->ident))->right))->symbol;
             }
         }
-
-
         for (int i = 0; i <= count; i++) {
             if (sym->declType == DeclarationType::TYPE) {
                 sym = sym->GetType();
@@ -167,19 +153,6 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
                 sym = sym->GetType();
             }
         }
-
-//        while (sym != ) {
-//            if (sym->declType == DeclarationType::TYPE) {
-//                sym = sym->GetType();
-//            } else if (sym->declType == DeclarationType::VAR || sym->declType == DeclarationType::CONST) {
-//                sym = sym->GetType();
-//            } else if (sym->declType == DeclarationType::FUNC) {
-//                sym = sym->GetType();
-//            }
-//        }
-
-
-
         return ((SymbolType*)sym)->dataType;
     }
     if (expr->expressionType == ExpressionType::VAR) {
@@ -192,7 +165,17 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
         }
         return ((SymbolType*)(((ExpressionIdent*)expr)->symbol)->GetType())->dataType;
     }
-
+    if (expr->expressionType == ExpressionType::FUNCCALL) {
+        auto symbol = symbolTable->FindReqSymbol(expr, pos);
+        if (symbol->declType == DeclarationType::PROCEDURE) {
+            return DataType::BADTYPE;
+        } else {
+            if (symbol->GetType()->declType == DeclarationType::RECORD) {
+                return DataType::RECORD;
+            }
+            return ((SymbolType*)symbol->GetType())->dataType;
+        }
+    }
     return GetTypeID(expr->expressionType);
 }
 

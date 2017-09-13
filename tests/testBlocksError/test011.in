@@ -1,0 +1,8 @@
+var a : real; b : integer;
+begin
+    repeat
+
+        ;;;;
+        a := 50;
+    until b > 10);
+end.

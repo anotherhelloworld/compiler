@@ -1,2 +1,11 @@
 var
-a = array[1..10] of integer = ;
+    a: record
+        a: record
+            a:record
+            end;
+        end;
+        b: record
+            a: record
+            end;
+        end
+    end;

@@ -1,0 +1,10 @@
+var a, i : integer;
+begin 
+    for i := 10 downto 1 begin
+     begin
+        ;;;; 
+    
+    a := 50;
+end;
+    end 
+end.

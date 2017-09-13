@@ -86,4 +86,8 @@ public:
     TypeNotFound(std::string name, std::pair<int, int> pos): Error("Unknown typename \"" + CheckSymbol(name) + "\" " + StrPos(pos), pos) {};
 };
 
+class ForwardDecl: public Error {
+public:
+    ForwardDecl(std::string name, std::pair<int, int> pos): Error("Forward declaration not inmplemented \"" + name + "\" " + StrPos(pos), pos) {};
+};
 #endif //COMPILER_ERRORS_H

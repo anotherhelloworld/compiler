@@ -1,2 +1,0 @@
-type
-    arr = array[1..100] of string;

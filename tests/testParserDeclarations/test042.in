@@ -1,3 +1,4 @@
-const
-a:type = 20;
-b = 20;
+type
+    MyType = array[1..6] of string[50];
+var
+    arr: MyType = ('qwe', 'rty', 'asd', 'fgh', 'zxc', 'vbn');

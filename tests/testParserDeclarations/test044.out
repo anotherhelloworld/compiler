@@ -1,1 +1,14 @@
-Illegal expression: expected 'of' (2, 18)
+Const   a
+   Type   char
+   abc
+
+Const   b
+   Type   char
+   qwerty
+
+Const   constarr
+   Array   1   2
+   string   
+   a
+   b
+

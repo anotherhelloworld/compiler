@@ -84,6 +84,45 @@ std::vector<Symbol*> SymbolTable::GetAllSymbols(std::string name, std::pair<int,
     return ans;
 }
 
+Symbol* SymbolTable::FindReqSymbol(Expression* exp, std::pair<int, int> pos) {
+    auto symbols = GetAllSymbols(((ExpressionIdent*)(((ExpressionFuncCall*)exp)->left))->symbol->name, pos);
+    for (auto it: symbols) {
+        if (it->declType != DeclarationType::FUNC && it->declType != DeclarationType::PROCEDURE) {
+            continue;
+        }
+        if (it->declType == DeclarationType::FUNC) {
+            if (((ExpressionFuncCall*)exp)->args.size() != ((SymbolFunction*)(it))->argc - 1) {
+                continue;
+            }
+
+        }
+        if (it->declType == DeclarationType::PROCEDURE) {
+            if (((SymbolProcedure*)it)->argc == -1 || ((SymbolProcedure*)it)->argc == -2) {
+                return it;
+            }
+            if (((ExpressionFuncCall*)exp)->args.size() != ((SymbolProcedure*)it)->argc) {
+                continue;
+            }
+        }
+        bool flag = false;
+        for (auto arg = ((ExpressionFuncCall*)exp)->args.begin(); arg != ((ExpressionFuncCall*)exp)->args.end(); arg++) {
+            auto type = ((SymbolCall*)it)->symbolTable->symbols[arg - ((ExpressionFuncCall*)exp)->args.begin()]->GetType();
+            if (type->declType == DeclarationType::RECORD && TypeChecker(this, std::make_pair(0, 0)).GetTypeID(*arg) == DataType::RECORD) {
+                continue;
+            }
+            if (TypeChecker(this, std::make_pair(0 ,0)).GetTypeID(*arg) != ((SymbolType*)type)->dataType) {
+                flag = true;
+            }
+        }
+
+        if (flag) {
+            continue;
+        }
+        return it;
+    }
+    throw IllegalExpression(pos);
+}
+
 Symbol* Symbol::GetType() {
     return nullptr;
 }
@@ -168,6 +207,10 @@ void SymbolFunction::Print(int spaces) {
     std::cout << "Function" << indent << name << indent << argc << std::endl;
     symbolTable->Print(spaces + 1);
     block->Print(spaces + 1);
+}
+
+Symbol* SymbolFunction::GetType() {
+    return type;
 }
 
 void SymbolProcedure::Print(int spaces) {

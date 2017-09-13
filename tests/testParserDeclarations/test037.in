@@ -1,1 +1,2 @@
-type a = a;
+var
+    str: string[10];

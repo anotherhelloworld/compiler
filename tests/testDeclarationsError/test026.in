@@ -1,0 +1,3 @@
+var
+    a: integer = 10;
+    const b = a;

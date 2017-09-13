@@ -1,8 +1,0 @@
-Type   a
-   Type   pointer
-      Type   integer
-
-Var   b
-   Type   pointer
-      Type   integer
-

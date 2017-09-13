@@ -1,1 +1,7 @@
-Duplicate IDENTIFIER 'integer' (1, 6)
+Var   a
+   Array   1   2
+   Array   1   1
+   string   
+   Hello
+   World
+

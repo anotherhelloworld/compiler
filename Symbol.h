@@ -113,6 +113,7 @@ public:
             SymbolCall(DeclarationType::FUNC, name, symbolTable, block, argc), type(type) {};
     Symbol* type;
     void Print(int);
+    Symbol* GetType();
 };
 
 class SymbolProcedure: public SymbolCall {
@@ -142,8 +143,9 @@ public:
     void Print(int);
     void Add(Symbol*);
     Symbol* GetSymbol(std::string, std::pair<int, int>);
-    int FindSymbol(std::string);
     void CheckLocalSymbol(std::string, std::pair<int, int>);
+    int FindSymbol(std::string);
+    Symbol* FindReqSymbol(Expression*, std::pair<int, int>);
     bool Find(std::string);
     std::vector<Symbol*> GetAllSymbols(std::string, std::pair<int, int>);
     std::vector<Symbol*> symbols;

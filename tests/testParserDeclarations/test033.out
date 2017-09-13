@@ -1,1 +1,4 @@
-Illegal expression: expected 'IDENTIFIER' (1, 8)
+Type   MyArr
+   DynArray   
+   Type   integer
+

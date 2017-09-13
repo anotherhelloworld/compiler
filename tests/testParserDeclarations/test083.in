@@ -1,4 +1,0 @@
-function a () : integer ; forward;
-function a() : integer ;
-begin 
-end;

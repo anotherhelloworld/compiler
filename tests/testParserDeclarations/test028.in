@@ -1,1 +1,2 @@
-const
+var
+a: ^integer;

@@ -1,1 +1,2 @@
-const ;
+type
+    MyArr = array of integer;

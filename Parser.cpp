@@ -246,7 +246,12 @@ void Parser::ParseDeclaration(SymbolTable* table) {
         if (scanner.GetLexem().token == BEGIN) {
             return;
         }
-        throw ParserException("Unexpected symbol " + scanner.GetLexem().GetStrPos());
+        throw UnexpectedExpression("begin", scanner.GetLexem().val, scanner.GetLexem().pos);
+    }
+    for (auto it : declForwardCall) {
+        if (((SymbolCall*)(it.sym))->block == nullptr) {
+            throw ForwardDecl(it.sym->name, it.pos);
+        }
     }
 }
 
@@ -342,7 +347,8 @@ void Parser::ParseVarDeclaration(SymbolTable* table) {
             type = ((SymbolType*)type)->type;
         }
         if (names.size() > 1 && scanner.GetLexem().token == EQUAL) {
-            throw ParserException("Illegal expression: expected ';' " + scanner.GetLexem().GetStrPos());
+            //throw ParserException("Illegal expression: expected ';' " + scanner.GetLexem().GetStrPos());
+            throw UnexpectedExpression(";", scanner.GetLexem().val, scanner.GetLexem().pos);
         }
         Expression* exp = nullptr;
         if (scanner.GetLexem().token == EQUAL) {
@@ -617,7 +623,8 @@ Block* Parser::ParseBlock(SymbolTable* table, int state) {
         return ParseCaseBlock(table, state);
     } else if (scanner.GetLexem().token == EXCEPT ||
                scanner.GetLexem().token == FINALLY ||
-               scanner.GetLexem().token == END) {
+               scanner.GetLexem().token == END ||
+               scanner.GetLexem().token == ELSE) {
         return nullptr;
     }
     else if (scanner.GetLexem().token == CONTINUE) {
@@ -642,7 +649,8 @@ Block* Parser::ParseBlock(SymbolTable* table, int state) {
         }
     }
     else {
-        throw ParserException("Illegal Expression in pos " + scanner.GetLexem().GetStrPos());
+//        throw ParserException("Illegal Expression in pos " + scanner.GetLexem().GetStrPos());
+        throw UnexpectedExpression("begin", scanner.GetLexem().val, scanner.GetLexem().pos);
     }
 }
 
@@ -780,6 +788,9 @@ Block* Parser::ParseBlockIdent(SymbolTable* table, int state) {
     Symbol* symbol = table->GetSymbol(scanner.GetLexem().val, pos);
     Expression* exp = ParseExpression(table, 0);
     if (exp->expressionType == ExpressionType::ASSIGN) {
+        if (testType) {
+            TypeChecker(table, exp, pos);
+        }
         CheckSemiColon();
         return new BlockAssign(exp);
     }
@@ -787,7 +798,8 @@ Block* Parser::ParseBlockIdent(SymbolTable* table, int state) {
         CheckSemiColon();
         return new BlockFuncCall(exp);
     }
-    throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());
+//    throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());
+    throw IllegalExpression(scanner.GetLexem().pos);
 }
 
 Block* Parser::ParseBlockStart() {
