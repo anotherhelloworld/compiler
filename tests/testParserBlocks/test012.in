@@ -1,4 +1,5 @@
-var i: integer;
+var a: integer;
+var b: integer = 5;
 begin
-    for i := 
-end;
+    a := b;
+end.

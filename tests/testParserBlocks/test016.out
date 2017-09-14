@@ -1,1 +1,14 @@
-Illegal expression in pos (6, 11)
+begin
+   try
+      try
+         begin
+         end
+      finally
+         begin
+            begin
+            end
+         end
+      end
+   except
+   end
+end

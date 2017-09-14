@@ -1,7 +1,9 @@
 begin
-   try
-      begin
-      end
-   except
-   end
+   Call
+         10
+            20
+         ()
+            real
+      ()
+         a
 end

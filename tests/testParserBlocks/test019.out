@@ -1,1 +1,8 @@
-Illegal expression: expected ';' (4, 6)
+begin
+      a
+   :=
+      100
+      b
+   :=
+      50
+end

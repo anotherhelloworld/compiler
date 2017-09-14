@@ -1,9 +1,0 @@
-begin
-   try
-         raise
-         abc
-   except
-         raise
-         qwerty
-   end
-end

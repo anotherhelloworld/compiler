@@ -1,9 +1,11 @@
-var a, i: integer;
+var a : integer;
 begin
-    for i := 10 downto 1 begin
-    begin
+    if ( 10 > 20 ) then begin
         ;;;;
         a := 50;
-    end;
     end
+    else begin
+        begin
+        end;
+    end;
 end.

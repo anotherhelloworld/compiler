@@ -1,3 +1,5 @@
 begin
-   goto   a
+   Call
+      ()
+         a
 end

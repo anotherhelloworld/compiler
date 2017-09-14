@@ -1,1 +1,9 @@
-Illegal Expression in pos (1, 21)
+begin
+   try
+         raise
+         abc
+   except
+         raise
+         qwerty
+   end
+end

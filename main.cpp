@@ -41,8 +41,8 @@ int main(int argc, char* argv[]) {
                 Parser parser(argv[2]);
                 parser.Print();
 
-            } catch (ParserException error) {
-                std::cout << error.getMsg() << std::endl;
+            } catch (Error error) {
+                std::cout << error.errorMsg << std::endl;
                 return 0;
             }
         } else if (strcmp(argv[1], "-d") == 0) {
@@ -69,12 +69,17 @@ int main(int argc, char* argv[]) {
             try {
                 Parser parser(argv[2]);
                 parser.testType = true;
-                Block* block = parser.ParseBlockStart();
+                Block *block = parser.ParseBlockStart();
                 block->Print(0);
-            } catch (TypeCheckerException error) {
-                std::cout << error.getMsg() << std::endl;
+//            } catch (TypeCheckerException error) {
+//                std::cout << error.getMsg() << std::endl;
+//                return 0;
+//            }
+            } catch (Error error) {
+                std::cout << error.errorMsg << std::endl;
                 return 0;
             }
+
         }
         else {
             std::cout << "error: unknown argument" << std::endl;

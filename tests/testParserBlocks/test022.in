@@ -1,1 +1,7 @@
-begin while true do else end.
+begin
+    try
+        raise 'abc';
+    except
+        raise 'qwerty';
+    end;
+end.

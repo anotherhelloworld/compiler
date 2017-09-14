@@ -1,1 +1,1 @@
-Illegal expression: expected ']' (1, 4)
+Expression "]" expected but "EOF" found in Line 1 Column 4

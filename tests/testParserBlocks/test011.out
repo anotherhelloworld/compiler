@@ -1,1 +1,3 @@
-Illegal expression: expected '.' (2, 5)
+begin
+   goto   a
+end

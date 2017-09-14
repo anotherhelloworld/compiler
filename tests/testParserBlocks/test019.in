@@ -1,6 +1,5 @@
+var a, b : integer;
 begin
-    begin
-    end
-    begin
-    end
+    a := 100;
+    b := 50
 end.

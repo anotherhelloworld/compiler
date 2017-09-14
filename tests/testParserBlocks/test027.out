@@ -1,5 +1,9 @@
 begin
-   try
-   finally
-   end
+   Call
+         10
+            20
+         ()
+            real
+      ()
+         a
 end

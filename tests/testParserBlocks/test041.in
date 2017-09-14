@@ -1,8 +1,0 @@
-function a(a: char): integer;
-begin
-    Result := integer(a);
-end;
-var b : integer;
-begin
-    b := a('a');
-end.

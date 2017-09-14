@@ -1,1 +1,4 @@
-Illegal expression: expected 'then' (6, 26)
+begin
+      raise
+      asda
+end

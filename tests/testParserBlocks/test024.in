@@ -1,4 +1,6 @@
-label a;
+function a(): integer;
 begin
-    goto a;
+end;
+begin
+    a();
 end.

@@ -1,6 +1,0 @@
-function a(): integer;
-begin
-end;
-begin
-    a();
-end.

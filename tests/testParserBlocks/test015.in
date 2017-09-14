@@ -1,5 +1,8 @@
 begin
-    while (10 > 20) do begin
-        := 50;
-    end;;;;
+    ;;;;;;;;;;;
+    try 
+        ;;;;;;;;;
+    except 
+    ;;;;;;;;;
+    end;;;;;;;; 
 end.

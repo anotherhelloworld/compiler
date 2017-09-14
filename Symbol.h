@@ -152,7 +152,6 @@ public:
     int stdTypeCount;
 private:
     SymbolTable* parentTable;
-    
 };
 
 #endif //COMPILER_SYMBOL_H

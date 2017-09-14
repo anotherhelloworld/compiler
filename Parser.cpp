@@ -3,8 +3,10 @@
 
 void Parser::Print() {
     expression = ParseExpression(symTable, 0);
-    if (scanner.GetLexem().token != TokenType::T_EOF)
-        throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());
+    scanner.CheckCurLexem(T_EOF, "EOF");
+//    if (scanner.GetLexem().token != TokenType::T_EOF)
+//        throw ParserException("Illegal expression in pos " + scanner.GetLexem().GetStrPos());
+
     expression->Print(0);
 }
 
@@ -41,7 +43,17 @@ Parser::Parser(char* filename): scanner(filename) {
     unarPriorities[ADD] = 3;
     unarPriorities[DOG] = 3;
     unarPriorities[CIRCUMFLEX] = 3;
-   ReserveCastFunc(symTable);
+
+    symTable->symbols.push_back(new SymbolType("integer", DataType::INTEGER));
+    symTable->symbols.push_back(new SymbolType("real", DataType::REAL));
+    symTable->symbols.push_back(new SymbolType("char", DataType::CHAR));
+    symTable->symbols.push_back(new SymbolType("boolean", DataType::BOOLEAN));
+    symTable->symbols.push_back(new SymbolType("string", DataType::STRING));
+    symTable->symbols.push_back(new SymbolType("record", DataType::RECORD));
+    symTable->symbols.push_back(new SymbolType("pointer", DataType::POINTER));
+    symTable->stdTypeCount = symTable->symbols.size();
+
+    ReserveCastFunc(symTable);
 
 
 //    expression = ParseExpression(0);

@@ -1,8 +1,7 @@
-function a(): char;
 begin
-end;
-
-var a: integer;
-begin
-    a = a();
+    while true do begin
+        continue;
+        break;
+        continue
+    end
 end.

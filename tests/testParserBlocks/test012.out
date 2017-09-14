@@ -1,1 +1,5 @@
-Illegal expression in pos (4, 1)
+begin
+      a
+   :=
+      b
+end

@@ -1,7 +1,6 @@
+procedure a(a: integer; b: real);
 begin
-    try
-        begin
-        end;
-    except
-    end
+end;
+begin
+    a(10, real(20));
 end.

@@ -1,1 +1,7 @@
-Illegal expression in pos (3, 7)
+begin
+   try
+      begin
+      end
+   except
+   end
+end

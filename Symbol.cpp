@@ -2,14 +2,14 @@
 #include "Block.h"
 
 SymbolTable::SymbolTable(SymbolTable * parentTable): parentTable(parentTable) {
-    symbols.push_back(new SymbolType("integer", DataType::INTEGER));
-    symbols.push_back(new SymbolType("real", DataType::REAL));
-    symbols.push_back(new SymbolType("char", DataType::CHAR));
-    symbols.push_back(new SymbolType("boolean", DataType::BOOLEAN));
-    symbols.push_back(new SymbolType("string", DataType::STRING));
-    symbols.push_back(new SymbolType("record", DataType::RECORD));
-    symbols.push_back(new SymbolType("pointer", DataType::POINTER));
-    stdTypeCount = symbols.size();
+//    symbols.push_back(new SymbolType("integer", DataType::INTEGER));
+//    symbols.push_back(new SymbolType("real", DataType::REAL));
+//    symbols.push_back(new SymbolType("char", DataType::CHAR));
+//    symbols.push_back(new SymbolType("boolean", DataType::BOOLEAN));
+//    symbols.push_back(new SymbolType("string", DataType::STRING));
+//    symbols.push_back(new SymbolType("record", DataType::RECORD));
+//    symbols.push_back(new SymbolType("pointer", DataType::POINTER));
+//    stdTypeCount = symbols.size();
 };
 
 void SymbolTable::Print(int spaces) {
@@ -106,6 +106,7 @@ Symbol* SymbolTable::FindReqSymbol(Expression* exp, std::pair<int, int> pos) {
         }
         bool flag = false;
         for (auto arg = ((ExpressionFuncCall*)exp)->args.begin(); arg != ((ExpressionFuncCall*)exp)->args.end(); arg++) {
+            auto temp = ((SymbolCall*)it)->symbolTable->symbols[arg - ((ExpressionFuncCall*)exp)->args.begin()];
             auto type = ((SymbolCall*)it)->symbolTable->symbols[arg - ((ExpressionFuncCall*)exp)->args.begin()]->GetType();
             if (type->declType == DeclarationType::RECORD && TypeChecker(this, std::make_pair(0, 0)).GetTypeID(*arg) == DataType::RECORD) {
                 continue;

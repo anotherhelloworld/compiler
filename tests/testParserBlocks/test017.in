@@ -1,7 +1,10 @@
-var a: integer;
+var i, j : integer;
 begin
-    repeat
-        ;;;;;;
-        a := 50;
-    until b > 10);
+    try
+        for i := 0 to 100 do begin
+            for j := 0 to 100 do begin
+            end
+        end;;
+    finally ;;
+    end;
 end.

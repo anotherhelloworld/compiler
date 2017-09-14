@@ -1,5 +1,6 @@
-var a: integer;
-var b: integer = 5;
+procedure a();
 begin
-    a := b;
+end;
+begin
+    a();
 end.

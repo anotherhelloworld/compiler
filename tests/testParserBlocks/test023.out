@@ -1,1 +1,10 @@
-Duplicate IDENTIFIER 'a'
+begin
+   while
+      true
+   do
+      begin
+         continue
+         break
+         continue
+      end
+end

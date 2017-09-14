@@ -8,7 +8,7 @@ class SymbolTable;
 class Symbol;
 
 enum class DataType {
-    BADTYPE = -1, INTEGER = 0, REAL = 1, CHAR = 2, BOOLEAN = 3, ARRAY = 4, STRING = 5, RECORD = 6, POINTER = 7, 
+    BADTYPE = -1, INTEGER = 0, REAL = 1, CHAR = 2, BOOLEAN = 3, ARRAY = 4, STRING = 5, RECORD = 6, POINTER = 7,
 };
 
 static std::vector<std::string> dataTypeString = {
@@ -25,6 +25,7 @@ public:
     void Check(DataType, DataType);
     bool CanCast(DataType, DataType);
     DataType GetTypeID(Expression*);
+    void Error(DataType, DataType);
 private:
     DataType GetTypeID(ExpressionType);
     DataType GetTypeIDBinExpression(DataType, DataType, TokenType);

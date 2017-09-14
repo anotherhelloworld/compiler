@@ -1,14 +1,11 @@
 begin
-   try
-      try
-         begin
-         end
-      finally
-         begin
-            begin
-            end
-         end
-      end
-   except
-   end
+      b
+   :=
+         a
+      @
+   Call
+            b
+         ^
+      ()
+         write
 end

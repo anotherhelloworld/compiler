@@ -1,1 +1,5 @@
-Illegal Expression in pos (3, 8)
+begin
+   try
+   except
+   end
+end

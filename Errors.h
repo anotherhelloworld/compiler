@@ -90,4 +90,10 @@ class ForwardDecl: public Error {
 public:
     ForwardDecl(std::string name, std::pair<int, int> pos): Error("Forward declaration not inmplemented \"" + name + "\" " + StrPos(pos), pos) {};
 };
+
+class IncompatibleTypes: public Error {
+public:
+    IncompatibleTypes(std::string expected, std::string found, std::pair<int,int> pos):
+            Error("Incompatible types: expected: \"" + expected + "\" but \"" + found + "\" found " + StrPos(pos), pos) {};
+};
 #endif //COMPILER_ERRORS_H

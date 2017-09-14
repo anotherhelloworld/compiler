@@ -1,5 +1,5 @@
 begin
-      a
-   :=
-      b
+   Call
+      ()
+         a
 end

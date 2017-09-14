@@ -1,9 +1,7 @@
+var 
+    a : integer = 10;
+    b : ^pointer;
 begin
-    try 
-        try ;; begin end ;;; ;;; ;;;; ;; ;;; ; 
-        finally
-            begin ;; ;; begin  ;; ;;  end ;;  end ;; ;;; ;; ;; 
-        end;
-    except
-    end
-end       .
+    b := @a;
+    write(b^);
+end.

@@ -114,7 +114,9 @@ TypeChecker::TypeChecker(SymbolTable* table, Expression* left, Expression* right
 
 void TypeChecker::Check(DataType type1, DataType type2) {
     if (!CanCast(type1, type2)) {
-        throw TypeCheckerException(dataTypeString[(int)type1], pos);
+//        throw TypeCheckerException(dataTypeString[(int)type1], pos);
+//        throw IncompatibleTypes(dataTypeString[(int)type1], dataTypeString[(int)type2], pos);
+        this->Error(type1, type2);
     }
 }
 
@@ -205,7 +207,9 @@ DataType TypeChecker::GetTypeIDBinExpression(DataType left, DataType right, Toke
         left = right;
     }
     else {
-        throw TypeCheckerException(dataTypeString[(int)left], pos);
+//        throw TypeCheckerException(dataTypeString[(int)left], pos);
+//        throw IncompatibleTypes(dataTypeString[(int)right], dataTypeString[(int)left], pos);
+        this->Error(right, left);
     }
     try {
         DataType res = operationsTypes.at(left).at(token);
@@ -246,6 +250,12 @@ bool CmpArguments::CompareTypes(Symbol* type1, Symbol* type2) {
         return ans;
     }
     return false;
+}
+
+void TypeChecker::Error(DataType type1, DataType type2) {
+    std::string strType1 = (int)type1 == -1 ? "BadType" : dataTypeString[(int)type1];
+    std::string strType2 = (int)type2 == -1 ? "BadType" : dataTypeString[(int)type2];
+    throw IncompatibleTypes(strType1, strType2, pos);
 }
 
 bool CmpArguments::Compare(Symbol* sym1, Symbol* sym2) {

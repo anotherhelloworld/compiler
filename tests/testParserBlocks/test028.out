@@ -1,5 +1,7 @@
 begin
-   try
-   except
-   end
+      b
+   :=
+         a
+      ()
+         a
 end

@@ -1,1 +1,5 @@
-Illegal expression: expected '.' (9, 9)
+begin
+   try
+   finally
+   end
+end

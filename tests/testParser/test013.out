@@ -1,1 +1,1 @@
-Illegal expression in pos (1, 6)
+Expression "EOF" expected but ")" found in Line 1 Column 7
