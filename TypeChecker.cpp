@@ -78,6 +78,8 @@ TypeChecker::TypeChecker(SymbolTable* symbolTable, DataType type1, Expression* e
 
 TypeChecker::TypeChecker(SymbolTable* symbolTable, Symbol* symbol, Expression* expr, std::pair<int, int> pos): symbolTable(symbolTable), pos(pos) {
     if (((SymbolType*)(symbol))->dataType == DataType::INTEGER) {
+        auto temp1 = ((SymbolType*)symbol);
+        auto temp2 = expr;
         Check(((SymbolType*)(symbol))->dataType, GetTypeID(expr));
         return;
     }
@@ -155,6 +157,9 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
                 sym = sym->GetType();
             }
         }
+        if (((SymbolType*)sym)->dataType == DataType::STRING) {
+            ((SymbolType*)sym)->dataType = DataType::STRING;
+        }
         return ((SymbolType*)sym)->dataType;
     }
     if (expr->expressionType == ExpressionType::VAR) {
@@ -177,6 +182,15 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
             }
             return ((SymbolType*)symbol->GetType())->dataType;
         }
+    }
+    if (expr->expressionType == ExpressionType::CHAR) {
+        if (((ExpressionChar*)expr)->val.val.size() > 1) {
+            return DataType::STRING;
+        }
+    }
+    if (expr->expressionType == ExpressionType::RECORD) {
+        auto dataType = ((SymbolType*)(((ExpressionRecordAccess*)expr)->field->GetType()))->dataType;
+        return dataType;
     }
     return GetTypeID(expr->expressionType);
 }

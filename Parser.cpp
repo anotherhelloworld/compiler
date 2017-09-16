@@ -48,6 +48,7 @@ Parser::Parser(char* filename): scanner(filename) {
     symTable->symbols.push_back(new SymbolType("real", DataType::REAL));
     symTable->symbols.push_back(new SymbolType("char", DataType::CHAR));
     symTable->symbols.push_back(new SymbolType("boolean", DataType::BOOLEAN));
+    symTable->symbols.push_back(new SymbolType("array", DataType::ARRAY));
     symTable->symbols.push_back(new SymbolType("string", DataType::STRING));
     symTable->symbols.push_back(new SymbolType("record", DataType::RECORD));
     symTable->symbols.push_back(new SymbolType("pointer", DataType::POINTER));
@@ -165,8 +166,9 @@ bool Parser::PriorityCheck(int priority, TokenType token) {
 Expression *Parser::ParseTerm(SymbolTable* table, bool flag) {
     Lexem lex = scanner.GetLexem();
     Expression* res = nullptr;
+    Symbol* sym = nullptr;
     if (testType || testDeclarations) {
-        Symbol* sym = table->GetSymbol(lex.val, lex.pos);
+        sym = table->GetSymbol(lex.val, lex.pos);
         res = (Expression*)new ExpressionIdent(lex, sym);
     } else {
         res = (Expression*)new ExpressionIdent(lex);
@@ -178,7 +180,14 @@ Expression *Parser::ParseTerm(SymbolTable* table, bool flag) {
         if (lex.token == POINT) {
             scanner.CheckNextLexem(IDENTIFIER, "IDENTIFIER");
             Expression* right = ParseTerm(table, false);
-            res = (Expression*)new ExpressionRecordAccess(res, right);
+            if (testType) {
+                Symbol* field = nullptr;
+                field = ((SymbolRecord*)sym->GetType())->table->GetSymbol(scanner.GetLexem().val, scanner.GetLexem().pos);
+                sym = field;
+                res = (Expression*)new ExpressionRecordAccess(res, right, field);
+            } else {
+                res = (Expression*)new ExpressionRecordAccess(res, right, nullptr);
+            }
         } else if (lex.token == OPEN_SQUARE_BRACKET) {
             std::vector<Expression*> indecies = ParseArrayIndices(table);
             res = (Expression*)new ExpressionArrayIndecies(res, indecies);
@@ -558,7 +567,8 @@ Symbol* Parser::ParseString(SymbolTable* table) {
         scanner.CheckCurLexem(CLOSE_SQUARE_BRACKET, "]");
         scanner.NextToken();
     }
-    return new SymbolString(length);
+    auto temp = new SymbolString(length);
+    return temp;
 }
 
 Expression* Parser::ParseInit(SymbolTable* table) {

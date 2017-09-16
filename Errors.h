@@ -96,4 +96,9 @@ public:
     IncompatibleTypes(std::string expected, std::string found, std::pair<int,int> pos):
             Error("Incompatible types: expected: \"" + expected + "\" but \"" + found + "\" found " + StrPos(pos), pos) {};
 };
+
+class IdentNotFound: public Error {
+public:
+    IdentNotFound(std::string name, std::pair<int, int> pos): Error("Ident \"" + name + "\" not found " + StrPos(pos), pos) {};
+};
 #endif //COMPILER_ERRORS_H

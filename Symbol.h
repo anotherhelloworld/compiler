@@ -129,11 +129,10 @@ public:
     void Print(int);
 };
 
-class SymbolString: public Symbol {
+class SymbolString: public SymbolType {
 public:
     int length;
-    DataType dataType;
-    SymbolString(int length): length(length), dataType(dataType) {};
+    SymbolString(int length): SymbolType("", DataType::STRING), length(length) {};
     void Print(int);
 };
 

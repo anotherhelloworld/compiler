@@ -43,9 +43,10 @@ Symbol* SymbolTable::GetSymbol(std::string name, std::pair<int, int> pos) {
         temp = temp->parentTable;
     } while (temp != nullptr);
     if (index == -1) {
-        std::stringstream ss;
-        ss << "Unknown typename '" << name << "' (" << pos.first << ", " << pos.second <<").";
-        throw ParserException(ss.str());
+//        std::stringstream ss;
+//        ss << "Unknown typename '" << name << "' (" << pos.first << ", " << pos.second <<").";
+//        throw ParserException(ss.str());
+        throw IdentNotFound(name, pos);
     }
     return temp->symbols[index];
 }

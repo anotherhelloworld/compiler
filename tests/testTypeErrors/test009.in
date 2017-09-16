@@ -1,0 +1,5 @@
+var i : integer;
+begin
+    for i := 10 to 'aasd' do begin
+    end;
+end.

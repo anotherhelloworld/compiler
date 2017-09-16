@@ -1,9 +1,9 @@
 Const   a
-   Type   char
+   Type   string
    abc
 
 Const   b
-   Type   char
+   Type   string
    qwerty
 
 Const   constarr

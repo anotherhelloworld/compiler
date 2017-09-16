@@ -1,0 +1,4 @@
+var a, b : real;
+begin
+    a := 100 and b;
+end.

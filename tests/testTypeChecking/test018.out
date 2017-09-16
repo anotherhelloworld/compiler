@@ -1,1 +1,1 @@
-Incompatible types, expected "integer" in pos (4, 20)
+Incompatible types: expected: "char" but "integer" found Line 4 Column 20

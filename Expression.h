@@ -68,7 +68,7 @@ public:
     ExpressionReal(const Lexem &val): ExpressionTerm(val, ExpressionType::REAL) {};
 };
 
-class ExpressionChar: ExpressionTerm {
+class ExpressionChar: public ExpressionTerm {
 public:
     ExpressionChar(const Lexem &val): ExpressionTerm(val, ExpressionType::CHAR) {};
 };
@@ -87,7 +87,10 @@ public:
 
 class ExpressionRecordAccess: public ExpressionBinOp {
 public:
-    ExpressionRecordAccess(Expression* right, Expression* left): ExpressionBinOp(Lexem(".", POINT), right, left) {}
+    Symbol* field;
+    ExpressionRecordAccess(Expression* right, Expression* left, Symbol* field): ExpressionBinOp(Lexem(".", POINT), right, left), field(field) {
+        expressionType = ExpressionType::RECORD;
+    };
 };
 
 class ExpressionArrayIndecies: public Expression {

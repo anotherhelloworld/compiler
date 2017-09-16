@@ -1,0 +1,9 @@
+var 
+    a : record
+        a : integer;
+        b : real; 
+    end;
+    b : real;
+begin 
+    a.a := b;
+end.
