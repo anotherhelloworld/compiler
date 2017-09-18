@@ -8,6 +8,7 @@
 //#include "Block.h"
 #include "Errors.h"
 #include "TypeChecker.h"
+#include "Generator.h"
 
 class SymbolTable;
 class Block;
@@ -25,6 +26,9 @@ public:
     DeclarationType declType;
     virtual Symbol* GetType();
     bool Same(std::string);
+    virtual void Generate(Generator*) {};
+    virtual std::string GenerateName() { return ""; };
+    virtual int GetSize() { return 0; };
 };
 
 class SymbolType : public Symbol {
@@ -45,6 +49,7 @@ public:
     Expression* initExpr;
     Symbol* GetType();
     int offset;
+    bool localFlag;
 };
 
 class SymbolConst: public SymbolIdent {
@@ -102,6 +107,7 @@ class SymbolCall: public Symbol {
 public:
     SymbolCall(DeclarationType declType, std::string name, SymbolTable* symbolTable, Block* block, int argc):
             Symbol(name, declType), symbolTable(symbolTable), block(block), argc(argc) {};
+    //void Generate(Generator*);
     SymbolTable* symbolTable;
     Block* block;
     int argc;
@@ -145,6 +151,8 @@ public:
     void CheckLocalSymbol(std::string, std::pair<int, int>);
     int FindSymbol(std::string);
     Symbol* FindReqSymbol(Expression*, std::pair<int, int>);
+    void GenerateVars(Generator*);
+
     bool Find(std::string);
     std::vector<Symbol*> GetAllSymbols(std::string, std::pair<int, int>);
     std::vector<Symbol*> symbols;

@@ -51,6 +51,17 @@ Symbol* SymbolTable::GetSymbol(std::string name, std::pair<int, int> pos) {
     return temp->symbols[index];
 }
 
+void SymbolTable::GenerateVars(Generator* generator) {
+    if (parentTable == nullptr) {
+        for (auto it = symbols.begin() + stdTypeCount; it != symbols.end(); it++) {
+            (*it)->Generate(generator);
+            if ((*it)->declType == DeclarationType::VAR || (*it)->declType == DeclarationType::CONST) {
+                ((SymbolIdent*)(*it))->localFlag = false;
+            }
+        }
+    }
+}
+
 void SymbolTable::CheckLocalSymbol(std::string name, std::pair<int, int> pos) {
     if (FindSymbol(name) != -1) {
         //throw ParserException("Duplicate IDENTIFIER '" + name + "'");

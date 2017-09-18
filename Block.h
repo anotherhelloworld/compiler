@@ -4,10 +4,12 @@
 #include <vector>
 #include <iostream>
 #include "Expression.h"
+#include "Generator.h"
 
 class Block {
 public:
     virtual void Print(int);
+    virtual void Generate(Generator*) {};
 };
 
 class BlockCompound: public Block {
@@ -15,6 +17,7 @@ public:
     std::vector<Block*> listBlock;
     void Add(Block*);
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockCondition: public Block {
@@ -40,6 +43,7 @@ public:
     Expression* exp;
     BlockFuncCall(Expression* exp): exp(exp) {};
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockAssign: public Block {

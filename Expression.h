@@ -1,6 +1,7 @@
 #ifndef COMPILER_EXPRESSION_H
 #define COMPILER_EXPRESSION_H
 #include "Scanner.h"
+#include "Generator.h"
 //#include "Symbol.h"
 #define indent "   "
 
@@ -26,6 +27,7 @@ public:
     Expression(ExpressionType expressionType): expressionType(expressionType) {};
     virtual void Print(int) {};
     virtual void GetIdentificitationList(ExpressionArgumentList*) {};
+    virtual void Generate(Generator* generator) {};
 };
 
 class ExpressionBinOp: public Expression {

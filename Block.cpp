@@ -1,3 +1,4 @@
+#include <tclDecls.h>
 #include "Block.h"
 #include "Symbol.h"
 
@@ -15,6 +16,12 @@ void BlockCompound::Print(int spaces) {
 
 void BlockCompound::Add(Block* block) {
     listBlock.push_back(block);
+}
+
+void BlockCompound::Generate(Generator* generator) {
+    for (auto it = listBlock.begin(); it != listBlock.end(); it ++) {
+        (*it)->Generate(generator);
+    }
 }
 
 void BlockFor::Print(int spaces) {
@@ -35,6 +42,16 @@ void BlockFuncCall::Print(int spaces) {
     printIndent(spaces);
     std::cout << "Call" << std::endl;
     exp->Print(spaces + 1);
+}
+
+void BlockFuncCall::Generate(Generator* generator) {
+    if (((ExpressionIdent*)((ExpressionFuncCall*)exp)->left)->symbol->declType == DeclarationType::FUNC) {
+        exp->Generate(generator);
+        SymbolFunction* sym = (SymbolFunction*)((ExpressionIdent*)((ExpressionFuncCall*)exp)->left)->symbol;
+        generator
+    } else {
+
+    }
 }
 
 void BlockAssign::Print(int spaces) {
