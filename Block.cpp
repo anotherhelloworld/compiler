@@ -48,9 +48,9 @@ void BlockFuncCall::Generate(Generator* generator) {
     if (((ExpressionIdent*)((ExpressionFuncCall*)exp)->left)->symbol->declType == DeclarationType::FUNC) {
         exp->Generate(generator);
         SymbolFunction* sym = (SymbolFunction*)((ExpressionIdent*)((ExpressionFuncCall*)exp)->left)->symbol;
-        generator
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, ((SymbolIdent*)sym->symbolTable->symbols[sym->argc - 1])->type->GetSize());
     } else {
-
+        exp->Generate(generator);
     }
 }
 

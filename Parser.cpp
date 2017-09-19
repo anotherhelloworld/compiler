@@ -80,8 +80,8 @@ void Parser::ReserveCastFunc(SymbolTable* table) {
     CastFunction(table, "real", "integer");
     CastFunction(table, "integer", "char");
     CastFunction(table, "char", "integer");
-    table->Add(new SymbolProcedure("write", new SymbolTable(table), nullptr, -1));
-    table->Add(new SymbolProcedure("writeln", new SymbolTable(table), nullptr, -2));
+    table->Add(new SymbolProcedure("write", new SymbolTable(table), nullptr, WRITE));
+    table->Add(new SymbolProcedure("writeln", new SymbolTable(table), nullptr, WRITELN));
     table->stdTypeCount++;
     table->stdTypeCount++;
 }

@@ -38,6 +38,7 @@ public:
     SymbolType(std::string name, Symbol* type): Symbol(name, DeclarationType::TYPE), type(type), dataType(DataType::BADTYPE) {};
     SymbolType(std::string name, DataType dataType): Symbol(name, DeclarationType::TYPE), type(nullptr), dataType(dataType) {};
     Symbol* GetType();
+    int GetSize();
     void Print(int);
 };
 

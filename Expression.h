@@ -5,6 +5,9 @@
 //#include "Symbol.h"
 #define indent "   "
 
+#define WRITE -1
+#define WRITELN -2
+
 void printIndent(int spaces);
 
 enum class DataType;
@@ -28,6 +31,7 @@ public:
     virtual void Print(int) {};
     virtual void GetIdentificitationList(ExpressionArgumentList*) {};
     virtual void Generate(Generator* generator) {};
+    virtual int GetSize() { return 0; };
 };
 
 class ExpressionBinOp: public Expression {
@@ -127,6 +131,8 @@ public:
     Expression* left;
     std::vector<Expression*> args;
     ExpressionFuncCall(Expression* left, std::vector<Expression*> args): Expression(ExpressionType::FUNCCALL), left(left), args(args) {};
+    void Generate(Generator* generator);
+    void GenerateWrite(Generator* generator, int argc);
     void Print(int);
 };
 

@@ -203,6 +203,23 @@ Symbol* SymbolType::GetType() {
     return type;
 }
 
+int SymbolType::GetSize() {
+    switch (dataType) {
+        case DataType::INTEGER:
+            return 4;
+        case DataType::REAL:
+            return 8;
+        case DataType::CHAR:
+        case DataType::BOOLEAN:
+            return 1;
+        default:
+            if (type == nullptr) {
+                return 0;
+            }
+            return type->GetSize();
+    }
+}
+
 Symbol* SymbolIdent::GetType() {
     return type;
 }

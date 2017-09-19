@@ -1,4 +1,5 @@
 #include "Expression.h"
+#include "Symbol.h"
 
 const char fill = ' ';
 const int mult = 3;
@@ -73,6 +74,39 @@ void ExpressionFuncCall::Print(int spaces) {
     std::cout << "()" << std::endl;
     left->Print(spaces + 1);
 }
+
+void ExpressionFuncCall::Generate(Generator* generator) {
+    SymbolCall* leftSymbol = (SymbolCall*)((ExpressionIdent*)left)->symbol;
+    int argc = leftSymbol->argc;
+    if (argc == WRITE || argc == WRITELN) {
+        this->Generate()
+    }
+}
+
+void ExpressionFuncCall::GenerateWrite(Generator* generator, int argc) {
+    std::vector <DataType> dataTypeExp;
+    for (auto it = args.rbegin(); it != args.rend(); it++) {
+        (*it)->Generate(generator);
+        dataTypeExp.push_back(TypeChecker(((SymbolProcedure*)((ExpressionIdent*)left)->symbol)->symbolTable, std::make_pair(0, 0)).GetTypeID(*it));
+    }
+    std::string format = "\'";
+    for (auto it = dataTypeExp.rbegin(); it != dataTypeExp.rend(); it++) {
+        switch (*it) {
+            case DataType::INTEGER:
+                format += "%d";
+                break;
+            case DataType::REAL:
+                format += "%f";
+                break;
+        }
+    }
+    generator->Add(AsmTypeOperation::PUSH, generator->AddFormat(format += argc == WRITELN ? "\', 0xA, 0x0" : "\', 0x0"));
+    generator->Add(AsmTypeOperation::CALL, "printf");
+    int size = 0;
+    for (auto it = args.begin(); it != args.end(); it++) {
+        size += (*it)->GetSize();
+    }
+};
 
 void ExpressionPointer::Print(int spaces) {
     exp->Print(spaces + 1);

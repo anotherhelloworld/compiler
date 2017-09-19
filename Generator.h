@@ -3,18 +3,28 @@
 #include <vector>
 #include <string>
 
-enum class AsmOperation {
-    _NULL = 0, PUSH, POP, IMUL, DIV, ADD, SUB
+enum class AsmTypeOperation {
+    _NULL = 0, PUSH, POP, IMUL, DIV, ADD, SUB, NEG, NOT, OR, AND, XOR, SHL, SHR, CALL,
 };
 
-enum class AsmRegister {
+enum class AsmTypeRegister {
     EAX = 0, EBX, ECX, EDX, EBP, ESP
+};
+
+enum class AsmCmdIndex {
+    Lbael = 0, Register, SizeAddrRegisterOffset, String, RegisterInt, RegisterIdent, AddrRegisterReg, Integer, Ident
+};
+
+enum class AsmSize {
+    QWORD, DWORD
 };
 
 class Generator {
 public:
     Generator(): frmtStr(new std::vector<std::string>), constStr(new std::vector<std::string>), depth(0), maxDepth(0) {};
-    void Add(AsmOperation, AsmRegister, int);
+    void Add(AsmTypeOperation, AsmTypeRegister, int);
+    void Add(AsmTypeOperation, std::string);
+    std::string AddFormat(std::string);
 
     std::vector <std::string>* frmtStr;
     std::vector <std::string>* constStr;
@@ -25,10 +35,10 @@ public:
 
 class AsmCommand {
 public:
-    AsmOperation operation;
+    AsmTypeOperation operation;
     int index;
     virtual std::string GetCode();
-    AsmCommand(AsmOperation operation, int index): operation(operation), index(index) {};
+    AsmCommand(AsmTypeOperation operation, int index): operation(operation), index(index) {};
 };
 
 class AsmOperand {
@@ -41,14 +51,44 @@ public:
     AsmOperand* operand1;
     AsmOperand* operand2;
     std::string GetCode();
-    AsmCommandBinary(AsmOperation op, AsmOperand* operand1, AsmOperand* operand2, int index):
+    AsmCommandBinary(AsmTypeOperation op, AsmOperand* operand1, AsmOperand* operand2, int index):
             AsmCommand(operation, index), operand1(operand1), operand2(operand2) {};
+};
+
+class AsmCommandUnar: public AsmCommand {
+public:
+    AsmOperand* operand;
     std::string GetCode();
+    AsmCommandUnar(AsmTypeOperation operation, AsmOperand* operand, int index):
+            AsmCommand(operation, index), operand(operand) {};
 };
 
 class AsmRegister: public AsmOperand {
 public:
-    
+    AsmTypeRegister reg;
+    std::string GetCode();
+    AsmRegister(AsmTypeRegister reg): reg(reg) {};
+};
+
+class AsmIntConstant: public AsmOperand {
+public:
+    std::string val;
+    std::string GetCode();
+    AsmIntConstant(std::string val): val(val) {};
+};
+
+class AsmStringConstant: public AsmOperand {
+public:
+    std::string str;
+    std::string GetCode();
+    AsmStringConstant(std::string str): str(str) {};
+};
+
+class AsmVar: public AsmOperand {
+public:
+    std::string val;
+    std::string GetCode();
+    AsmVar(std::string val): val(val) {};
 };
 
 #endif //COMPILER_GENERATOR_H
