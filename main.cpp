@@ -80,6 +80,9 @@ int main(int argc, char* argv[]) {
                 Parser parser(argv[2]);
                 parser.testType = true;
                 Block *block = parser.ParseBlockStart();
+                Generator* generator = new Generator();
+                block->Generate(generator);
+                generator->Print();
             } catch (Error error) {
                 std::cout << error.errorMsg << std::endl;
                 return 0;

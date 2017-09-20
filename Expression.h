@@ -1,8 +1,10 @@
 #ifndef COMPILER_EXPRESSION_H
 #define COMPILER_EXPRESSION_H
+#include <set>
+#include <algorithm>
+#include <cmath>
 #include "Scanner.h"
 #include "Generator.h"
-//#include "Symbol.h"
 #define indent "   "
 
 #define WRITE -1
@@ -39,6 +41,8 @@ public:
     ExpressionBinOp(Lexem operation, Expression* right, Expression* left): Expression(ExpressionType::BINOP), operation(operation), right(right), left(left) {};
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
+    void Generate(Generator*);
+    int GetSize();
     Expression* left;
     Expression* right;
     Lexem operation;
@@ -67,6 +71,8 @@ public:
 class ExpressionInteger: public ExpressionTerm {
 public:
     ExpressionInteger(const Lexem &val): ExpressionTerm(val, ExpressionType::INT) {};
+    void Generate(Generator*);
+    int GetSize();
 };
 
 class ExpressionReal: ExpressionTerm {

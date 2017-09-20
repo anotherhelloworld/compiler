@@ -1,4 +1,3 @@
-#include <tclDecls.h>
 #include "Block.h"
 #include "Symbol.h"
 
