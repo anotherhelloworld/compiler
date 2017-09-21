@@ -83,6 +83,8 @@ public:
 class ExpressionChar: public ExpressionTerm {
 public:
     ExpressionChar(const Lexem &val): ExpressionTerm(val, ExpressionType::CHAR) {};
+    void Generate(Generator*);
+    int GetSize();
 };
 
 class ExpressionBoolean: ExpressionTerm {

@@ -1,7 +1,7 @@
 #include "Generator.h"
 
 static std::string AsmOperationToString[] = {
-        "", "push", "pop", "imul", "div", "add", "sub", "neg", "not", "or", "and", "xor", "shl", "shr", "call"
+        "", "push", "pop", "imul", "div", "add", "sub", "neg", "not", "or", "and", "xor", "shl", "shr", "call", "mov"
 };
 
 static std::string AsmRegisterToString[] = {
@@ -38,6 +38,17 @@ std::string AsmVar::GetCode() {
 
 void Generator::Add(AsmTypeOperation operation, AsmTypeRegister reg, int val) {
     commands.push_back(new AsmCommandBinary(operation, new AsmRegister(reg), new AsmIntConstant(std::to_string(val)), (int)AsmCmdIndex::RegisterInt));
+}
+
+void Generator::AddCallOffset(AsmTypeOperation operation, AsmTypeRegister reg, int val, int offset) {
+    auto command = new AsmCommandBinary(operation, new AsmRegister(reg), new AsmIntConstant(std::to_string(val)), (int)AsmCmdIndex::RegisterInt);
+    commands.insert(commands.end() - offset, command);
+}
+
+std::string Generator::AddConstString(std::string str) {
+    std::string num = std::to_string((*constStr).size());
+    (*constStr).push_back("str" + num + ": db \'" + str + "\', 0");
+    return "str" + num;
 }
 
 void Generator::Add(AsmTypeOperation operation, std::string val) {
@@ -82,9 +93,12 @@ void Generator::Print() {
     for (auto it : (*frmtStr)) {
         std::cout << "    " + it << std::endl;
     }
+    std::cout << "section .text" << std::endl;
     std::cout << "_main:" << std::endl;
     for (auto it : commands) {
         std::cout << "    " << it->GetCode() << std::endl;
     }
+
+    std::cout << "    mov eax, 0" << std::endl;
     std::cout << "    ret" << std::endl;
 }

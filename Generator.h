@@ -5,7 +5,7 @@
 #include <iostream>
 
 enum class AsmTypeOperation {
-    _NULL = 0, PUSH, POP, IMUL, DIV, ADD, SUB, NEG, NOT, OR, AND, XOR, SHL, SHR, CALL,
+    _NULL = 0, PUSH, POP, IMUL, DIV, ADD, SUB, NEG, NOT, OR, AND, XOR, SHL, SHR, CALL, MOV
 };
 
 enum class AsmTypeRegister {
@@ -36,6 +36,8 @@ public:
     void Add(AsmTypeOperation, AsmTypeRegister);
     void Add(AsmTypeOperation, AsmTypeRegister, std::string);
     void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeRegister);
+    void AddCallOffset(AsmTypeOperation, AsmTypeRegister, int, int);
+    std::string AddConstString(std::string);
     std::string AddFormat(std::string);
     void Print();
 

@@ -59,7 +59,7 @@ void ExpressionBinOp::Generate(Generator* generator) {
     if (relations.find(operation.token) != relations.end()) {
         return;
     }
-    left->Generate(generator);
+    right->Generate(generator);
     if (operation.token == SHL || operation.token == SHR) {
         generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
         if (right->expressionType != ExpressionType::INT) {
@@ -75,11 +75,11 @@ void ExpressionBinOp::Generate(Generator* generator) {
         generator->Add(AsmTypeOperation::PUSH, AsmTypeRegister::EAX);
         return;
     }
-    right->Generate(generator);
+    left->Generate(generator);
     generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EBX);
     generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
-    if (operation.token == DIV || operation.token == AND) {
-        generator->Add(AsmTypeOperation::XOR, AsmTypeRegister::EDX, AsmTypeRegister::EAX);
+    if (operation.token == DIV || operation.token == MOD) {
+        generator->Add(AsmTypeOperation::XOR, AsmTypeRegister::EDX, AsmTypeRegister::EDX);
         generator->Add(AsmTypeOperation::DIV, AsmTypeRegister::EBX);
         if (operation.token == DIV) {
             generator->Add(AsmTypeOperation::PUSH, AsmTypeRegister::EAX);
@@ -146,10 +146,36 @@ void ExpressionFuncCall::GenerateWrite(Generator* generator, int argc) {
         count++;
     }
 
+
+    int border = 16;
+    int reserveStack = 8;
+    while (size > border - reserveStack) {
+        border += 16;
+    }
+
+    if (count > 1) {
+        generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, border - size - reserveStack);
+    } else {
+        generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, border - size - 8);
+    }
+
     for (auto it = args.rbegin(); it != args.rend(); it++) {
         (*it)->Generate(generator);
         dataTypeExp.push_back(TypeChecker(((SymbolProcedure*)((ExpressionIdent*)left)->symbol)->symbolTable, std::make_pair(0, 0)).GetTypeID(*it));
     }
+
+//    generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, (int)pow(2, count));
+//    int border = 16;
+//    int reserveStack = 8;
+//    while (size > border - reserveStack) {
+//        border += 16;
+//    }
+//
+//    if (count > 1) {
+//        generator->AddCallOffset(AsmTypeOperation::SUB, AsmTypeRegister::ESP, border - size - reserveStack, count - 1);
+//    } else {
+//        generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, border - size - 8);
+//    }
 
     std::string format = "\'";
     for (auto it = dataTypeExp.rbegin(); it != dataTypeExp.rend(); it++) {
@@ -160,12 +186,16 @@ void ExpressionFuncCall::GenerateWrite(Generator* generator, int argc) {
             case DataType::REAL:
                 format += "%f";
                 break;
+            case DataType::CHAR:
+                format += "%c";
+                break;
         }
     }
-    generator->Add(AsmTypeOperation::PUSH, generator->AddFormat(format += argc == WRITELN ? "\', 10, 0" : "\', 0"));
-    generator->Add(AsmTypeOperation::CALL, "printf");
 
-    generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, (int)pow(2, count) + 4);
+    generator->Add(AsmTypeOperation::PUSH, generator->AddFormat(format += argc == WRITELN ? "\', 10, 0" : "\', 0"));
+    generator->Add(AsmTypeOperation::CALL, "_printf");
+
+    generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, border - 4);
 };
 
 void ExpressionPointer::Print(int spaces) {
@@ -183,5 +213,17 @@ void ExpressionInteger::Generate(Generator* generator) {
 }
 
 int ExpressionInteger::GetSize() {
+    return 4;
+}
+
+void ExpressionChar::Generate(Generator* generator) {
+    if (val.val.size() == 1) {
+        generator->Add(AsmTypeOperation::PUSH, "\'" + val.val + "\'");
+        return;
+    }
+    generator->Add(AsmTypeOperation::PUSH, generator->AddConstString(val.val));
+}
+
+int ExpressionChar::GetSize() {
     return 4;
 }
