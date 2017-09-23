@@ -35,8 +35,8 @@ Parser::Parser(char* filename): scanner(filename) {
     priorities[DIVISION] = 2;
     priorities[MOD] = 2;
     priorities[AND] = 2;
-    priorities[SHIFT_RIGHT] = 2;
-    priorities[SHIFT_LEFT] = 2;
+    priorities[SHR] = 2;
+    priorities[SHL] = 2;
 
     unarPriorities[NOT] = 3;
     unarPriorities[SUB] = 3;

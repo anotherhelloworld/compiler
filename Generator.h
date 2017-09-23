@@ -13,11 +13,16 @@ enum class AsmTypeRegister {
 };
 
 enum class AsmCmdIndex {
-    Lbael = 0, Register, SizeAddrRegisterOffset, String, RegisterInt, RegisterIdent, AddrRegisterReg, Integer, Ident
+    Lbael = 0, Register, SizeAddrRegisterOffset, String, RegisterInt, RegisterIdent, AddrRegisterReg, Integer, Ident,
+    CmdLabel, RegisterReg, RegisterAddrIdentOffset, RegisterString, StringReg, IntReg, IdentReg, SizeAddrIdentOffset
 };
 
-enum class AsmSize {
+enum class AsmTypeSize {
     QWORD, DWORD
+};
+
+enum class AsmTypeAddress {
+    ADDR
 };
 
 class AsmCommand {
@@ -28,6 +33,15 @@ public:
     AsmCommand(AsmTypeOperation operation, int index): operation(operation), index(index) {};
 };
 
+class AsmGlobalData {
+public:
+    std::string name;
+    std::string type;
+    std::string initList;
+    std::string GetCode();
+    AsmGlobalData(std::string name, std::string type, std::string initList): name(name), type(type), initList(initList) {};
+};
+
 class Generator {
 public:
     Generator(): frmtStr(new std::vector<std::string>), constStr(new std::vector<std::string>), depth(0), maxDepth(0) {};
@@ -36,16 +50,23 @@ public:
     void Add(AsmTypeOperation, AsmTypeRegister);
     void Add(AsmTypeOperation, AsmTypeRegister, std::string);
     void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeRegister);
+    void Add(std::string, std::string, std::string);
+    void Add(AsmTypeOperation, AsmTypeSize, AsmTypeAddress, std::string, int);
     void AddCallOffset(AsmTypeOperation, AsmTypeRegister, int, int);
+    std::string AddReal(std::string);
     std::string AddConstString(std::string);
     std::string AddFormat(std::string);
+    std::string GetLocalLabel();
     void Print();
 
     std::vector <std::string>* frmtStr;
     std::vector <std::string>* constStr;
     std::vector <AsmCommand*> commands;
+    std::vector <AsmGlobalData*> data;
     int depth;
     int maxDepth;
+    int labelCount = 0;
+    int realCount = 0;
 };
 
 class AsmOperand {
@@ -96,6 +117,24 @@ public:
     std::string val;
     std::string GetCode();
     AsmVar(std::string val): val(val) {};
+};
+
+class AsmCommandUnarSize: public AsmCommand {
+public:
+    AsmOperand* operand;
+    AsmTypeSize size;
+    AsmCommandUnarSize(AsmTypeOperation op, AsmTypeSize size, AsmOperand* operand, int cmdIndex):
+            AsmCommand(op, cmdIndex), size(size), operand(operand) {};
+    std::string GetCode();
+};
+
+class AsmAddress: public AsmOperand {
+public:
+    AsmOperand* operand;
+    int offset;
+    std::string GetCode();
+    AsmAddress(std::string val, int offset): operand(new AsmVar(val)), offset(offset) {};
+    AsmAddress(AsmTypeRegister reg, int offset): operand(new AsmRegister(reg)), offset(offset) {};
 };
 
 #endif //COMPILER_GENERATOR_H

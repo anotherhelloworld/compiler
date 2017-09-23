@@ -8,6 +8,10 @@ static std::string AsmRegisterToString[] = {
         "eax", "ebx", "ecx", "edx", "ebp", "esp"
 };
 
+static std::string AsmSizeToString[] = {
+        "qword", "dword"
+};
+
 std::string AsmCommand::GetCode() {
     return AsmOperationToString[(int)operation];
 }
@@ -45,6 +49,17 @@ void Generator::AddCallOffset(AsmTypeOperation operation, AsmTypeRegister reg, i
     commands.insert(commands.end() - offset, command);
 }
 
+std::string Generator::AddReal(std::string val) {
+    realCount++;
+    std::string name = "d" + std::to_string(realCount);
+    Add(name, "dq", val);
+    return name;
+}
+
+std::string Generator::GetLocalLabel() {
+    return ".L" + std::to_string(++labelCount);
+}
+
 std::string Generator::AddConstString(std::string str) {
     std::string num = std::to_string((*constStr).size());
     (*constStr).push_back("str" + num + ": db \'" + str + "\', 0");
@@ -79,6 +94,14 @@ void Generator::Add(AsmTypeOperation operation, AsmTypeRegister reg1, AsmTypeReg
     commands.push_back(new AsmCommandBinary(operation, new AsmRegister(reg1), new AsmRegister(reg2), (int)AsmCmdIndex::Register));
 }
 
+void Generator::Add(std::string name, std::string type, std::string initList) {
+    data.push_back(new AsmGlobalData(name, type, initList));
+}
+
+void Generator::Add(AsmTypeOperation op, AsmTypeSize size, AsmTypeAddress addres, std::string val, int offset) {
+    commands.push_back(new AsmCommandUnarSize(op, size, new AsmAddress(val, offset), (int)AsmCmdIndex::SizeAddrIdentOffset));
+}
+
 std::string Generator::AddFormat(std::string format) {
     std::string num = std::to_string((*frmtStr).size());
     (*frmtStr).push_back("format" + num + " : db " + format);
@@ -93,6 +116,14 @@ void Generator::Print() {
     for (auto it : (*frmtStr)) {
         std::cout << "    " + it << std::endl;
     }
+
+    for (auto it : (*constStr)) {
+        std::cout << "    " + it << std::endl;
+    }
+
+    for (auto it : data) {
+        std::cout << "    " + (*it).GetCode() << std::endl;
+    }
     std::cout << "section .text" << std::endl;
     std::cout << "_main:" << std::endl;
     for (auto it : commands) {
@@ -101,4 +132,16 @@ void Generator::Print() {
 
     std::cout << "    mov eax, 0" << std::endl;
     std::cout << "    ret" << std::endl;
+}
+
+std::string AsmGlobalData::GetCode() {
+    return name + ": " + type + " " + initList;
+}
+
+std::string AsmCommandUnarSize::GetCode() {
+    return AsmOperationToString[(int)operation] + " " + AsmSizeToString[(int)size] + " " + operand->GetCode();
+}
+
+std::string AsmAddress::GetCode() {
+    return "[" + operand->GetCode() + (offset == 0 ? "" : " + " + std::to_string(offset)) + "]";
 }

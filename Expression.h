@@ -43,6 +43,7 @@ public:
     void GetIdentificitationList(ExpressionArgumentList*);
     void Generate(Generator*);
     int GetSize();
+    void GenerateBoolExpr(Generator*, AsmTypeOperation);
     Expression* left;
     Expression* right;
     Lexem operation;
@@ -78,6 +79,8 @@ public:
 class ExpressionReal: ExpressionTerm {
 public:
     ExpressionReal(const Lexem &val): ExpressionTerm(val, ExpressionType::REAL) {};
+    void Generate(Generator*);
+    int GetSize();
 };
 
 class ExpressionChar: public ExpressionTerm {
