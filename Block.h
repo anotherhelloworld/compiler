@@ -24,6 +24,7 @@ class BlockCondition: public Block {
 public:
     Expression* exp;
     BlockCondition(Expression* exp): exp(exp) {};
+    void GenerateCond(Generator*);
 };
 
 class BlockFor: public BlockCondition {
@@ -51,6 +52,7 @@ public:
     Expression* exp;
     BlockAssign(Expression* exp): exp(exp) {};
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockWhile: public BlockCondition {
@@ -71,6 +73,7 @@ public:
     Block* blockElse;
     BlockIf(Expression* exp, Block* blockThen, Block* blockElse): BlockCondition(exp), blockThen(blockThen), blockElse(blockElse) {}
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockRepeat: public BlockCondition {

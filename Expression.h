@@ -32,8 +32,10 @@ public:
     Expression(ExpressionType expressionType): expressionType(expressionType) {};
     virtual void Print(int) {};
     virtual void GetIdentificitationList(ExpressionArgumentList*) {};
-    virtual void Generate(Generator* generator) {};
+    virtual void Generate(Generator* generator, ArgTypeState state = ArgTypeState::RVALUE) {};
+    virtual std::string GenerateInitlist() { return ""; };
     virtual int GetSize() { return 0; };
+    virtual void ConvertToReal(Generator*) {};
 };
 
 class ExpressionBinOp: public Expression {
@@ -41,7 +43,8 @@ public:
     ExpressionBinOp(Lexem operation, Expression* right, Expression* left): Expression(ExpressionType::BINOP), operation(operation), right(right), left(left) {};
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
-    void Generate(Generator*);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
+    void GenerateDoubleExpr(Generator*);
     int GetSize();
     void GenerateBoolExpr(Generator*, AsmTypeOperation);
     Expression* left;
@@ -72,21 +75,24 @@ public:
 class ExpressionInteger: public ExpressionTerm {
 public:
     ExpressionInteger(const Lexem &val): ExpressionTerm(val, ExpressionType::INT) {};
-    void Generate(Generator*);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
     int GetSize();
+    void ConvertToReal(Generator*);
+    std::string GenerateInitlist();
 };
 
 class ExpressionReal: ExpressionTerm {
 public:
     ExpressionReal(const Lexem &val): ExpressionTerm(val, ExpressionType::REAL) {};
-    void Generate(Generator*);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
     int GetSize();
+    std::string GenerateInitlist();
 };
 
 class ExpressionChar: public ExpressionTerm {
 public:
     ExpressionChar(const Lexem &val): ExpressionTerm(val, ExpressionType::CHAR) {};
-    void Generate(Generator*);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
     int GetSize();
 };
 
@@ -100,6 +106,8 @@ public:
     Symbol* symbol;
     ExpressionIdent(const Lexem &val) : ExpressionTerm(val, ExpressionType::VAR) {};
     ExpressionIdent(const Lexem &val, Symbol* symbol) : symbol(symbol), ExpressionTerm(val, ExpressionType::VAR) {};
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
+    int GetSize();
 };
 
 class ExpressionRecordAccess: public ExpressionBinOp {
@@ -135,6 +143,7 @@ public:
     Expression* right;
     ExpressionAssign(Expression* left, Expression* right): Expression(ExpressionType::ASSIGN), left(left), right(right) {};
     void Print(int);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
 };
 
 class ExpressionFuncCall: public Expression {
@@ -142,7 +151,7 @@ public:
     Expression* left;
     std::vector<Expression*> args;
     ExpressionFuncCall(Expression* left, std::vector<Expression*> args): Expression(ExpressionType::FUNCCALL), left(left), args(args) {};
-    void Generate(Generator* generator);
+    void Generate(Generator* generator, ArgTypeState state = ArgTypeState::RVALUE);
     void GenerateWrite(Generator* generator, int argc);
     void Print(int);
 };

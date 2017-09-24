@@ -39,24 +39,31 @@ public:
     SymbolType(std::string name, DataType dataType): Symbol(name, DeclarationType::TYPE), type(nullptr), dataType(dataType) {};
     Symbol* GetType();
     int GetSize();
+    std::string GenerateName();
     void Print(int);
 };
 
 class SymbolIdent: public Symbol {
 public:
-    SymbolIdent(std::string name, DeclarationType declType, Expression* initExpr, Symbol* type):
-            Symbol(name, declType), initExpr(initExpr), type(type) {};
+    SymbolIdent(std::string name, DeclarationType declType, Expression* initExpr, Symbol* type, ArgTypeState state):
+            Symbol(name, declType), initExpr(initExpr), type(type), state(state) {};
     Symbol* type;
     Expression* initExpr;
     Symbol* GetType();
+    void Generate(Generator*);
+    std::string GenerateName();
+    std::string GetInitlist();
+    int GetSize();
     int offset;
     bool localFlag;
+    ArgTypeState state;
+    int depth = 0;
 };
 
 class SymbolConst: public SymbolIdent {
 public:
-    SymbolConst(std::string name, Expression* initExpr, Symbol* type):
-            SymbolIdent(name, DeclarationType::CONST, initExpr, type) {};
+    SymbolConst(std::string name, Expression* initExpr, Symbol* type, ArgTypeState state):
+            SymbolIdent(name, DeclarationType::CONST, initExpr, type, state) {};
     void Print(int);
 };
 
@@ -69,8 +76,8 @@ public:
 
 class SymbolVar: public SymbolIdent {
 public:
-    SymbolVar(std::string name, Expression* initExpr, Symbol* type):
-            SymbolIdent(name, DeclarationType ::VAR, initExpr, type) {};
+    SymbolVar(std::string name, Expression* initExpr, Symbol* type, ArgTypeState state):
+            SymbolIdent(name, DeclarationType ::VAR, initExpr, type, state) {};
     void Print(int);
 };
 

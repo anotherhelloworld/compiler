@@ -1,0 +1,5 @@
+var a: real;
+begin
+    a := 10.1;
+    writeln(a);
+end.

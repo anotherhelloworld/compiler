@@ -64,9 +64,9 @@ Parser::Parser(char* filename): scanner(filename) {
 
 void Parser::CastFunction(SymbolTable* table, std::string type1, std::string type2) {
     auto newTable = new SymbolTable(table);
-    Symbol* symArg = new SymbolVar("arg0", nullptr, table->GetSymbol(type2, std::make_pair(0, 0)));
+    Symbol* symArg = new SymbolVar("arg0", nullptr, table->GetSymbol(type2, std::make_pair(0, 0)), ArgTypeState::RVALUE);
     newTable->Add(symArg);
-    Symbol* symRes = new SymbolVar("result", nullptr, table->GetSymbol(type1, std::make_pair(0, 0)));
+    Symbol* symRes = new SymbolVar("result", nullptr, table->GetSymbol(type1, std::make_pair(0, 0)), ArgTypeState::RVALUE);
     newTable->Add(symRes);
     auto block = new BlockCompound();
     block->Add(new BlockAssign(new ExpressionAssign(new ExpressionIdent(Lexem("result", START, std::make_pair(0, 0)), newTable->GetSymbol("result", std::make_pair(0, 0))),
@@ -304,7 +304,7 @@ void Parser::ParseFuncDeclaration(SymbolTable* table, DeclarationType declaratio
         scanner.CheckCurLexem(COLON, ":");
         scanner.NextToken();
         Symbol* type = ParseType(table);
-        localTable->Add(new SymbolVar("Result", nullptr, type));
+        localTable->Add(new SymbolVar("Result", nullptr, type, ArgTypeState::RVALUE));
         scanner.CheckCurLexem(SEMI_COLON, ";");
         scanner.NextToken();
         newSymbol = new SymbolFunction(name, localTable, nullptr, argc + 1, type);
@@ -364,6 +364,7 @@ void Parser::ParseVarDeclaration(SymbolTable* table) {
         scanner.CheckCurLexem(COLON, ":");
         scanner.NextToken();
         Symbol* type = ParseType(table);
+        ArgTypeState state = ArgTypeState::RVALUE;
         while (type->declType == DeclarationType::TYPE && ((SymbolType*)type)->dataType == DataType::BADTYPE) {
             type = ((SymbolType*)type)->type;
         }
@@ -382,7 +383,7 @@ void Parser::ParseVarDeclaration(SymbolTable* table) {
         }
         for (int i = 0; i < names.size(); i++) {
             table->CheckLocalSymbol(names[i], namesPos[i]);
-            table->Add(new SymbolVar(names[i], exp, type));
+            table->Add(new SymbolVar(names[i], exp, type, state));
         }
         scanner.CheckCurLexem(SEMI_COLON, ";");
         scanner.NextToken();
@@ -431,15 +432,18 @@ void Parser::ParseConstantDeclaration(SymbolTable* table) {
         scanner.CheckCurLexem(EQUAL, "=");
         std::pair<int, int> pos = scanner.GetLexem().pos;
         Expression* exp = ParseInit(table);
-
+        ArgTypeState state = ArgTypeState::RVALUE;
         if (type != nullptr) {
             TypeChecker(table, type, exp, scanner.GetLexem().pos);
         } else {
             DataType typeID = TypeChecker(table, scanner.GetLexem().pos).GetTypeID(exp);
             type = new SymbolType(dataTypeString[(int)typeID], typeID);
+            if (typeID == DataType::ARRAY || typeID == DataType::POINTER) {
+                state = ArgTypeState::VAR;
+            }
         }
         table->CheckLocalSymbol(name, namePos);
-        table->Add(new SymbolConst(name, exp, type));
+        table->Add(new SymbolConst(name, exp, type, ArgTypeState::RVALUE));
         scanner.CheckCurLexem(SEMI_COLON, ";");
         scanner.NextToken();
     }
@@ -481,10 +485,13 @@ int Parser::ParseArguments(SymbolTable* table) {
     int res = 0;
     while (scanner.GetLexem().token == IDENTIFIER || scanner.GetLexem().token == CONST ||
             scanner.GetLexem().token == VAR) {
+        ArgTypeState state = ArgTypeState::RVALUE;
         if (scanner.GetLexem().token == CONST) {
+            state = ArgTypeState::CONST;
             scanner.NextToken();
         }
         if (scanner.GetLexem().token == VAR) {
+            state = ArgTypeState::VAR;
             scanner.NextToken();
         }
         ++res;
@@ -494,7 +501,7 @@ int Parser::ParseArguments(SymbolTable* table) {
         scanner.NextToken();
         Symbol* type = ParseType(table);
         table->CheckLocalSymbol(name, pos);
-        table->Add(new SymbolVar(name, nullptr, type));
+        table->Add(new SymbolVar(name, nullptr, type, state));
         if (scanner.GetLexem().token != END && scanner.GetLexem().token != CLOSE_BRACKET) {
             scanner.CheckCurLexem(SEMI_COLON, ";");
             scanner.NextToken();

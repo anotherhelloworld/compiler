@@ -220,8 +220,48 @@ int SymbolType::GetSize() {
     }
 }
 
+std::string SymbolType::GenerateName() {
+    switch(dataType) {
+        case DataType::INTEGER:
+            return "dd";
+        case DataType::CHAR:
+            return "db";
+        case DataType::BOOLEAN:
+            return "db";
+        case DataType::REAL:
+            return "dq";
+    }
+}
+
 Symbol* SymbolIdent::GetType() {
     return type;
+}
+
+std::string SymbolIdent::GenerateName() {
+    return "v" + name;
+}
+
+std::string SymbolIdent::GetInitlist() {
+    if (initExpr == nullptr) {
+        if (((SymbolType*)type)->dataType == DataType::REAL) {
+            return "0.0";
+        } else {
+            return "0";
+        }
+    }
+    return initExpr->GenerateInitlist() +
+            (initExpr->expressionType != ExpressionType::REAL && initExpr->typeID == DataType::REAL ? ".0" : "");
+}
+
+void SymbolIdent::Generate(Generator* generator) {
+    generator->Add(GenerateName(), type->GenerateName(), GetInitlist());
+}
+
+int SymbolIdent::GetSize() {
+    if (type == nullptr) {
+        return 0;
+    }
+    return type->GetSize();
 }
 
 void SymbolRecord::Print(int spaces) {

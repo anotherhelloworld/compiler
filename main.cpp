@@ -81,6 +81,7 @@ int main(int argc, char* argv[]) {
                 parser.testType = true;
                 Block *block = parser.ParseBlockStart();
                 Generator* generator = new Generator();
+                parser.symTable->GenerateVars(generator);
                 block->Generate(generator);
                 generator->Print();
             } catch (Error error) {

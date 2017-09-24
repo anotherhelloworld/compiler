@@ -57,6 +57,10 @@ void BlockAssign::Print(int spaces) {
     exp->Print(spaces);
 }
 
+void BlockAssign::Generate(Generator* generator) {
+    exp->Generate(generator);
+}
+
 void BlockWhile::Print(int spaces) {
     printIndent(spaces);
     std::cout << "while" << std::endl;
@@ -85,6 +89,11 @@ void BlockIf::Print(int spaces) {
         std::cout << "else" << std::endl;
         blockElse->Print(spaces + 1);
     }
+}
+
+void BlockIf::Generate(Generator* generator) {
+    std::string labelNameElse = generator->GetLocalLabel();
+    Gene
 }
 
 void BlockRepeat::Print(int spaces) {
@@ -154,4 +163,10 @@ void BlockCase::Print(int spaces) {
     for (auto it = caseList.begin(); it != caseList.end(); it++) {
         (*it).block->Print(spaces + 1);
     }
+}
+
+void BlockCondition::GenerateCond(Generator* generator) {
+    exp->Generate(generator);
+    generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
+    generator->Add(AsmTypeOperation::TEST, AsmTypeRegister::EAX, AsmTypeRegister::EAX);
 }

@@ -5,7 +5,9 @@
 #include <iostream>
 
 enum class AsmTypeOperation {
-    _NULL = 0, PUSH, POP, IMUL, DIV, ADD, SUB, NEG, NOT, OR, AND, XOR, SHL, SHR, CALL, MOV
+    _NULL = 0, PUSH, POP, IMUL, DIV, ADD, SUB, NEG, NOT, OR, AND, XOR, SHL, SHR, CALL, MOV, RET, TEST, CMP, JZ, JNZ,
+    JMP, JG, JGE, JL, JLE, JE, JNE, FLD, FILD, FSTP, FADD, FSUB, FDIV, FMUL, FIADD, FISUB, FIDIV, FIMUL, JA, JB, JAE,
+    JBE, FCOM, FCOMI, FCOMIP
 };
 
 enum class AsmTypeRegister {
@@ -14,7 +16,9 @@ enum class AsmTypeRegister {
 
 enum class AsmCmdIndex {
     Lbael = 0, Register, SizeAddrRegisterOffset, String, RegisterInt, RegisterIdent, AddrRegisterReg, Integer, Ident,
-    CmdLabel, RegisterReg, RegisterAddrIdentOffset, RegisterString, StringReg, IntReg, IdentReg, SizeAddrIdentOffset
+    CmdLabel, RegisterReg, RegisterAddrIdentOffset, RegisterString, StringReg, IntReg, IdentReg, SizeAddrIdentOffset,
+    Cmd, AddrIdentOffset, AddrIdentOffsetRegister, RegisterAddrRegisterOffset, AddrRegisterOffsetRegister, SizeInt,
+    SizeAddrRegisterRegister
 };
 
 enum class AsmTypeSize {
@@ -23,6 +27,10 @@ enum class AsmTypeSize {
 
 enum class AsmTypeAddress {
     ADDR
+};
+
+enum class ArgTypeState {
+    RVALUE, VAR, CONST, OUT
 };
 
 class AsmCommand {
@@ -52,6 +60,10 @@ public:
     void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeRegister);
     void Add(std::string, std::string, std::string);
     void Add(AsmTypeOperation, AsmTypeSize, AsmTypeAddress, std::string, int);
+    void Add(AsmTypeOperation, AsmTypeSize, AsmTypeAddress, AsmTypeRegister, int);
+    void Add(AsmTypeOperation, AsmTypeAddress, AsmTypeRegister, int, AsmTypeRegister);
+    void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeAddress, std::string, int);
+    void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeAddress, AsmTypeRegister);
     void AddCallOffset(AsmTypeOperation, AsmTypeRegister, int, int);
     std::string AddReal(std::string);
     std::string AddConstString(std::string);

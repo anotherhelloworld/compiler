@@ -1,7 +1,9 @@
 #include "Generator.h"
 
 static std::string AsmOperationToString[] = {
-        "", "push", "pop", "imul", "div", "add", "sub", "neg", "not", "or", "and", "xor", "shl", "shr", "call", "mov"
+        "", "push", "pop", "imul", "div", "add", "sub", "neg", "not", "or", "and", "xor", "shl", "shr", "call", "mov",
+        "ret", "test", "cmp", "jz", "jnz", "jmp", "jg", "jge", "jl", "jle", "je", "jne", "fld", "fild", "fstp", "fadd",
+        "fsub", "fdiv", "fmul", "fiadd", "fisub", "fidiv", "fimul", "ja", "jb", "jae", "jbe", "fcom", "fcomi", "fcomip"
 };
 
 static std::string AsmRegisterToString[] = {
@@ -100,6 +102,22 @@ void Generator::Add(std::string name, std::string type, std::string initList) {
 
 void Generator::Add(AsmTypeOperation op, AsmTypeSize size, AsmTypeAddress addres, std::string val, int offset) {
     commands.push_back(new AsmCommandUnarSize(op, size, new AsmAddress(val, offset), (int)AsmCmdIndex::SizeAddrIdentOffset));
+}
+
+void Generator::Add(AsmTypeOperation op, AsmTypeSize size, AsmTypeAddress addres, AsmTypeRegister reg, int offset) {
+    commands.push_back(new AsmCommandUnarSize(op, size, new AsmAddress(reg, offset), (int)AsmCmdIndex::SizeAddrRegisterOffset));
+};
+
+void Generator::Add(AsmTypeOperation op, AsmTypeAddress addr, AsmTypeRegister reg1, int offset, AsmTypeRegister reg2) {
+    commands.push_back(new AsmCommandBinary(op, new AsmAddress(reg1, offset), new AsmRegister(reg2), (int)AsmCmdIndex::AddrRegisterOffsetRegister));
+}
+
+void Generator::Add(AsmTypeOperation op, AsmTypeRegister reg, AsmTypeAddress addr, std::string var, int offset) {
+    commands.push_back(new AsmCommandBinary(op, new AsmRegister(reg), new AsmAddress(var, offset), (int)AsmCmdIndex::RegisterAddrIdentOffset));
+}
+
+void Generator::Add(AsmTypeOperation op, AsmTypeRegister reg1, AsmTypeAddress addr, AsmTypeRegister reg2) {
+    commands.push_back(new AsmCommandBinary(op, new AsmRegister(reg1), new AsmAddress(reg2, 0), (int)AsmCmdIndex::RegisterAddrRegisterOffset));
 }
 
 std::string Generator::AddFormat(std::string format) {

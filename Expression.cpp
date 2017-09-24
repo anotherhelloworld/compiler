@@ -1,6 +1,10 @@
 #include "Expression.h"
 #include "Symbol.h"
 
+AsmTypeOperation SwitchCmd(DataType dataType, AsmTypeOperation cmdF, AsmTypeOperation cmdI) {
+    return dataType == DataType::REAL ? cmdF : cmdI;
+}
+
 const char fill = ' ';
 const int mult = 3;
 
@@ -55,11 +59,48 @@ void ExpressionBinOp::GetIdentificitationList(ExpressionArgumentList* list) {
     left->GetIdentificitationList(list);
 }
 
-void ExpressionBinOp::Generate(Generator* generator) {
+void ExpressionBinOp::GenerateDoubleExpr(Generator* generator) {
+    left->Generate(generator);
+    right->Generate(generator);
+    if (right->typeID == DataType::REAL) {
+        generator->Add(AsmTypeOperation::FLD, AsmTypeSize::QWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, 8);
+    } else {
+        generator->Add(AsmTypeOperation::FILD, AsmTypeSize::DWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, 4);
+    }
+
+    auto dataType = left->typeID;
+    auto size = dataType == DataType::REAL ? AsmTypeSize::QWORD : AsmTypeSize::DWORD;
+    switch (operation.token) {
+        case ADD:
+            generator->Add(SwitchCmd(dataType, AsmTypeOperation::FADD, AsmTypeOperation::FIADD), size, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+            break;
+        case SUB:
+            generator->Add(SwitchCmd(dataType, AsmTypeOperation::FSUB, AsmTypeOperation::FISUB), size, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+            break;
+        case MULT:
+            generator->Add(SwitchCmd(dataType, AsmTypeOperation::FMUL, AsmTypeOperation::FIMUL), size, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+            break;
+        case DIVISION:
+            generator->Add(SwitchCmd(dataType, AsmTypeOperation::FDIV, AsmTypeOperation::FIDIV), size, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+            break;
+    }
+
+    if (left->typeID != DataType::REAL) {
+        generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, 4);
+    }
+    generator->Add(AsmTypeOperation::FSTP, AsmTypeSize::QWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+}
+
+void ExpressionBinOp::Generate(Generator* generator, ArgTypeState state) {
     if (relations.find(operation.token) != relations.end()) {
         return;
     }
-
+    if (typeID == DataType::REAL) {
+        GenerateDoubleExpr(generator);
+        return;
+    }
     if (left->typeID == DataType::BOOLEAN && (operation.token == AND || operation.token == OR)) {
         if (operation.token == AND) {
 
@@ -130,6 +171,20 @@ void ExpressionAssign::Print(int spaces) {
     left->Print(spaces + 1);
 }
 
+void ExpressionAssign::Generate(Generator* generator, ArgTypeState state) {
+    left->Generate(generator);
+    right->Generate(generator, ArgTypeState::VAR);
+    generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
+    if (right->typeID == DataType::REAL && left->typeID != DataType::REAL) {
+        left->ConvertToReal(generator);
+    }
+    int size = std::max(right->GetSize(), left->GetSize());
+    for (int i = 0; i < size; i+=4) {
+        generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EBX);
+        generator->Add(AsmTypeOperation::MOV, AsmTypeAddress::ADDR, AsmTypeRegister::EAX, i, AsmTypeRegister::EBX);
+    }
+}
+
 void ExpressionFuncCall::Print(int spaces) {
     for (auto i: args) {
         i->Print(spaces + 1);
@@ -139,7 +194,7 @@ void ExpressionFuncCall::Print(int spaces) {
     left->Print(spaces + 1);
 }
 
-void ExpressionFuncCall::Generate(Generator* generator) {
+void ExpressionFuncCall::Generate(Generator* generator, ArgTypeState state) {
     SymbolCall* leftSymbol = (SymbolCall*)((ExpressionIdent*)left)->symbol;
     int argc = leftSymbol->argc;
     if (argc == WRITE || argc == WRITELN) {
@@ -222,7 +277,7 @@ void ExpressionDereference::Print(int spaces) {
     std::cout << std::string(spaces * mult, fill) << "^" << std::endl;
 }
 
-void ExpressionInteger::Generate(Generator* generator) {
+void ExpressionInteger::Generate(Generator* generator, ArgTypeState state) {
     generator->Add(AsmTypeOperation::PUSH, val.val);
 }
 
@@ -230,7 +285,17 @@ int ExpressionInteger::GetSize() {
     return 4;
 }
 
-void ExpressionChar::Generate(Generator* generator) {
+void ExpressionInteger::ConvertToReal(Generator* generator) {
+    generator->Add(AsmTypeOperation::FILD, AsmTypeSize::DWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+    generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, 4);
+    generator->Add(AsmTypeOperation::FSTP, AsmTypeSize::QWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+}
+
+std::string ExpressionInteger::GenerateInitlist() {
+    return val.val;
+}
+
+void ExpressionChar::Generate(Generator* generator, ArgTypeState state) {
     if (val.val.size() == 1) {
         generator->Add(AsmTypeOperation::PUSH, "\'" + val.val + "\'");
         return;
@@ -242,7 +307,7 @@ int ExpressionChar::GetSize() {
     return 4;
 }
 
-void ExpressionReal::Generate(Generator* generator) {
+void ExpressionReal::Generate(Generator* generator, ArgTypeState state) {
     std::string name = generator->AddReal(val.val);
     generator->Add(AsmTypeOperation::PUSH, AsmTypeSize::DWORD, AsmTypeAddress::ADDR, name, 4);
     generator->Add(AsmTypeOperation::PUSH, AsmTypeSize::DWORD, AsmTypeAddress::ADDR, name, 0);
@@ -250,4 +315,39 @@ void ExpressionReal::Generate(Generator* generator) {
 
 int ExpressionReal::GetSize() {
     return 8;
+}
+
+std::string ExpressionReal::GenerateInitlist() {
+    return val.val;
+}
+
+void ExpressionIdent::Generate(Generator* generator, ArgTypeState state) {
+    auto idenSym = (SymbolIdent*)symbol;
+    if (idenSym->localFlag) {
+        if (idenSym->depth < generator->depth) {
+            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, "depth", 4 * idenSym->depth);
+        } else {
+            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeRegister::EBP);
+        }
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX, idenSym->offset);
+    } else {
+        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, idenSym->GenerateName());
+    }
+
+    if ((idenSym->state == ArgTypeState::VAR || idenSym->state == ArgTypeState::CONST)) {
+        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, AsmTypeRegister::EAX);
+    }
+
+    if (state == ArgTypeState::RVALUE) {
+        for (int i = idenSym->GetSize() - 4; i >= 0; i-=4) {
+            generator->Add(AsmTypeOperation::PUSH, AsmTypeSize::DWORD, AsmTypeAddress::ADDR, AsmTypeRegister::EAX, i);
+        }
+        return;
+    }
+
+    generator->Add(AsmTypeOperation::PUSH, AsmTypeRegister::EAX);
+}
+
+int ExpressionIdent::GetSize() {
+    return symbol->GetSize();
 }
