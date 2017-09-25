@@ -1,0 +1,3 @@
+begin
+    write(1e500);
+end.

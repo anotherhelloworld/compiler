@@ -11,7 +11,7 @@ enum class AsmTypeOperation {
 };
 
 enum class AsmTypeRegister {
-    EAX = 0, EBX, ECX, EDX, EBP, ESP
+    EAX = 0, EBX, ECX, EDX, EBP, ESP, ST0, ST1
 };
 
 enum class AsmCmdIndex {
@@ -64,7 +64,9 @@ public:
     void Add(AsmTypeOperation, AsmTypeAddress, AsmTypeRegister, int, AsmTypeRegister);
     void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeAddress, std::string, int);
     void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeAddress, AsmTypeRegister);
+    void Add(AsmTypeOperation);
     void AddCallOffset(AsmTypeOperation, AsmTypeRegister, int, int);
+    void AddLabel(std::string);
     std::string AddReal(std::string);
     std::string AddConstString(std::string);
     std::string AddFormat(std::string);
@@ -147,6 +149,13 @@ public:
     std::string GetCode();
     AsmAddress(std::string val, int offset): operand(new AsmVar(val)), offset(offset) {};
     AsmAddress(AsmTypeRegister reg, int offset): operand(new AsmRegister(reg)), offset(offset) {};
+};
+
+class AsmLabel: public AsmCommand {
+public:
+    std::string name;
+    AsmLabel(std::string name): name(name), AsmCommand(AsmTypeOperation::_NULL, 0) {};
+    std::string GetCode();
 };
 
 #endif //COMPILER_GENERATOR_H

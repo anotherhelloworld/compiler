@@ -47,6 +47,7 @@ public:
     void GenerateDoubleExpr(Generator*);
     int GetSize();
     void GenerateBoolExpr(Generator*, AsmTypeOperation);
+    void GenerateRelations(Generator*, ArgTypeState);
     Expression* left;
     Expression* right;
     Lexem operation;

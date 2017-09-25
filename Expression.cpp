@@ -95,6 +95,7 @@ void ExpressionBinOp::GenerateDoubleExpr(Generator* generator) {
 
 void ExpressionBinOp::Generate(Generator* generator, ArgTypeState state) {
     if (relations.find(operation.token) != relations.end()) {
+        GenerateRelations(generator, state);
         return;
     }
     if (typeID == DataType::REAL) {
@@ -147,6 +148,65 @@ void ExpressionBinOp::Generate(Generator* generator, ArgTypeState state) {
 
 void ExpressionBinOp::GenerateBoolExpr(Generator* generator, AsmTypeOperation) {
 //    std::string label1 =
+}
+
+void ExpressionBinOp::GenerateRelations(Generator* generator, ArgTypeState state) {
+    std::string label1 = generator->GetLocalLabel();
+    std::string label2 = generator->GetLocalLabel();
+    right->Generate(generator, state);
+    if (right->typeID != DataType::REAL && left->typeID == DataType::REAL) {
+        generator->Add(AsmTypeOperation::FILD, AsmTypeSize::DWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+        generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, 4);
+        generator->Add(AsmTypeOperation::FSTP, AsmTypeSize::QWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+    }
+    left->Generate(generator, state);
+    if (right->typeID == DataType::REAL && left->typeID != DataType::REAL) {
+        generator->Add(AsmTypeOperation::FILD, AsmTypeSize::DWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+        generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, 4);
+        generator->Add(AsmTypeOperation::FSTP, AsmTypeSize::QWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+    }
+
+    auto dataType = right->typeID == DataType::REAL || left->typeID == DataType::REAL ? DataType::REAL : DataType::INTEGER;
+    if (dataType == DataType::REAL) {
+        generator->Add(AsmTypeOperation::FLD, AsmTypeSize::QWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 0);
+        generator->Add(AsmTypeOperation::FLD, AsmTypeSize::QWORD, AsmTypeAddress::ADDR, AsmTypeRegister::ESP, 8);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, 16);
+    }
+
+    if (right->typeID == DataType::REAL || left->typeID == DataType::REAL) {
+        generator->Add(AsmTypeOperation::FCOMIP, AsmTypeRegister::ST0, AsmTypeRegister::ST1);
+        //generator->Add(AsmTypeOperation::FSTP);
+    } else {
+        generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EBX);
+        generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
+        generator->Add(AsmTypeOperation::CMP, AsmTypeRegister::EAX, AsmTypeRegister::EBX);
+    }
+
+    switch (operation.token) {
+        case GREATER_THAN:
+            generator->Add(SwitchCmd(dataType, AsmTypeOperation::JA, AsmTypeOperation::JG), label1);
+            break;
+        case GREATER_OR_EQUAL_THAN:
+            generator->Add(SwitchCmd(dataType, AsmTypeOperation::JAE, AsmTypeOperation::JGE), label1);
+            break;
+        case LESS_THAN:
+            generator->Add(SwitchCmd(dataType, AsmTypeOperation::JB, AsmTypeOperation::JL), label1);
+            break;
+        case LESS_OR_EQUAL_THAN:
+            generator->Add(SwitchCmd(dataType, AsmTypeOperation::JBE, AsmTypeOperation::JLE), label1);
+            break;
+        case EQUAL:
+            generator->Add(AsmTypeOperation::JE, label1);
+            break;
+        case NOT_EQUAL:
+            generator->Add(AsmTypeOperation::JNE, label1);
+            break;
+    }
+    generator->Add(AsmTypeOperation::PUSH, "0");
+    generator->Add(AsmTypeOperation::JMP, label2);
+    generator->AddLabel(label1);
+    generator->Add(AsmTypeOperation::PUSH, "1");
+    generator->AddLabel(label2);
 }
 
 int ExpressionBinOp::GetSize() {
@@ -324,19 +384,19 @@ std::string ExpressionReal::GenerateInitlist() {
 void ExpressionIdent::Generate(Generator* generator, ArgTypeState state) {
     auto idenSym = (SymbolIdent*)symbol;
     if (idenSym->localFlag) {
-        if (idenSym->depth < generator->depth) {
-            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, "depth", 4 * idenSym->depth);
-        } else {
-            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeRegister::EBP);
-        }
+//        if (idenSym->depth < generator->depth) {
+//            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, "depth", 4 * idenSym->depth);
+//        } else {
+//            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeRegister::EBP);
+//        }
         generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX, idenSym->offset);
     } else {
         generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, idenSym->GenerateName());
     }
 
-    if ((idenSym->state == ArgTypeState::VAR || idenSym->state == ArgTypeState::CONST)) {
-        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, AsmTypeRegister::EAX);
-    }
+//    if ((idenSym->state == ArgTypeState::VAR || idenSym->state == ArgTypeState::CONST)) {
+//        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, AsmTypeRegister::EAX);
+//    }
 
     if (state == ArgTypeState::RVALUE) {
         for (int i = idenSym->GetSize() - 4; i >= 0; i-=4) {

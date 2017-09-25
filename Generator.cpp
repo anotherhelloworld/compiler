@@ -7,7 +7,7 @@ static std::string AsmOperationToString[] = {
 };
 
 static std::string AsmRegisterToString[] = {
-        "eax", "ebx", "ecx", "edx", "ebp", "esp"
+        "eax", "ebx", "ecx", "edx", "ebp", "esp", "ST0", "ST1"
 };
 
 static std::string AsmSizeToString[] = {
@@ -49,6 +49,10 @@ void Generator::Add(AsmTypeOperation operation, AsmTypeRegister reg, int val) {
 void Generator::AddCallOffset(AsmTypeOperation operation, AsmTypeRegister reg, int val, int offset) {
     auto command = new AsmCommandBinary(operation, new AsmRegister(reg), new AsmIntConstant(std::to_string(val)), (int)AsmCmdIndex::RegisterInt);
     commands.insert(commands.end() - offset, command);
+}
+
+void Generator::AddLabel(std::string name) {
+    commands.push_back(new AsmLabel(name));
 }
 
 std::string Generator::AddReal(std::string val) {
@@ -120,6 +124,10 @@ void Generator::Add(AsmTypeOperation op, AsmTypeRegister reg1, AsmTypeAddress ad
     commands.push_back(new AsmCommandBinary(op, new AsmRegister(reg1), new AsmAddress(reg2, 0), (int)AsmCmdIndex::RegisterAddrRegisterOffset));
 }
 
+void Generator::Add(AsmTypeOperation op) {
+    commands.push_back(new AsmCommand(op, (int)AsmCmdIndex::Cmd));
+}
+
 std::string Generator::AddFormat(std::string format) {
     std::string num = std::to_string((*frmtStr).size());
     (*frmtStr).push_back("format" + num + " : db " + format);
@@ -162,4 +170,8 @@ std::string AsmCommandUnarSize::GetCode() {
 
 std::string AsmAddress::GetCode() {
     return "[" + operand->GetCode() + (offset == 0 ? "" : " + " + std::to_string(offset)) + "]";
+}
+
+std::string AsmLabel::GetCode() {
+    return name + ": ";
 }

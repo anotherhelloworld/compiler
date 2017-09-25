@@ -93,7 +93,13 @@ void BlockIf::Print(int spaces) {
 
 void BlockIf::Generate(Generator* generator) {
     std::string labelNameElse = generator->GetLocalLabel();
-    Gene
+    GenerateCond(generator);
+    generator->Add(AsmTypeOperation::JZ, labelNameElse);
+    blockThen->Generate(generator);
+    generator->AddLabel(labelNameElse);
+    if (blockElse != nullptr) {
+        blockElse->Generate(generator);
+    }
 }
 
 void BlockRepeat::Print(int spaces) {
