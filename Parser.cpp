@@ -20,7 +20,7 @@ Parser::Parser(char* filename): scanner(filename) {
     priorities[NOT_EQUAL] = 0;
     priorities[GREATER_THAN] = 0;
     priorities[LESS_THAN] = 0;
-    priorities[LESS_OR_EQUAL_THAN];
+    priorities[LESS_OR_EQUAL_THAN] = 0;
     priorities[GREATER_OR_EQUAL_THAN] = 0;
     priorities[ASSIGNMENT] = 0;
 

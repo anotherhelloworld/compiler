@@ -384,19 +384,19 @@ std::string ExpressionReal::GenerateInitlist() {
 void ExpressionIdent::Generate(Generator* generator, ArgTypeState state) {
     auto idenSym = (SymbolIdent*)symbol;
     if (idenSym->localFlag) {
-//        if (idenSym->depth < generator->depth) {
-//            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, "depth", 4 * idenSym->depth);
-//        } else {
-//            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeRegister::EBP);
-//        }
+        if (idenSym->depth < generator->depth) {
+            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, "depth", 4 * idenSym->depth);
+        } else {
+            generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeRegister::EBP);
+        }
         generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX, idenSym->offset);
     } else {
         generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, idenSym->GenerateName());
     }
 
-//    if ((idenSym->state == ArgTypeState::VAR || idenSym->state == ArgTypeState::CONST)) {
-//        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, AsmTypeRegister::EAX);
-//    }
+    if ((idenSym->state == ArgTypeState::VAR || idenSym->state == ArgTypeState::CONST)) {
+        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeAddress::ADDR, AsmTypeRegister::EAX);
+    }
 
     if (state == ArgTypeState::RVALUE) {
         for (int i = idenSym->GetSize() - 4; i >= 0; i-=4) {
