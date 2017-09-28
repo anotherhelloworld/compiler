@@ -160,6 +160,16 @@ void Generator::Print() {
     std::cout << "    ret" << std::endl;
 }
 
+void Generator::SaveLabels(std::string labelContinue, std::string labelBreak) {
+    breakLabels.push_back(labelBreak);
+    continueLabels.push_back(labelContinue);
+}
+
+void Generator::LoadLabels() {
+    breakLabels.pop_back();
+    continueLabels.pop_back();
+}
+
 std::string AsmGlobalData::GetCode() {
     return name + ": " + type + " " + initList;
 }

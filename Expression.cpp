@@ -104,8 +104,12 @@ void ExpressionBinOp::Generate(Generator* generator, ArgTypeState state) {
     }
     if (left->typeID == DataType::BOOLEAN && (operation.token == AND || operation.token == OR)) {
         if (operation.token == AND) {
-
+            GenerateBoolExpr(generator, state, AsmTypeOperation::JZ);
         }
+        if (operation.token == OR) {
+            GenerateBoolExpr(generator, state, AsmTypeOperation::JNZ);
+        }
+        return;
     }
 
     right->Generate(generator);
@@ -146,8 +150,18 @@ void ExpressionBinOp::Generate(Generator* generator, ArgTypeState state) {
     }
 }
 
-void ExpressionBinOp::GenerateBoolExpr(Generator* generator, AsmTypeOperation) {
-//    std::string label1 =
+void ExpressionBinOp::GenerateBoolExpr(Generator* generator, ArgTypeState state, AsmTypeOperation operation) {
+    std::string label1 = generator->GetLocalLabel();
+    std::string label2 = generator->GetLocalLabel();
+    right->Generate(generator, state);
+    generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
+    generator->Add(AsmTypeOperation::TEST, AsmTypeRegister::EAX, AsmTypeRegister::EAX);
+    generator->Add(operation, label1);
+    right->Generate(generator, state);
+    generator->Add(AsmTypeOperation::JMP, label2);
+    generator->AddLabel(label1);
+    generator->Add(AsmTypeOperation::PUSH, AsmTypeRegister::EAX);
+    generator->AddLabel(label2);
 }
 
 void ExpressionBinOp::GenerateRelations(Generator* generator, ArgTypeState state) {
@@ -410,4 +424,8 @@ void ExpressionIdent::Generate(Generator* generator, ArgTypeState state) {
 
 int ExpressionIdent::GetSize() {
     return symbol->GetSize();
+}
+
+void ExpressionBoolean::Generate(Generator* generator, ArgTypeState state) {
+    generator->Add(AsmTypeOperation::PUSH, );
 }

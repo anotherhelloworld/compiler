@@ -81,6 +81,7 @@ public:
     std::vector<Block*> blocks;
     BlockRepeat(Expression* exp, std::vector<Block*> blocks): BlockCondition(exp), blocks(blocks) {};
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockGoTo: public Block {

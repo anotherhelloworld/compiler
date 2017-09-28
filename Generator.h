@@ -72,11 +72,15 @@ public:
     std::string AddFormat(std::string);
     std::string GetLocalLabel();
     void Print();
+    void SaveLabels(std::string, std::string);
+    void LoadLabels();
 
     std::vector <std::string>* frmtStr;
     std::vector <std::string>* constStr;
     std::vector <AsmCommand*> commands;
     std::vector <AsmGlobalData*> data;
+    std::vector <std::string> breakLabels;
+    std::vector <std::string> continueLabels;
     int depth;
     int maxDepth;
     int labelCount = 0;

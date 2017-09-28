@@ -3,23 +3,21 @@ extern _printf
 global _main
 section .data
     format0 : db '%f', 10, 0
-    va: dd 11
+    va: dq 11.0
     d1: dq 10.0
     d2: dq 100.5
 section .text
 _main:
     mov eax, va
+    push dword [eax + 4]
     push dword [eax]
-    fild dword [esp]
-    sub esp, 4
-    fstp qword [esp]
     push dword [d1 + 4]
     push dword [d1]
     fld qword [esp]
     fld qword [esp + 8]
     add esp, 16
     fcomip ST0, ST1
-    jae .L2
+    jne .L2
     push 0
     jmp .L3
     .L2: 

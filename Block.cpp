@@ -112,6 +112,22 @@ void BlockRepeat::Print(int spaces) {
     }
 }
 
+void BlockRepeat::Generate(Generator* generator) {
+    std::string labelBody = generator->GetLocalLabel();
+    std::string labelBreak = generator->GetLocalLabel();
+    std::string labelCond = generator->GetLocalLabel();
+    generator->SaveLabels(labelCond, labelBreak);
+    generator->AddLabel(labelBody);
+    for (auto it : blocks) {
+        it->Generate(generator);
+    }
+    generator->AddLabel(labelCond);
+    GenerateCond(generator);
+    generator->Add(AsmTypeOperation::JZ, labelBody);
+    generator->AddLabel(labelBreak);
+    generator->LoadLabels();
+}
+
 void BlockGoTo::Print(int spaces) {
     printIndent(spaces);
     std::cout << "goto" << indent << labelSym->name << std::endl;

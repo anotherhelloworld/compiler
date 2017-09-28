@@ -3,6 +3,7 @@
 #include <set>
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include "Scanner.h"
 #include "Generator.h"
 #define indent "   "
@@ -46,7 +47,7 @@ public:
     void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
     void GenerateDoubleExpr(Generator*);
     int GetSize();
-    void GenerateBoolExpr(Generator*, AsmTypeOperation);
+    void GenerateBoolExpr(Generator*, ArgTypeState, AsmTypeOperation);
     void GenerateRelations(Generator*, ArgTypeState);
     Expression* left;
     Expression* right;
@@ -100,6 +101,7 @@ public:
 class ExpressionBoolean: ExpressionTerm {
 public:
     ExpressionBoolean(const Lexem &val): ExpressionTerm(val, ExpressionType::BOOLEAN) {};
+    void Generate(Generator*, ArgTypeState);
 };
 
 class ExpressionIdent: public ExpressionTerm {

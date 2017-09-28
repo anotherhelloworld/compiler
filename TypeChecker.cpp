@@ -30,7 +30,7 @@ std::map <DataType, std::map<TokenType, DataType> > operationsTypes = {
                         { ADD, DataType::REAL },
                         { DIVISION, DataType::REAL },
                         { MULT, DataType::REAL },
-                        { NOT_EQUAL, DataType::REAL },
+                        { NOT_EQUAL, DataType::BOOLEAN },
                         { GREATER_THAN, DataType::BOOLEAN },
                         { LESS_THAN, DataType::BOOLEAN },
                         { GREATER_OR_EQUAL_THAN, DataType::BOOLEAN },
@@ -115,6 +115,7 @@ TypeChecker::TypeChecker(SymbolTable* table, Expression* left, Expression* right
 }
 
 void TypeChecker::Check(DataType type1, DataType type2) {
+    //std::cout << dataTypeString[(int)type1] << "    " << dataTypeString[(int)type2] << std::endl;
     if (!CanCast(type1, type2)) {
 //        throw TypeCheckerException(dataTypeString[(int)type1], pos);
 //        throw IncompatibleTypes(dataTypeString[(int)type1], dataTypeString[(int)type2], pos);
