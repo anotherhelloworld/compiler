@@ -66,6 +66,14 @@ std::string Generator::GetLocalLabel() {
     return ".L" + std::to_string(++labelCount);
 }
 
+std::string Generator::GetLabelBreak() {
+    return *breakLabels.crbegin();
+}
+
+std::string Generator::GetLabelContinue() {
+    return *continueLabels.crbegin();
+}
+
 std::string Generator::AddConstString(std::string str) {
     std::string num = std::to_string((*constStr).size());
     (*constStr).push_back("str" + num + ": db \'" + str + "\', 0");

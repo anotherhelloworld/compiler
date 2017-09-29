@@ -71,6 +71,8 @@ public:
     std::string AddConstString(std::string);
     std::string AddFormat(std::string);
     std::string GetLocalLabel();
+    std::string GetLabelBreak();
+    std::string GetLabelContinue();
     void Print();
     void SaveLabels(std::string, std::string);
     void LoadLabels();

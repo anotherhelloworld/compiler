@@ -35,8 +35,9 @@ public:
     Block* block;
     BlockFor(Expression* exp1, Expression* exp2, bool toFlag, Block* block):
             exp1(exp1), exp2(exp2), toFlag(toFlag), block(block),
-            BlockCondition(new ExpressionBinOp(Lexem(toFlag ? ">" : "<", toFlag ? GREATER_THAN: LESS_THAN, std::make_pair(0, 0)), ((ExpressionAssign*)exp1)->left, exp2)) {};
+            BlockCondition(new ExpressionBinOp(Lexem(toFlag ? ">" : "<", toFlag ? GREATER_THAN: LESS_THAN, std::make_pair(0, 0)), ((ExpressionAssign*)exp1)->right, exp2)) {};
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockFuncCall: public Block {
@@ -60,6 +61,7 @@ public:
     Block* block;
     BlockWhile(Expression* cond, Block* block): BlockCondition(cond), block(block) {};
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockContinue: public Block {
@@ -110,6 +112,7 @@ public:
 class BlockBreak: public Block {
 public:
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockRaise: public Block {

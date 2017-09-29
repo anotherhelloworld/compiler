@@ -102,6 +102,7 @@ class ExpressionBoolean: ExpressionTerm {
 public:
     ExpressionBoolean(const Lexem &val): ExpressionTerm(val, ExpressionType::BOOLEAN) {};
     void Generate(Generator*, ArgTypeState);
+    std::string GenerateInitList();
 };
 
 class ExpressionIdent: public ExpressionTerm {

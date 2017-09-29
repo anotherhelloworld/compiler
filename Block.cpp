@@ -37,6 +37,29 @@ void BlockFor::Print(int spaces) {
     }
 }
 
+void BlockFor::Generate(Generator* generator) {
+    exp1->Generate(generator);
+    std::string labelCond = generator->GetLocalLabel();
+    std::string labelBreak = generator->GetLocalLabel();
+    generator->SaveLabels(labelCond, labelBreak);
+    generator->AddLabel(labelCond);
+    GenerateCond(generator);
+    generator->Add(AsmTypeOperation::JNZ, labelBreak);
+    block->Generate(generator);
+    ExpressionAssign(
+            new ExpressionBinOp(
+                    Lexem("", toFlag ? ADD : SUB),
+
+                    ((ExpressionAssign*)exp1)->right,
+                    new ExpressionInteger(Lexem("1", NUMBER))
+            ),
+            ((ExpressionAssign*)exp1)->right
+    ).Generate(generator);
+    generator->Add(AsmTypeOperation::JMP, labelCond);
+    generator->AddLabel(labelBreak);
+    generator->LoadLabels();
+}
+
 void BlockFuncCall::Print(int spaces) {
     printIndent(spaces);
     std::cout << "Call" << std::endl;
@@ -70,6 +93,19 @@ void BlockWhile::Print(int spaces) {
     if (block != nullptr) {
         block->Print(spaces + 1);
     }
+}
+
+void BlockWhile::Generate(Generator* generator) {
+    std::string labelCond = generator->GetLocalLabel();
+    std::string labelBreak = generator->GetLocalLabel();
+    generator->SaveLabels(labelCond, labelBreak);
+    generator->AddLabel(labelCond);
+    GenerateCond(generator);
+    generator->Add(AsmTypeOperation::JZ, labelBreak);
+    block->Generate(generator);
+    generator->Add(AsmTypeOperation::JMP, labelCond);
+    generator->AddLabel(labelBreak);
+    generator->LoadLabels();
 }
 
 void BlockContinue::Print(int spaces) {
@@ -166,6 +202,10 @@ void BlockTryFinally::Print(int spaces) {
 void BlockBreak::Print(int spaces) {
     printIndent(spaces);
     std::cout << "break" << std::endl;
+}
+
+void BlockBreak::Generate(Generator* generator) {
+    generator->Add(AsmTypeOperation::JMP, generator->Get);
 }
 
 void BlockRaise::Print(int spaces) {

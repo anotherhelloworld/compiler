@@ -427,5 +427,9 @@ int ExpressionIdent::GetSize() {
 }
 
 void ExpressionBoolean::Generate(Generator* generator, ArgTypeState state) {
-    generator->Add(AsmTypeOperation::PUSH, );
+    generator->Add(AsmTypeOperation::PUSH, std::strcmp(val.val.c_str(), "true") == 0 ? "1" : "0");
+}
+
+std::string ExpressionBoolean::GenerateInitList() {
+    return std::strcmp(val.val.c_str(), "true") == 0 ? "1" : "0";
 }
