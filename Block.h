@@ -67,6 +67,7 @@ public:
 class BlockContinue: public Block {
 public:
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockIf: public BlockCondition {
@@ -91,6 +92,15 @@ public:
     Symbol* labelSym;
     BlockGoTo(Symbol* labelSym): labelSym(labelSym) {};
     void Print(int);
+    void Generate(Generator*);
+};
+
+class BlockGoToLabel: public Block {
+public:
+    Symbol* labelSym;
+    BlockGoToLabel(Symbol* symbol): labelSym(symbol) {};
+    void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockTryExcept: public Block {

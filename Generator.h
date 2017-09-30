@@ -73,6 +73,7 @@ public:
     std::string GetLocalLabel();
     std::string GetLabelBreak();
     std::string GetLabelContinue();
+    std::string GetGlobalLabel(std::string);
     void Print();
     void SaveLabels(std::string, std::string);
     void LoadLabels();

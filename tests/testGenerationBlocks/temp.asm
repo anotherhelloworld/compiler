@@ -6,7 +6,7 @@ section .data
     vi: dd 0
 section .text
 _main:
-    push 10
+    push 1
     mov eax, vi
     push eax
     pop eax
@@ -15,11 +15,11 @@ _main:
     .L1: 
     mov eax, vi
     push dword [eax]
-    push 1
+    push 5
     pop ebx
     pop eax
     cmp eax, ebx
-    jl .L3
+    jg .L3
     push 0
     jmp .L4
     .L3: 
@@ -28,18 +28,26 @@ _main:
     pop eax
     test eax, eax
     jnz .L2
+    .L5: 
+    push 1
+    pop eax
+    test eax, eax
+    jz .L6
     sub esp, 4
     mov eax, vi
     push dword [eax]
     push format0
     call _printf
     add esp, 12
+    jmp .L6
+    jmp .L5
+    .L6: 
     mov eax, vi
     push dword [eax]
     push 1
     pop ebx
     pop eax
-    sub eax, ebx
+    add eax, ebx
     push eax
     mov eax, vi
     push eax

@@ -113,6 +113,10 @@ void BlockContinue::Print(int spaces) {
     std::cout << "continue" << std::endl;
 }
 
+void BlockContinue::Generate(Generator* generator) {
+    generator->Add(AsmTypeOperation::JMP, generator->GetLabelContinue());
+}
+
 void BlockIf::Print(int spaces) {
     printIndent(spaces);
     std::cout << "if" << std::endl;
@@ -169,6 +173,19 @@ void BlockGoTo::Print(int spaces) {
     std::cout << "goto" << indent << labelSym->name << std::endl;
 };
 
+void BlockGoToLabel::Print(int spaces) {
+    printIndent(spaces);
+    std::cout << "goToLabel" << indent << labelSym->name << std::endl;
+}
+
+void BlockGoToLabel::Generate(Generator* generator) {
+    generator->AddLabel(generator->GetGlobalLabel(labelSym->name));
+}
+
+void BlockGoTo::Generate(Generator* generator) {
+    generator->Add(AsmTypeOperation::JMP, generator->GetGlobalLabel(labelSym->name));
+}
+
 void BlockTryExcept::Print(int spaces) {
     printIndent(spaces);
     std::cout << "try" << std::endl;
@@ -205,7 +222,7 @@ void BlockBreak::Print(int spaces) {
 }
 
 void BlockBreak::Generate(Generator* generator) {
-    generator->Add(AsmTypeOperation::JMP, generator->Get);
+    generator->Add(AsmTypeOperation::JMP, generator->GetLabelBreak());
 }
 
 void BlockRaise::Print(int spaces) {

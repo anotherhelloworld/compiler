@@ -74,6 +74,10 @@ std::string Generator::GetLabelContinue() {
     return *continueLabels.crbegin();
 }
 
+std::string Generator::GetGlobalLabel(std::string name) {
+    return "L" + name;
+}
+
 std::string Generator::AddConstString(std::string str) {
     std::string num = std::to_string((*constStr).size());
     (*constStr).push_back("str" + num + ": db \'" + str + "\', 0");

@@ -815,6 +815,12 @@ Block* Parser::ParseRaiseBlock(SymbolTable* table, int state) {
 Block* Parser::ParseBlockIdent(SymbolTable* table, int state) {
     std::pair<int, int> pos = scanner.GetLexem().pos;
     Symbol* symbol = table->GetSymbol(scanner.GetLexem().val, pos);
+    if (symbol->declType == DeclarationType::LABEL) {
+        scanner.NextToken();
+        scanner.CheckCurLexem(COLON, ":");
+        scanner.NextToken();
+        return new BlockGoToLabel(symbol);
+    }
     Expression* exp = ParseExpression(table, 0);
     if (exp->expressionType == ExpressionType::ASSIGN) {
         if (testType) {

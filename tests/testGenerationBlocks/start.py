@@ -9,7 +9,7 @@ for i in range(0, count):
 
     expectedAns = fo.read()
     os.system('/Users/a1/Documents/stuff/cstuff/compiler/bin/Debug/Compiler -g {0}.in > temp.asm'.format(testnum))
-    os.system('nasm -f macho temp.asm -o test.o && ld -arch i386 -macosx_version_min 10.7.0 -o a.out test.o -lc /usr/lib/crt1.o -no_pie')
+    os.system('nasm -O1 -f macho temp.asm -o test.o && ld -arch i386 -macosx_version_min 10.7.0 -o a.out test.o -lc /usr/lib/crt1.o -no_pie')
     ans = subprocess.check_output(['/Users/a1/Documents/stuff/cstuff/compiler/tests/testGenerationBlocks/a.out'])
     
     if (ans == expectedAns):
