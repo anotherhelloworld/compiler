@@ -2,6 +2,7 @@ bits 32
 extern _printf
 global _main
 section .data
+    depth: times 0 dd 0
     format0 : db '%f', 10, 0
     va: dq 11.0
     d1: dq 10.0

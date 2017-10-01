@@ -62,6 +62,49 @@ void SymbolTable::GenerateVars(Generator* generator) {
     }
 }
 
+std::pair<int, int> SymbolTable::GenerateLocalVariables(Generator* generator, int lastArg, int firstArg, int depth) {
+    int offset = 8;
+    for (int i = lastArg - 1; i >= 0; --i) {
+        if (symbols[i]->declType == DeclarationType::VAR) {
+            ((SymbolIdent*)symbols[i])->localFlag = true;
+            ((SymbolIdent*)symbols[i])->offset = offset;
+            ((SymbolIdent*)symbols[i])->depth = depth;
+            if (((SymbolIdent*)symbols[i])->state == ArgTypeState::RVALUE) {
+                offset += ((SymbolIdent*)symbols[i])->GetSize();
+            } else {
+                offset += 4;
+            }
+        }
+    }
+    if (lastArg != firstArg) {
+        ((SymbolIdent*)symbols[lastArg])->offset = offset;
+        ((SymbolIdent*)symbols[lastArg])->localFlag = true;
+        ((SymbolIdent*)symbols[lastArg])->depth = depth;
+    }
+    int size = 0;
+    for (auto it = symbols.begin() + firstArg; it != symbols.end(); it++) {
+        if ((*it)->declType == DeclarationType::VAR) {
+            size -= (*it)->GetType()->GetSize();
+            ((SymbolIdent*)*it)->localFlag = true;
+            ((SymbolIdent*)*it)->offset = size;
+            ((SymbolIdent*)*it)->depth = depth;
+        } else if ((*it)->declType == DeclarationType::PROCEDURE || (*it)->declType == DeclarationType::FUNC) {
+            (*it)->Generate(generator);
+        }
+    }
+    int offsetSize = 16;
+    while (size > 0 && -size < offsetSize - 8) { offsetSize += 16; }
+
+    generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, std::to_string(offsetSize - 8));
+    for (auto it = symbols.begin() + firstArg; it != symbols.end(); it++) {
+        if ((*it)->declType == DeclarationType::VAR && ((SymbolIdent*)*it)->initExpr != nullptr) {
+            ExpressionAssign* exp = new ExpressionAssign(((SymbolIdent*)*it)->initExpr, new ExpressionIdent(Lexem(), *it));
+            exp->Generate(generator);
+        }
+    }
+    return std::make_pair(-size, offset - 8);
+}
+
 void SymbolTable::CheckLocalSymbol(std::string name, std::pair<int, int> pos) {
     if (FindSymbol(name) != -1) {
         //throw ParserException("Duplicate IDENTIFIER '" + name + "'");
@@ -195,8 +238,24 @@ void SymbolArray::Print(int spaces) {
     type->Print(spaces);
 }
 
-Symbol *SymbolArray::GetType() {
+int SymbolArray::GetLow() {
+    return left;
+}
+
+int SymbolArray::GetHigh() {
+    return right;
+}
+
+int SymbolArray::GetSize() {
+    return (right - left + 1) * type->GetSize();
+}
+
+Symbol* SymbolArray::GetType() {
     return type;
+}
+
+std::string SymbolArray::GenerateName() {
+    return "times " + std::to_string(right - left + 1) + " " + type->GenerateName();
 }
 
 Symbol* SymbolType::GetType() {
@@ -270,6 +329,35 @@ void SymbolRecord::Print(int spaces) {
     this->table->Print(spaces + 1);
     printIndent(spaces);
     std::cout << "End" << std::endl;
+}
+
+void SymbolCall::Generate(Generator* generator) {
+    AsmFunction* asmFunc = new AsmFunction(GenerateName(), std::vector<AsmCommand*>(), 0);
+    Generator* funcGen = new Generator();
+    funcGen->frmtStr = generator->frmtStr;
+    funcGen->constStr = generator->constStr;
+    funcGen->Add(AsmTypeOperation::PUSH, AsmTypeRegister::EBP);
+    funcGen->Add(AsmTypeOperation::MOV, AsmTypeRegister::EBP, AsmTypeRegister::ESP);
+    funcGen->depth = generator->depth + 1;
+    auto size = symbolTable->GenerateLocalVariables(funcGen, declType == DeclarationType::FUNC ? argc - 1: argc, argc, funcGen->depth);
+    generator->maxDepth = std::max(funcGen->depth, generator->depth);
+    block->Generate(funcGen);
+    int offsetSize = 16;
+    while (size.first > 0 &&  size.first < offsetSize - 8) { offsetSize += 16; }
+    funcGen->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, std::to_string(offsetSize - 8));
+    funcGen->Add(AsmTypeOperation::POP, AsmTypeRegister::EBP);
+    funcGen->Add(AsmTypeOperation::RET, std::to_string(size.second));
+    for (auto it = funcGen->commands.begin(); it != funcGen->commands.end(); it++) {
+        asmFunc->cmnds.push_back(*it);
+    }
+    for (auto it = funcGen->functions.begin(); it != funcGen->functions.end(); it++) {
+        asmFunc->functions.push_back(*it);
+    }
+    generator->Add(asmFunc);
+}
+
+std::string SymbolCall::GenerateName() {
+    return "c" + std::to_string(argc) + name + std::to_string((long)&argc);
 }
 
 void SymbolFunction::Print(int spaces) {

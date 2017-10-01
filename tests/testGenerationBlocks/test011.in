@@ -1,0 +1,12 @@
+procedure B();
+    procedure A();
+    begin
+        writeln(1, ' ', 2);
+    end;
+begin
+    A();
+end;
+
+begin
+    B();
+end.

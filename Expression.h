@@ -37,6 +37,7 @@ public:
     virtual std::string GenerateInitlist() { return ""; };
     virtual int GetSize() { return 0; };
     virtual void ConvertToReal(Generator*) {};
+    virtual std::pair<int, int> GetBound(int) { return std::make_pair(0, 0); };
 };
 
 class ExpressionBinOp: public Expression {
@@ -111,6 +112,7 @@ public:
     ExpressionIdent(const Lexem &val) : ExpressionTerm(val, ExpressionType::VAR) {};
     ExpressionIdent(const Lexem &val, Symbol* symbol) : symbol(symbol), ExpressionTerm(val, ExpressionType::VAR) {};
     void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
+    std::pair <int, int> GetBound(int);
     int GetSize();
 };
 
@@ -128,6 +130,9 @@ public:
             Expression(ExpressionType::ARRAY), operation(Lexem("[]", OPEN_SQUARE_BRACKET)), ident(ident), indecies(indecies) {};
     void Print(int);
     void GetIdentificitationList(ExpressionArgumentList*);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
+    int GetSize();
+    std::pair<int, int> GetBound(int depth);
     std::vector<Expression*> indecies;
     Lexem operation;
     Expression* ident;
@@ -139,6 +144,9 @@ public:
     ExpressionInitializeList(std::vector<Expression*> initList = std::vector<Expression*>()):
             Expression(ExpressionType::INITLIST), initList(initList) {};
     void Print(int);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
+    std::string GenerateInitlist();
+    int GetSize();
 };
 
 class ExpressionAssign: public Expression {

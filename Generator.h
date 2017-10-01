@@ -50,6 +50,17 @@ public:
     AsmGlobalData(std::string name, std::string type, std::string initList): name(name), type(type), initList(initList) {};
 };
 
+class AsmFunction {
+public:
+    int argSize;
+    std::string name;
+    std::vector <AsmCommand*> cmnds;
+    std::vector <AsmFunction*> functions;
+    std::string GetCode();
+    AsmFunction(std::string name, std::vector<AsmCommand*> cmnds, int argSize): name(name), cmnds(cmnds), argSize(argSize) {};
+};
+
+
 class Generator {
 public:
     Generator(): frmtStr(new std::vector<std::string>), constStr(new std::vector<std::string>), depth(0), maxDepth(0) {};
@@ -65,6 +76,7 @@ public:
     void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeAddress, std::string, int);
     void Add(AsmTypeOperation, AsmTypeRegister, AsmTypeAddress, AsmTypeRegister);
     void Add(AsmTypeOperation);
+    void Add(AsmFunction*);
     void AddCallOffset(AsmTypeOperation, AsmTypeRegister, int, int);
     void AddLabel(std::string);
     std::string AddReal(std::string);
@@ -84,6 +96,7 @@ public:
     std::vector <AsmGlobalData*> data;
     std::vector <std::string> breakLabels;
     std::vector <std::string> continueLabels;
+    std::vector <AsmFunction*> functions;
     int depth;
     int maxDepth;
     int labelCount = 0;

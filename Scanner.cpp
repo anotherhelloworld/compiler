@@ -290,4 +290,3 @@ void Scanner::CheckNextLexem(TokenType expcToken, std::string expcName) {
     this->NextToken();
     this->CheckCurLexem(expcToken, expcName);
 }
-

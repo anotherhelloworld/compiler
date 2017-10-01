@@ -88,6 +88,8 @@ public:
     SymbolDynArray(Symbol* type): Symbol("", DeclarationType::TYPE), type(type), dataType(DataType::ARRAY) {};
     void Print(int);
     Symbol* GetType();
+    virtual int GetLow() { return 0; };
+    virtual int GetHigh() { return 0; };
 };
 
 class SymbolArray: public SymbolDynArray {
@@ -99,7 +101,11 @@ public:
     SymbolArray(Symbol* type, int left, int right): 
         SymbolDynArray(type), dataType(DataType::ARRAY), type(type), left(left), right(right) {};
     void Print(int);
+    int GetLow();
+    int GetHigh();
+    int GetSize();
     Symbol* GetType();
+    std::string GenerateName();
 };
 
 class SymbolRecord: public Symbol {
@@ -115,7 +121,8 @@ class SymbolCall: public Symbol {
 public:
     SymbolCall(DeclarationType declType, std::string name, SymbolTable* symbolTable, Block* block, int argc):
             Symbol(name, declType), symbolTable(symbolTable), block(block), argc(argc) {};
-    //void Generate(Generator*);
+    void Generate(Generator*);
+    std::string GenerateName();
     SymbolTable* symbolTable;
     Block* block;
     int argc;
@@ -160,7 +167,7 @@ public:
     int FindSymbol(std::string);
     Symbol* FindReqSymbol(Expression*, std::pair<int, int>);
     void GenerateVars(Generator*);
-
+    std::pair <int, int> GenerateLocalVariables(Generator*, int, int, int);
     bool Find(std::string);
     std::vector<Symbol*> GetAllSymbols(std::string, std::pair<int, int>);
     std::vector<Symbol*> symbols;

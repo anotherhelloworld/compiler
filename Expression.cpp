@@ -50,6 +50,25 @@ void ExpressionInitializeList::Print(int spaces) {
     }
 }
 
+void ExpressionInitializeList::Generate(Generator* generator, ArgTypeState state) {
+    for (int i = initList.size() - 1; i >= 0; i--) {
+        initList[i]->typeID = typeID;
+        initList[i]->Generate(generator);
+    }
+}
+
+std::string ExpressionInitializeList::GenerateInitlist() {
+    std::string ans = initList[0]->GenerateInitlist();
+    for (int i = 1; i < initList.size(); i++) {
+        ans += ", " + initList[i]->GenerateInitlist();
+    }
+    return ans;
+}
+
+int ExpressionInitializeList::GetSize() {
+    return initList[0]->GetSize();
+}
+
 void ExpressionTerm::GetIdentificitationList(ExpressionArgumentList* list) {
     list->arguments.push_back(val.val);
 }
@@ -238,6 +257,48 @@ void ExpressionArrayIndecies::GetIdentificitationList(ExpressionArgumentList* li
     }
 }
 
+int ExpressionArrayIndecies::GetSize() {
+    auto bound = ident->GetBound(1);
+    int size = ident->GetSize();
+    return ident->GetSize() / (bound.second - bound.first + 1);
+}
+
+std::pair<int, int> ExpressionArrayIndecies::GetBound(int depth) {
+    return ident->GetBound(depth + 1);
+}
+
+
+static void pushRvalue(Generator* generator, int size) {
+    for (int i = size - 4; i >= 0; i -= 4) {
+        generator->Add(AsmTypeOperation::PUSH, AsmTypeSize::DWORD, AsmTypeAddress::ADDR, AsmTypeRegister::EAX, i);
+    }
+}
+
+void ExpressionArrayIndecies::Generate(Generator* generator, ArgTypeState state) {
+    ident->Generate(generator, ArgTypeState::VAR);
+    for (auto it : indecies) {
+        it->Generate(generator);
+    }
+    generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EBX);
+    int size = GetSize();
+    int low = GetBound(0).first;
+    generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::EBX, low);
+    generator->Add(AsmTypeOperation::IMUL, AsmTypeRegister::EBX, size);
+    if (ident->expressionType == ExpressionType::FUNCCALL) {
+        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeRegister::ESP);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX, AsmTypeRegister::EBX);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, ident->GetSize());
+    } else {
+        generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX, AsmTypeRegister::EBX);
+    }
+    if (state == ArgTypeState::RVALUE) {
+        pushRvalue(generator, size);
+        return;
+    }
+    generator->Add(AsmTypeOperation::PUSH, AsmTypeRegister::EAX);
+}
+
 void ExpressionAssign::Print(int spaces) {
     right->Print(spaces + 1);
     printIndent(spaces);
@@ -271,6 +332,17 @@ void ExpressionFuncCall::Print(int spaces) {
 void ExpressionFuncCall::Generate(Generator* generator, ArgTypeState state) {
     SymbolCall* leftSymbol = (SymbolCall*)((ExpressionIdent*)left)->symbol;
     int argc = leftSymbol->argc;
+    if (argc >= 0) {
+        if (leftSymbol->declType == DeclarationType::FUNC) {
+            generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, leftSymbol->symbolTable->symbols[argc - 1]->GetSize());
+        }
+        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, "depth");
+        generator->Add(AsmTypeOperation::MOV, AsmTypeAddress::ADDR, AsmTypeRegister::EAX, 4 * generator->depth, AsmTypeRegister::EBP);
+        for (int i = 0; i < args.size(); i++) {
+            args[i]->Generate(generator, ((SymbolIdent*)(leftSymbol->symbolTable->symbols[i]))->state);
+        }
+        generator->Add(AsmTypeOperation::CALL, leftSymbol->GenerateName());
+    }
     if (argc == WRITE || argc == WRITELN) {
         this->GenerateWrite(generator, argc);
     }
@@ -420,6 +492,14 @@ void ExpressionIdent::Generate(Generator* generator, ArgTypeState state) {
     }
 
     generator->Add(AsmTypeOperation::PUSH, AsmTypeRegister::EAX);
+}
+
+std::pair<int, int> ExpressionIdent::GetBound(int depth) {
+    Symbol* symId = symbol->GetType();
+    for (int i = 0; i < depth - 1; i++) {
+        symId = symId->GetType();
+    }
+    return std::make_pair(((SymbolDynArray*)symId)->GetLow(), ((SymbolDynArray*)symId)->GetHigh());
 }
 
 int ExpressionIdent::GetSize() {

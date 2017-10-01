@@ -140,6 +140,10 @@ void Generator::Add(AsmTypeOperation op) {
     commands.push_back(new AsmCommand(op, (int)AsmCmdIndex::Cmd));
 }
 
+void Generator::Add(AsmFunction* function) {
+    functions.push_back(function);
+}
+
 std::string Generator::AddFormat(std::string format) {
     std::string num = std::to_string((*frmtStr).size());
     (*frmtStr).push_back("format" + num + " : db " + format);
@@ -151,6 +155,7 @@ void Generator::Print() {
     std::cout << "extern _printf" << std::endl;
     std::cout << "global _main" << std::endl;
     std::cout << "section .data" << std::endl;
+    std::cout << "    depth: times " + std::to_string(maxDepth * 4) + " dd 0" << std::endl;
     for (auto it : (*frmtStr)) {
         std::cout << "    " + it << std::endl;
     }
@@ -163,6 +168,9 @@ void Generator::Print() {
         std::cout << "    " + (*it).GetCode() << std::endl;
     }
     std::cout << "section .text" << std::endl;
+    for (auto it : functions) {
+        std::cout << it->GetCode() << std::endl;
+    }
     std::cout << "_main:" << std::endl;
     for (auto it : commands) {
         std::cout << "    " << it->GetCode() << std::endl;
@@ -196,4 +204,16 @@ std::string AsmAddress::GetCode() {
 
 std::string AsmLabel::GetCode() {
     return name + ": ";
+}
+
+std::string AsmFunction::GetCode() {
+    std::string ans;
+    ans = name + ":\n";
+    for (int i = 0; i < cmnds.size(); i++) {
+        ans += "    " + cmnds[i]->GetCode() + "\n";
+    }
+    for (int i = 0; i < this->functions.size(); i++) {
+        ans += functions[i]->GetCode() + "\n";
+    }
+    return ans;
 }
