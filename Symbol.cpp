@@ -92,17 +92,18 @@ std::pair<int, int> SymbolTable::GenerateLocalVariables(Generator* generator, in
             (*it)->Generate(generator);
         }
     }
-    int offsetSize = 16;
-    while (size > 0 && -size < offsetSize - 8) { offsetSize += 16; }
 
-    generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, std::to_string(offsetSize - 8));
+//    int offsetSize = 16;
+//    while (size > 0 && -size < offsetSize - 8) { offsetSize += 16; }
+    generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, offset);
+
     for (auto it = symbols.begin() + firstArg; it != symbols.end(); it++) {
         if ((*it)->declType == DeclarationType::VAR && ((SymbolIdent*)*it)->initExpr != nullptr) {
             ExpressionAssign* exp = new ExpressionAssign(((SymbolIdent*)*it)->initExpr, new ExpressionIdent(Lexem(), *it));
             exp->Generate(generator);
         }
     }
-    return std::make_pair(-size, offset - 8);
+    return std::make_pair(-size, offset);
 }
 
 void SymbolTable::CheckLocalSymbol(std::string name, std::pair<int, int> pos) {
@@ -342,11 +343,13 @@ void SymbolCall::Generate(Generator* generator) {
     auto size = symbolTable->GenerateLocalVariables(funcGen, declType == DeclarationType::FUNC ? argc - 1: argc, argc, funcGen->depth);
     generator->maxDepth = std::max(funcGen->depth, generator->depth);
     block->Generate(funcGen);
-    int offsetSize = 16;
-    while (size.first > 0 &&  size.first < offsetSize - 8) { offsetSize += 16; }
-    funcGen->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, std::to_string(offsetSize - 8));
+
+//    int offsetSize = 16;
+//    while (size.first > 0 &&  size.first < offsetSize - 8) { offsetSize += 16; }
+    funcGen->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, std::to_string(size.second));
+
     funcGen->Add(AsmTypeOperation::POP, AsmTypeRegister::EBP);
-    funcGen->Add(AsmTypeOperation::RET, std::to_string(size.second));
+    funcGen->Add(AsmTypeOperation::RET, std::to_string(size.second - 8));
     for (auto it = funcGen->commands.begin(); it != funcGen->commands.end(); it++) {
         asmFunc->cmnds.push_back(*it);
     }

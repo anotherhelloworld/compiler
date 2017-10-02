@@ -147,5 +147,6 @@ public:
     BlockCase(Expression* exp): BlockCondition(exp), blockElse(nullptr) {};
     void Add(CaseNode);
     void Print(int);
+    void Generate(Generator*);
 };
 #endif //COMPILER_BLOCK_H

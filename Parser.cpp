@@ -856,7 +856,7 @@ Block* Parser::ParseIfBlock(SymbolTable* table, int state) {
     }
     scanner.CheckCurLexem(THEN, "then");
     scanner.NextToken();
-    Block* blockThen = ParseBlock(symTable, state);
+    Block* blockThen = ParseBlock(table, state);
     Block* blockElse = nullptr;
     if (scanner.GetLexem().token == ELSE) {
         scanner.NextToken();

@@ -244,6 +244,32 @@ void BlockCase::Print(int spaces) {
     }
 }
 
+void BlockCase::Generate(Generator* generator) {
+    std::string labelBreak = generator->GetLocalLabel();
+    for (auto it = caseList.begin(); it != caseList.end(); it++) {
+        if (it->exp2 == nullptr) {
+            ExpressionBinOp(Lexem("=", EQUAL), it->exp1, exp).Generate(generator);
+            generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
+        } else {
+            ExpressionBinOp(Lexem(">=", GREATER_OR_EQUAL_THAN), it->exp1, exp).Generate(generator);
+            ExpressionBinOp(Lexem("<=", LESS_OR_EQUAL_THAN), it->exp2, exp).Generate(generator);
+            generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX);
+            generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EBX);
+            generator->Add(AsmTypeOperation::AND, AsmTypeRegister::EAX, AsmTypeRegister::EAX);
+        }
+        generator->Add(AsmTypeOperation::TEST, AsmTypeRegister::EAX, AsmTypeRegister::EAX);
+        std::string labelElse = generator->GetLocalLabel();
+        generator->Add(AsmTypeOperation::JZ, labelElse);
+        it->block->Generate(generator);
+        generator->Add(AsmTypeOperation::JMP, labelBreak);
+        generator->AddLabel(labelElse);
+    }
+    if (blockElse != nullptr) {
+        blockElse->Generate(generator);
+    }
+    generator->AddLabel(labelBreak);
+}
+
 void BlockCondition::GenerateCond(Generator* generator) {
     exp->Generate(generator);
     generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);

@@ -1,0 +1,9 @@
+procedure B();
+var i: integer;
+begin
+    writeln(1, ' ', 2);
+end;
+
+begin
+    B();
+end.
