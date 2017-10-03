@@ -251,9 +251,9 @@ void BlockCase::Generate(Generator* generator) {
             ExpressionBinOp(Lexem("=", EQUAL), it->exp1, exp).Generate(generator);
             generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
         } else {
-            ExpressionBinOp(Lexem(">=", GREATER_OR_EQUAL_THAN), it->exp1, exp).Generate(generator);
-            ExpressionBinOp(Lexem("<=", LESS_OR_EQUAL_THAN), it->exp2, exp).Generate(generator);
-            generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX);
+            ExpressionBinOp(Lexem(">=", GREATER_OR_EQUAL_THAN), exp, it->exp1).Generate(generator);
+            ExpressionBinOp(Lexem("<=", LESS_OR_EQUAL_THAN), exp, it->exp2).Generate(generator);
+            generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
             generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EBX);
             generator->Add(AsmTypeOperation::AND, AsmTypeRegister::EAX, AsmTypeRegister::EAX);
         }
