@@ -1,0 +1,7 @@
+begin
+    try
+        raise 'Hello'
+    finally
+        writeln('Hello World!')
+    end
+end.

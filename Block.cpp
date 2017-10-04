@@ -201,6 +201,21 @@ void BlockTryExcept::Print(int spaces) {
     std::cout << "end" << std::endl;
 } 
 
+void BlockTryExcept::Generate(Generator* generator) {
+    std::string oldErrorLabel = generator->errorLabel;
+    std::string labelExcept = generator->GetGlobalLabel();
+    generator->errorLabel = generator->GetNewErrorLabel();
+    for (auto it : blockListTry) {
+        it->Generate(generator);
+    }
+    generator->Add(AsmTypeOperation::JMP, labelExcept);
+    generator->AddLabel(generator->errorLabel);
+    for (auto it : blockListExcept) {
+        it->Generate(generator);
+    }
+    generator->AddLabel(labelExcept);
+}
+
 void BlockTryFinally::Print(int spaces) {
     printIndent(spaces);
     std::cout << "try" << std::endl;
@@ -216,6 +231,18 @@ void BlockTryFinally::Print(int spaces) {
     std::cout << "end" << std::endl;
 } 
 
+void BlockTryFinally::Generate(Generator* generator) {
+    std::string oldErrorLabel = generator->errorLabel;
+    generator->errorLabel = generator->GetNewErrorLabel();
+    for (auto it : blockListTry) {
+        it->Generate(generator);
+    }
+    generator->AddLabel(generator->errorLabel);
+    for (auto it : blockListFinally) {
+        it->Generate(generator);
+    }
+}
+
 void BlockBreak::Print(int spaces) {
     printIndent(spaces);
     std::cout << "break" << std::endl;
@@ -229,6 +256,16 @@ void BlockRaise::Print(int spaces) {
     printIndent(spaces + 1);
     std::cout << "raise" << std::endl;
     exp->Print(spaces + 1);
+}
+
+void BlockRaise::Generate(Generator* generator) {
+    std::string formatName = generator->AddFormat("\'%s\', 10, 0");
+    generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, 4);
+    exp->Generate(generator);
+    generator->Add(AsmTypeOperation::PUSH, formatName);
+    generator->Add(AsmTypeOperation::CALL, "_printf");
+    generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, 12);
+    generator->Add(AsmTypeOperation::JMP, generator->errorLabel);
 }
 
 void BlockCase::Add(CaseNode caseNode) {

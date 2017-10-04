@@ -78,6 +78,14 @@ std::string Generator::GetGlobalLabel(std::string name) {
     return "L" + name;
 }
 
+std::string Generator::GetGlobalLabel() {
+    return "G" + std::to_string(labelCount);
+}
+
+std::string Generator::GetNewErrorLabel() {
+    return "E" + std::to_string(errorCount++);
+}
+
 std::string Generator::AddConstString(std::string str) {
     std::string num = std::to_string((*constStr).size());
     (*constStr).push_back("str" + num + ": db \'" + str + "\', 0");

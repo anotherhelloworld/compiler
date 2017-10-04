@@ -374,6 +374,10 @@ Symbol* SymbolFunction::GetType() {
     return type;
 }
 
+int SymbolFunction::GetSize() {
+    return type->GetSize();
+}
+
 void SymbolProcedure::Print(int spaces) {
     printIndent(spaces);
     std::cout << "Procedure" << indent << name << indent << argc << std::endl;

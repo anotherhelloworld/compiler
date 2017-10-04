@@ -109,6 +109,7 @@ public:
     std::vector<Block*> blockListExcept;
     BlockTryExcept(std::vector<Block*> blockListTry, std::vector<Block*> blockListExcept): blockListTry(blockListTry), blockListExcept(blockListExcept) {};
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockTryFinally: public Block {
@@ -117,6 +118,7 @@ public:
     std::vector<Block*> blockListFinally;
     BlockTryFinally(std::vector<Block*> blockListTry, std::vector<Block*> blockListFinally): blockListTry(blockListTry), blockListFinally(blockListFinally) {};
     void Print(int);
+    void Generate(Generator*);
 };
 
 class BlockBreak: public Block {
@@ -130,6 +132,7 @@ public:
     Expression* exp;
     BlockRaise(Expression* exp): exp(exp) {};
     void Print(int);
+    void Generate(Generator*);
 };
 
 class CaseNode {

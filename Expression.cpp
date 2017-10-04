@@ -334,7 +334,7 @@ void ExpressionFuncCall::Generate(Generator* generator, ArgTypeState state) {
     int argc = leftSymbol->argc;
     if (argc >= 0) {
         if (leftSymbol->declType == DeclarationType::FUNC) {
-            generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, leftSymbol->symbolTable->symbols[argc - 1]->GetSize());
+            //generator->Add(AsmTypeOperation::SUB, AsmTypeRegister::ESP, leftSymbol->symbolTable->symbols[argc - 1]->GetSize());
         }
         generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, "depth");
         generator->Add(AsmTypeOperation::MOV, AsmTypeAddress::ADDR, AsmTypeRegister::EAX, 4 * generator->depth, AsmTypeRegister::EBP);

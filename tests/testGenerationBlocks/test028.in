@@ -1,0 +1,7 @@
+begin
+    try
+        raise 'hello';
+    except
+        writeln('except')
+    end
+end.

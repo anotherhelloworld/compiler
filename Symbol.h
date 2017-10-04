@@ -135,6 +135,7 @@ public:
     Symbol* type;
     void Print(int);
     Symbol* GetType();
+    int GetSize();
 };
 
 class SymbolProcedure: public SymbolCall {

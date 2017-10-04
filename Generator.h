@@ -86,6 +86,9 @@ public:
     std::string GetLabelBreak();
     std::string GetLabelContinue();
     std::string GetGlobalLabel(std::string);
+    std::string GetGlobalLabel();
+    std::string GetNewErrorLabel();
+    std::string errorLabel;
     void Print();
     void SaveLabels(std::string, std::string);
     void LoadLabels();
@@ -101,6 +104,7 @@ public:
     int maxDepth;
     int labelCount = 0;
     int realCount = 0;
+    int errorCount = 0;
 };
 
 class AsmOperand {
