@@ -404,6 +404,9 @@ void ExpressionFuncCall::GenerateWrite(Generator* generator, int argc) {
             case DataType::STRING:
                 format += "%s";
                 break;
+            case DataType::POINTER:
+                format += "%d";
+                break;
         }
     }
 
@@ -418,9 +421,21 @@ void ExpressionPointer::Print(int spaces) {
     std::cout << std::string(spaces * mult, fill) << "@" << std::endl;
 }
 
+void ExpressionPointer::Generate(Generator* generate, ArgTypeState state) {
+    exp->Generate(generate, ArgTypeState::RVALUE);
+}
+
 void ExpressionDereference::Print(int spaces) {
     exp->Print(spaces + 1);
     std::cout << std::string(spaces * mult, fill) << "^" << std::endl;
+}
+
+void ExpressionDereference::Generate(Generator* generator, ArgTypeState state) {
+    exp->Generate(generator, ArgTypeState::RVALUE);
+}
+
+int ExpressionDereference::GetSize() {
+    return 4;
 }
 
 void ExpressionInteger::Generate(Generator* generator, ArgTypeState state) {
@@ -512,4 +527,22 @@ void ExpressionBoolean::Generate(Generator* generator, ArgTypeState state) {
 
 std::string ExpressionBoolean::GenerateInitList() {
     return std::strcmp(val.val.c_str(), "true") == 0 ? "1" : "0";
+}
+
+void ExpressionRecordAccess::Generate(Generator* generator, ArgTypeState state) {
+    right->Generate(generator, ArgTypeState::VAR);
+    int offset = ((SymbolIdent*)field)->offset;
+    if (right->expressionType == ExpressionType::FUNCCALL) {
+        generator->Add(AsmTypeOperation::MOV, AsmTypeRegister::EAX, AsmTypeRegister::ESP);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX, offset);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::ESP, right->GetSize());
+    } else {
+        generator->Add(AsmTypeOperation::POP, AsmTypeRegister::EAX);
+        generator->Add(AsmTypeOperation::ADD, AsmTypeRegister::EAX, offset);
+    }
+    if (state == ArgTypeState::RVALUE) {
+        pushRvalue(generator, field->GetSize());
+        return;
+    }
+    generator->Add(AsmTypeOperation::PUSH, AsmTypeRegister::EAX);
 }

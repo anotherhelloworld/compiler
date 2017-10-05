@@ -122,6 +122,7 @@ public:
     ExpressionRecordAccess(Expression* right, Expression* left, Symbol* field): ExpressionBinOp(Lexem(".", POINT), right, left), field(field) {
         expressionType = ExpressionType::RECORD;
     };
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
 };
 
 class ExpressionArrayIndecies: public Expression {
@@ -173,6 +174,7 @@ public:
     Expression* exp;
     ExpressionPointer(Expression* exp): exp(exp), Expression(ExpressionType::POINTER) {};
     void Print(int);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
 };
 
 class ExpressionDereference: public Expression {
@@ -180,6 +182,8 @@ public:
     Expression* exp;
     ExpressionDereference(Expression* exp): exp(exp), Expression(ExpressionType::DEREFERENCE) {};
     void Print(int);
+    void Generate(Generator*, ArgTypeState state = ArgTypeState::RVALUE);
+    int GetSize();
 };
 
 #endif //COMPILER_EXPRESSION_H

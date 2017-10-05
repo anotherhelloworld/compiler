@@ -169,7 +169,11 @@ DataType TypeChecker::GetTypeID(Expression* expr) {
             return DataType::BADTYPE;
         }
         if (((ExpressionIdent*)expr)->symbol->GetType()->declType == DeclarationType::RECORD) {
-            return  DataType::BADTYPE;
+            return  DataType::RECORD;
+        }
+        if (type->name == "pointer") {
+//            auto temp = ((SymbolType*)(((SymbolPointer*)(((ExpressionIdent*)expr)->symbol))->GetType()->GetType()))->dataType;
+            return  ((SymbolType*)(((SymbolPointer*)(((ExpressionIdent*)expr)->symbol))->GetType()->GetType()))->dataType;
         }
         return ((SymbolType*)(((ExpressionIdent*)expr)->symbol)->GetType())->dataType;
     }
@@ -210,7 +214,13 @@ DataType TypeChecker::GetTypeID(ExpressionType exprType) {
         return DataType::ARRAY;
     }
     if (exprType == ExpressionType::BOOLEAN) {
-        return DataType ::BOOLEAN;
+        return DataType::BOOLEAN;
+    }
+    if (exprType == ExpressionType::POINTER) {
+        return DataType::POINTER;
+    }
+    if (exprType == ExpressionType::DEREFERENCE) {
+        return DataType::POINTER;
     }
     throw ParserException("Illegal expression");
 }

@@ -70,8 +70,12 @@ public:
 class SymbolPointer: public Symbol {
 public:
     SymbolPointer(std::string name, Symbol* type): Symbol(name, DeclarationType::TYPE), type(type) {};
+//    SymbolPointer(std::string name, Symbol* type): SymbolType(name, type) {};
     Symbol* type;
     void Print(int);
+    std::string GenerateName();
+    int GetSize();
+    Symbol* GetType();
 };
 
 class SymbolVar: public SymbolIdent {
@@ -115,6 +119,8 @@ public:
     SymbolRecord(SymbolTable* table, std::string name, int argc):
             Symbol(name, DeclarationType::RECORD), table(table), argc(argc) {};
     void Print(int);
+    std::string GenerateName();
+    int GetSize();
 };
 
 class SymbolCall: public Symbol {

@@ -179,7 +179,12 @@ Expression *Parser::ParseTerm(SymbolTable* table, bool flag) {
         lex = scanner.GetLexem();
         if (lex.token == POINT) {
             scanner.CheckNextLexem(IDENTIFIER, "IDENTIFIER");
-            Expression* right = ParseTerm(table, false);
+            Expression* right = nullptr;
+            if (testType || testDeclarations) {
+                right = ParseTerm(((SymbolRecord*)sym->GetType())->table, false);
+            } else {
+                right = ParseTerm(table, false);
+            }
             if (testType) {
                 Symbol* field = nullptr;
                 field = ((SymbolRecord*)sym->GetType())->table->GetSymbol(scanner.GetLexem().val, scanner.GetLexem().pos);
@@ -514,6 +519,10 @@ Symbol* Parser::ParseRecord(SymbolTable* table) {
     scanner.NextToken();
     SymbolTable* tempTable = new SymbolTable(table);
     int argc = ParseArguments(tempTable);
+    for (int i = 0, offset = 0; i < argc; i++) {
+        ((SymbolIdent*)tempTable->symbols[i])->offset = offset;
+        offset += ((SymbolIdent*)tempTable->symbols[i])->type->GetSize();
+    }
     scanner.CheckCurLexem(END, "END");
     scanner.NextToken();
     return new SymbolRecord(tempTable, "", argc);

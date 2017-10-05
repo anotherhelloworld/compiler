@@ -223,6 +223,18 @@ void SymbolPointer::Print(int spaces) {
     type->Print(spaces + 1);
 }
 
+std::string SymbolPointer::GenerateName() {
+    return "dd";
+}
+
+int SymbolPointer::GetSize() {
+    return 4;
+}
+
+Symbol* SymbolPointer::GetType() {
+    return type;
+}
+
 void SymbolDynArray::Print(int spaces) {
     printIndent(spaces);
     std::cout << "DynArray" << indent << name << std::endl;
@@ -272,6 +284,8 @@ int SymbolType::GetSize() {
         case DataType::CHAR:
         case DataType::BOOLEAN:
             return 1;
+//        case DataType::POINTER:
+//            return 4;
         default:
             if (type == nullptr) {
                 return 0;
@@ -330,6 +344,18 @@ void SymbolRecord::Print(int spaces) {
     this->table->Print(spaces + 1);
     printIndent(spaces);
     std::cout << "End" << std::endl;
+}
+
+std::string SymbolRecord::GenerateName() {
+    return "times " + std::to_string(GetSize()) + " db";
+}
+
+int SymbolRecord::GetSize() {
+    int size = 0;
+    for (auto it : table->symbols) {
+        size += ((SymbolIdent*)it)->GetSize();
+    }
+    return (size / 4 * 4 + (size) % 4 == 0 ? 0 : 4);
 }
 
 void SymbolCall::Generate(Generator* generator) {

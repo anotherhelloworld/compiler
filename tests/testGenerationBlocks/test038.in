@@ -1,0 +1,15 @@
+var
+    a : record
+        a : integer;
+        b : integer;
+        c : integer;
+    end;
+
+begin
+    a.c := 10;
+    a.a := 2 * 2;
+    a.b := 3 * 3;
+    writeln(a.a);
+    writeln(a.b);
+    writeln(a.c);
+end.
