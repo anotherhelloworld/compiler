@@ -117,7 +117,7 @@ void Generator::Add(AsmTypeOperation operation, AsmTypeRegister reg, std::string
 }
 
 void Generator::Add(AsmTypeOperation operation, AsmTypeRegister reg1, AsmTypeRegister reg2) {
-    commands.push_back(new AsmCommandBinary(operation, new AsmRegister(reg1), new AsmRegister(reg2), (int)AsmCmdIndex::Register));
+    commands.push_back(new AsmCommandBinary(operation, new AsmRegister(reg1), new AsmRegister(reg2), (int)AsmCmdIndex::RegisterReg));
 }
 
 void Generator::Add(std::string name, std::string type, std::string initList) {

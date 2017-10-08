@@ -11,45 +11,28 @@ section .text
 _main:
     push 10
     mov eax, va
-    push eax
-    pop eax
     add eax, 8
-    push eax
-    pop eax
     pop ebx
     mov [eax], ebx
-    push 2
-    push 2
-    pop ebx
-    pop eax
+    mov eax, 2
+    mov ebx, 2
     imul eax, ebx
     push eax
     mov eax, va
-    push eax
-    pop eax
     add eax, 0
-    push eax
-    pop eax
     pop ebx
     mov [eax], ebx
     push 3
-    push 3
-    pop ebx
+    mov ebx, 3
     pop eax
     imul eax, ebx
     push eax
     mov eax, va
-    push eax
-    pop eax
     add eax, 4
-    push eax
-    pop eax
     pop ebx
     mov [eax], ebx
     sub esp, 4
     mov eax, va
-    push eax
-    pop eax
     add eax, 0
     push dword [eax]
     push format0
@@ -57,8 +40,6 @@ _main:
     add esp, 12
     sub esp, 4
     mov eax, va
-    push eax
-    pop eax
     add eax, 4
     push dword [eax]
     push format1
@@ -66,8 +47,6 @@ _main:
     add esp, 12
     sub esp, 4
     mov eax, va
-    push eax
-    pop eax
     add eax, 8
     push dword [eax]
     push format2

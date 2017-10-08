@@ -6,6 +6,7 @@
 #include <iomanip>
 #include "Scanner.h"
 #include "Parser.h"
+#include "Optimizator.h"
 
 using namespace std;
 
@@ -81,8 +82,10 @@ int main(int argc, char* argv[]) {
                 parser.testType = true;
                 Block *block = parser.ParseBlockStart();
                 Generator* generator = new Generator();
+                auto optimizator = new Optimizator(generator);
                 parser.symTable->GenerateVars(generator);
                 block->Generate(generator);
+                optimizator->Optimize();
                 generator->Print();
             } catch (Error error) {
                 std::cout << error.errorMsg << std::endl;

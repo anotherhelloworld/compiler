@@ -7,10 +7,8 @@ section .data
 section .text
 _main:
     sub esp, 4
-    push 3
-    push 2
-    pop ebx
-    pop eax
+    mov eax, 3
+    mov ebx, 2
     and eax, ebx
     push eax
     push format0

@@ -3,5 +3,5 @@ project(Compiler)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES main.cpp Scanner.cpp Scanner.h Parser.cpp Parser.h Errors.h Symbol.cpp Symbol.h Expression.cpp Expression.h CalculateExpression.cpp CalculateExpression.h Block.cpp Block.h TypeChecker.cpp TypeChecker.h Generator.cpp Generator.h)
-add_executable(Compiler ${SOURCE_FILES} Parser.cpp Parser.h Errors.h Symbol.cpp Symbol.h Expression.cpp Expression.h CalculateExpression.cpp CalculateExpression.h Block.cpp Block.h TypeChecker.cpp TypeChecker.h Generator.cpp Generator.h)
+set(SOURCE_FILES main.cpp Scanner.cpp Scanner.h Parser.cpp Parser.h Errors.h Symbol.cpp Symbol.h Expression.cpp Expression.h CalculateExpression.cpp CalculateExpression.h Block.cpp Block.h TypeChecker.cpp TypeChecker.h Generator.cpp Generator.h Optimizator.cpp Optimizator.h)
+add_executable(Compiler ${SOURCE_FILES} Parser.cpp Parser.h Errors.h Symbol.cpp Symbol.h Expression.cpp Expression.h CalculateExpression.cpp CalculateExpression.h Block.cpp Block.h TypeChecker.cpp TypeChecker.h Generator.cpp Generator.h Optimizator.cpp Optimizator.h)
