@@ -3,6 +3,7 @@
 
 #include "Generator.h"
 #include <vector>
+#include <set>
 
 typedef bool (*TemplateFunc)(std::vector<AsmCommand*>* commands);
 
